@@ -43,6 +43,9 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 .primary{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;min-height:46px;padding:9px 8px;border:1px solid #7d332a;border-radius:3px;background:#963c31;color:#fff7e8;box-shadow:inset 0 0 0 3px #963c31,inset 0 0 0 4px #dca79370,0 2px 0 #6e392b;font:700 17px/1.4 var(--serif);letter-spacing:.055em}
 .primary:active:not(:disabled){transform:translateY(1px);box-shadow:none}.primary .cut{font-size:24px;line-height:.9}
 .imprint{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:var(--muted);font:12px var(--serif);letter-spacing:.07em}.inks{color:var(--red);margin-right:4px;text-shadow:6px 0 var(--blue)}
+.ledger-counter{text-align:center;color:#6e5d4f;font:11.5px/2 var(--serif)}
+.ledger-counter>span{border-bottom:1px dashed #963c3133;white-space:nowrap}
+.ledger-counter b{color:#23438e;font-family:var(--mono);font-weight:700}
 .stagehead{margin-bottom:15px}.stagehead h2{margin-top:9px}.stagehead p{color:var(--muted);font-size:14px;margin-top:6px}
 .info{padding:14px 0;border-bottom:1px dotted #aa9181}.info h3{color:var(--red);font-size:15px;margin-bottom:5px}.info p{font-size:15px}
 .summary{display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:13px;margin-bottom:8px}.summary b{font:700 18px var(--hand);color:var(--blue)}.over,.summary.over b{color:var(--pen)}
@@ -163,7 +166,11 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
   <div class="binding" aria-hidden="true"></div>
   <div class="sheet-face">
   <header class="brand"><strong><i aria-hidden="true">单</i><span id="brand-name">万家酒楼 · 点菜联单</span></strong><button class="smallbtn" data-act="help" aria-label="玩法说明">玩法<span class="help-tail">说明</span></button><button id="progress-tag" class="clip-note" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-level">第 1 关 · 须达 60 分</span><span id="tag-count">成就 0/10</span></button></header>
-  <div id="page"></div>
+  <div id="page">
+    <div class="ledger-counter" aria-live="polite">
+      <span id="busuanzi_container_site_pv" style="display:none">全国累计已开出 <b id="busuanzi_value_site_pv"></b> 桌水单</span><span id="busuanzi_container_site_uv" style="display:none"> · 累计 <b id="busuanzi_value_site_uv"></b> 位经手人到店</span>
+    </div>
+  </div>
   </div>
 </main>
 <dialog id="dialog" aria-labelledby="dialogTitle"><h2 id="dialogTitle"></h2><div id="dialogText"></div><button class="primary" data-act="close">收好联单</button></dialog>
@@ -624,6 +631,7 @@ function judge(scenario, order, options={}) {
 }
 // ==================== [MODULE 4: UI_APP] 页面交互与渲染 ====================
 const page = document.querySelector("#page"), pad = document.querySelector("#pad"), dialog = document.querySelector("#dialog");
+const ledgerCounter=page.querySelector(".ledger-counter");
 const achModal=document.querySelector("#achModal"), archivePages=achModal.querySelector(".archive-pages");
 const shareModal=document.querySelector("#shareModal");
 // 旧版喜报仍须按好友当时取得的职级原样展示。
@@ -1160,7 +1168,10 @@ function render(fresh=false){
   const [body,foot]=stage==="cover"?cover():stage==="brief"?[heading("第一联　／　接待派单",scene.title)+meta()+scenarioInfo(),action("edit","接单，开始勾菜","primary")+imprint()]:stage==="menu"?menu():stage==="kitchen"?kitchen():grade();
   pad.classList.toggle("back",stage==="report");
   page.innerHTML='<div class="body '+(stage==="cover"?"cover ":"")+(fresh?(stage==="report"?"turn":"reveal"):"")+'">'+body+'</div><footer class="foot">'+foot+'</footer>';
-  if(stage==="cover")fishPrint();
+  if(stage==="cover"){
+    page.querySelector(".foot .imprint").before(ledgerCounter);
+    fishPrint();
+  }
   if(fresh){page.querySelector("h2,h1")?.focus({preventScroll:true})}
   else{page.querySelector(".body").scrollTop=scroll;if(current?.act){const candidates=Array.from(page.querySelectorAll("button"));const match=candidates.find(b=>!b.disabled&&b.dataset.act===current.act&&b.dataset.id===current.id&&b.dataset.cat===current.cat)||candidates.find(b=>!b.disabled&&current.id&&b.dataset.id===current.id);match?.focus({preventScroll:true})}}
 }
@@ -1249,6 +1260,12 @@ window.addEventListener("storage",event=>{
 });
 readProgress();
 render();
+if(window.location.protocol==="http:"||window.location.protocol==="https:"){
+  const counterScript=document.createElement("script");
+  counterScript.async=true;
+  counterScript.src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
+  document.head.appendChild(counterScript);
+}
 </script>
 </body>
 </html>
