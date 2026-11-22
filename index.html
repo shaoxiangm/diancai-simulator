@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#21463d">
-<meta name="application-version" content="1.3.0">
+<meta name="application-version" content="1.3.1">
 <title>点菜模拟器 · 万家酒楼</title>
 <style>
 :root{--paper:#f6efe2;--pink:#f4dfd8;--red:#963c31;--line:#b98777;--green:#21463d;--ink:#322f29;--blue:#23438e;--pen:#c62828;--muted:#695d50;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
@@ -116,7 +116,9 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 @media(prefers-reduced-motion:no-preference){.dish.just-checked .dish-desc{animation:dish-unfold .24s ease}}
 .orderbtns{grid-column:1/-1;justify-self:end;display:flex;align-items:center;gap:3px;margin-top:5px;color:var(--blue)}
 .orderbtns .ctrl{height:32px;min-width:32px;border-color:#23438e55}.qty{min-width:30px;text-align:center;font:700 14px/1.3 var(--hand)}
+.order-list{max-height:55vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#ac978277 transparent}
 .queue-list{position:relative;overflow-anchor:none}
+.dish,.queue,body.queue-dragging{-webkit-user-select:none;user-select:none}
 .queue{position:relative;gap:6px}.queue .seq{flex:none}.queue .ctrl{width:28px;min-width:28px;height:38px;padding:0}
 .queue .course{display:block;color:var(--blue);font:600 13px/1.4 var(--hand)}
 .queue-grip{flex:0 0 36px;height:44px;padding:0;border:1px dashed #23438e77;border-radius:2px;background:#23438e07;color:var(--blue);font:700 23px var(--serif);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
@@ -128,6 +130,19 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 .sliptop{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.sliptop b{color:var(--red);font-family:var(--serif)}
 .report{border-top:3px double var(--red);margin-top:13px;padding-top:10px}.score{color:var(--pen);font:italic 700 51px/1 var(--hand)}.score small{font-size:18px}.bars{margin:12px 0}.bar{display:grid;grid-template-columns:72px 1fr 26px;align-items:center;gap:8px;font-size:13px;margin:6px 0}.track{background:#b985712a;height:7px}.track i{display:block;height:100%;background:var(--blue)}.bar b{color:var(--blue);text-align:right}
 .notes{padding-left:23px;color:var(--pen);font:600 16px/1.65 var(--hand)}.notes li{padding:6px 0;border-bottom:1px dotted #bc998b}.notes strong{border:1px solid;border-radius:49%;padding:1px 4px}.notes u{text-underline-offset:3px}
+.guest-check{
+  width:85%;margin:20px auto 8px;padding:12px clamp(8px,3vw,15px);
+  background:#fff;color:#333;border-block:1px dashed #bbb;box-shadow:1px 2px 4px #3332;
+  font:11px/1.6 monospace,var(--font-sans,sans-serif);font-variant-numeric:tabular-nums;
+}
+.guest-check h3,.guest-check p{margin:0;text-align:center;font:inherit;overflow-wrap:anywhere}
+.guest-check h3{font-weight:700}
+.guest-check table{width:100%;table-layout:fixed;border-collapse:collapse;margin-top:8px}
+.guest-check .count-col{width:4em}.guest-check .price-col{width:5em}
+.guest-check th,.guest-check td{text-align:right;padding:3px 0 3px 4px;vertical-align:top}
+.guest-check th:first-child{text-align:left;padding-left:0;overflow-wrap:anywhere}
+.guest-check thead{border-block:1px dashed #ccc}.guest-check tbody th{font-weight:400}
+.guest-check tfoot{border-top:3px double #888;font-weight:700}.guest-check tfoot :is(th,td){padding-top:7px}
 .grade-title{display:grid;grid-template-columns:minmax(0,1fr) clamp(112px,31vw,128px);gap:10px;align-items:center;margin:12px 5px 0 0}
 .grade-title h2{margin:0;font-size:clamp(20px,6.4vw,27px);text-wrap:balance}
 .seal{position:relative;display:grid;align-content:center;justify-items:center;min-height:80px;border:3px solid currentColor;border-radius:50%;color:#a42b23;transform:rotate(-7deg);font-family:var(--serif);line-height:1.13;white-space:nowrap}
@@ -245,7 +260,7 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
     <strong><i aria-hidden="true">单</i><span id="brand-name">万家酒楼 · 点菜联单</span></strong>
     <button class="smallbtn" data-act="help" aria-haspopup="dialog" aria-controls="dialog">玩法说明</button>
     <span class="brand-level" id="tag-level">第 1 关 · 须达 60 分</span>
-    <button id="progress-tag" class="archive-link" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-count">成就 0/12</span></button>
+    <button id="progress-tag" class="archive-link" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-count">成就 0/13</span></button>
   </header>
   <div id="page"></div>
   </div>
@@ -437,8 +452,8 @@ const CAMPAIGN_SPECIALS={
     tableNames:["老街四方桌","炉边小桌"],region:"luyu",regionLabel:"开封·老街",tier:"street",tierLabel:"街坊砂锅铺 · 四人合计最多24元",
     headcount:4,budgetMin:0,budgetMax:24,guestTraits:{},
     guestsSummary:"你和三名同期入职的同事，四个人刚下班，合起来只凑出二十四块钱。",
-    purpose:"明天才发薪。单碗白米饭六元一人份，至少得买一份付费主食才能开火。例汤、酸豆角和大麦茶进店免费，每桌各限一份。",
-    hiddenTips:"数一数主食够不够四个人吃，再看看柜台上的三样免费福利。"
+    purpose:"明天才发薪。白米饭六元一碗，先给四个人安排够吃的付费主食。老板发话了，紫菜例汤、酸豆角、大麦茶这三样 ¥0 的免费福利，每桌【只能任选一样】。",
+    hiddenTips:"先数够四人份主食，再从柜台的三样赠品里挑一样合适的。"
   },
   7:{
     id:"tycoon_07",mode:"tycoon",title:"大老板庆功宴",restaurantName:"深巷黑珍珠私房馆",
@@ -560,7 +575,7 @@ const ACHIEVEMENTS=[
   {id:'ach_streak',type:'regular',name:'三连胜经手人',description:'连续三次接单均一次通过，中途无重考或弃单。',
     clue:'接连三张单子，别让后厨退回来一张。',comment:'连着三场硬仗滴水不漏，单位里往后但凡有重要接待，第一个就得喊你张罗。'},
   {id:'ach_frugal',type:'regular',name:'极限刮油大师',description:'完成第 4 关发薪前夜凑份子。',
-    clue:'月底手头紧，先问伙计有哪些进店福利。',comment:'二十四块钱愣是安排出四个人有主食、有热汤、有小菜的体面局，免费福利一滴没漏，财务科连夜给你发锦旗。'},
+    clue:'月底手头紧，先数够四人份主食，再看柜台的赠品。',comment:'四个人的主食都安排齐了，二十四块钱也没超。财务科要是桌桌都碰上你这样的经手人，月底能早下班。'},
   {id:'ach_tycoon',type:'regular',name:'不差钱操盘手',description:'完成第 7 关大老板庆功宴。',
     clue:'即便黑卡随便刷，也得看有几张嘴吃饭。',comment:'面对无上限黑卡既没手软丢了排面，也没盲目乱点造成浪费，这才是真见过大世面的操盘手。'},
   {id:'ach_chief',type:'regular',name:'驻京办首席司长',description:'单局拿到 99～100 分和最高职级印章。',
@@ -572,7 +587,9 @@ const ACHIEVEMENTS=[
   {id:'ach_algorithm',type:'secret',name:'人肉运筹算法',description:'在有限预算局正好花光预算上限。',
     clue:'将预算红线利用到极致。',comment:'你是来点菜的，还是带着计算器来跑数学优化模型的？财务科看到这张严丝合缝的报销单，都得怀疑你私吞了抹零的两块钱。'},
   {id:'ach_beggar',type:'secret',name:'包厢要饭人',description:'四人及以上的饭局只点一份白米饭。',
-    clue:'在四人以上的饭局里只点一样主食。',comment:'请客只点一桶白米饭，怎么，今天包厢里不吃饭改行现场要饭了？你还要饭吗？'}
+    clue:'在四人以上的饭局里只点一样主食。',comment:'请客只点一桶白米饭，怎么，今天包厢里不吃饭改行现场要饭了？你还要饭吗？'},
+  {id:'ach_shameless',type:'secret',name:'脸皮厚之人',priority:101,description:'在第 4 关点了付费菜，又把三种免费福利全点上。',
+    clue:'月底凑份子，柜台上三样赠品只准任选一样。',comment:'明文写着免费福利只能挑一样，你倒好，紫菜汤、酸豆角、大麦茶全给包圆了。这脸皮厚度，后厨的切菜板都自叹不如。敬你是条汉子。'}
 ];
 const RANK_TIERS=[
   {max:39,rank:'试用期端茶小弟',stampNote:'考核未过'},
@@ -592,17 +609,16 @@ function estimatePercentile(score){
   const [first,last,low,high]=percentileBands.find(b=>score<=b[1]);
   return low+Math.round((Math.max(first,score)-first)*(high-low)/(last-first));
 }
-function budgetPoints(bill,lo,hi){
-  if(!Number.isFinite(hi))return 100;
-  if(bill>hi)return 100-(9+(bill-hi)/hi*170);
-  if(bill<lo)return 100-Math.min(42,(lo-bill)/lo*55);
+function budgetPoints(bill,budgetMin,budgetMax){
+  if(budgetMax===Infinity)return 100;
+  if(bill>budgetMax)return 100-(9+(bill-budgetMax)/budgetMax*170);
+  if(bill<budgetMin)return 100-Math.min(42,(budgetMin-bill)/budgetMin*55);
   return 100;
 }
 function orderSubmissionIssue(scenario,order){
   const entries=order.filter(r=>r.qty>0);
   if(!entries.length)return '请先点一道菜。';
   if(scenario.mode!=='frugal')return '';
-  if(!entries.some(r=>r.dish.ingredientType==='staple'&&r.dish.price>0))return '请至少点一份付费主食，再交后厨。';
   const claimed=new Set();
   for(const {dish,qty} of entries){
     if(dish.maxQty!==1)continue;
@@ -620,8 +636,13 @@ function judge(scenario, order, options={}) {
   const ds=order.map(r=>r.dish),notes=[];
   const money=k=>order.reduce((a,r)=>a+r.dish[k]*r.qty,0);
   const hasIronPotStew=ds.some(d=>d.id==='dish_64');
+  // 一锅有整鹅、粉条、配菜和贴饼，折作四道；小票仍按实际菜数开。
+  const effectiveDishCount=n+(hasIronPotStew?3:0);
   const size=order.reduce((a,{dish,qty})=>a+qty*(dish.id==='dish_64'?Math.max(dish.portion,Math.min(8,h)):dish.portion),0);
   const bill=money('price'),servings=order.reduce((a,r)=>a+r.qty,0);
+  const frugal=scenario.mode==='frugal';
+  const paidCount=ds.filter(d=>d.price>0).length;
+  const gifts=frugal?FRUGAL_FREEBIES.filter(gift=>ds.some(d=>d.id===gift.id&&d.price===0)):[];
   const edible=money('edibility')/Math.max(1,servings);
   const tagged=(d,k)=>d.tags.includes(k),withTag=k=>ds.filter(d=>tagged(d,k));
   const heavy=d=>d.heaviness>=70;
@@ -666,12 +687,12 @@ function judge(scenario, order, options={}) {
       ach_investor:premade.length>=3,
       ach_furnace:!ds.some(d=>d.ingredientType==='veg')&&ds.filter(heavy).length>=3,
       ach_algorithm:bill>0&&Number.isFinite(hi)&&bill===hi,
-      ach_beggar:beggar
+      ach_beggar:beggar,
+      ach_shameless:frugal&&paidCount>0&&gifts.length===FRUGAL_FREEBIES.length
     };
-    const awards=ACHIEVEMENTS.filter(a=>earned[a.id]);
-    const missedGift=result.notes.some(n=>n.reason==='进店福利漏领');
-    const pinned=awards.filter(a=>(a.type==='secret'||!existing.has(a.id))&&!(a.id==='ach_frugal'&&missedGift))
-      .map(a=>({priority:100,dish:a.name,reason:'经理批示',text:a.comment,good:a.type==='regular'}));
+    const awards=ACHIEVEMENTS.filter(a=>earned[a.id]).sort((a,b)=>(b.priority??100)-(a.priority??100));
+    const pinned=awards.filter(a=>a.type==='secret'||!existing.has(a.id))
+      .map(a=>({priority:a.priority??100,dish:a.name,reason:'经理批示',text:a.comment,good:a.type==='regular'}));
     if(conflict)pinned.push(conflict);
     const chosen=result.notes.slice(0,Math.max(3,6-pinned.length));
     const praise=result.notes.find(c=>c.good);
@@ -723,27 +744,35 @@ function judge(scenario, order, options={}) {
     notes.sort((a,b)=>b.priority-a.priority);
     return finish({score,rank,stampNote,dimensions,fatal,notes});
   }
-  if(scenario.mode==='frugal'){
+  if(frugal){
+    if(paidCount===0){
+      scores.fill(15);
+      limit(15,'整桌没有一道付费菜');
+      note(100,'本桌水单','一分钱不花来蹭吃','一分钱不花来蹭吃，四个人坐满一桌，账上一碗饭钱都找不着。先看看同事碗里有没有饭，再跟老板谈赠品。');
+      return scoreReport();
+    }
     const issue=orderSubmissionIssue(scenario,order);
     const staples=order.filter(r=>r.dish.ingredientType==='staple'&&r.dish.price>0);
     const fed=staples.reduce((sum,r)=>sum+(r.dish.stapleServings??1)*r.qty,0);
-    const gifts=new Set(ds.filter(d=>d.price===0&&d.maxQty===1).map(d=>d.id));
-    scores[1]=40+20*gifts.size;
+    const giftsTaken=gifts.length;
+    const extraGifts=Math.max(0,giftsTaken-1);
+    scores[1]=giftsTaken===0?80:100-20*extraGifts;
     scores[2]=100-28*Math.max(0,h-fed)-12*Math.max(0,fed-h);
-    scores[3]=40+20*gifts.size;
-    scores[4]=gifts.size===3?100:74+6*gifts.size;
+    scores[3]=giftsTaken===0?85:100-25*extraGifts;
+    scores[4]=giftsTaken===1?100:85;
     if(issue){limit(39,issue);note(99,'后厨核单','水单须重开',issue)}
     if(bill>hi){limit(54,'四人凑的份子钱只有二十四元');note(98,anchor,'份子钱不够','这桌一共只凑了'+hi+'元，多出来的'+(bill-hi)+'元得由谁垫上？')}
     if(fed<h){
       limit(target-1,'还有同事没分到主食');
       note(92,names(staples.map(r=>r.dish))||'主食','主食没备足',h+'人围桌，只备了'+fed+'人份主食。先叫每人都能吃饱，再算别的账。');
     }else if(fed===h)note(80,names(staples.map(r=>r.dish)),'主食管饱','四位刚发完工牌的同事各有一份正经主食，谁也不用看着别人碗里的饭。',true);
-    const missing=[['free_soup','例汤'],['free_pickles','酸豆角小碟'],['free_tea','大麦茶']].filter(([id])=>!gifts.has(id)).map(([,name])=>name);
-    if(missing.length){
-      const copy=missing.includes('例汤')?'白送的例汤都不知道盛。':'店家已经把福利写在水牌头上了。';
-      note(95,missing.join('、'),'进店福利漏领',copy+'请伙计把'+missing.join('、')+'也端上来，这些都是店里送的。');
-    }else note(85,'本桌福利','赠碟齐全','热汤、小碟和大麦茶一样不少，四个人坐下就能好好吃顿饭。',true);
-    if(bill<=hi)note(65,anchor,'份子钱对账','本桌付费菜共'+bill+'元，已领的'+gifts.size+'样福利都按零元入账。',true);
+    if(extraGifts>0){
+      limit(target-1,'每桌赠品只能任选一样');
+      note(98,'本桌福利','赠品多领','水牌上写着三选一，这张单却勾了'+giftsTaken+'样。留一样，余下的给隔壁桌。');
+    }else if(giftsTaken===1){
+      note(85,gifts[0].name,'福利选得妥当','三样里依规选了一样，四个人分着吃喝，老板也乐意再招呼你们。',true);
+    }else note(80,'本桌福利','赠品未取','柜台上三样都能挑，一桌正好领一样，下回记得问一声。');
+    if(bill<=hi)note(65,anchor,'份子钱对账','本桌付费菜共'+bill+'元，都在四位同事凑的份子钱里。',true);
     return scoreReport();
   }
   if(scenario.mode==='tycoon'){
@@ -756,7 +785,7 @@ function judge(scenario, order, options={}) {
       note(89,anchor,'席面还缺菜','五个人庆功，挑五到七道好菜才成席。加份填不出另一道菜。');
     }else note(82,anchor,'黑卡有度','五个人用'+n+'道菜撑起席面，黑卡只管付账，你还顾得上客人的饭量。',true);
   }
-  if(!Number.isFinite(hi)){
+  if(hi===Infinity){
     note(48,anchor,'黑卡签单','全桌'+bill+'元由老板签单。恰到好处，才值得这一桌身价。',true);
   }else if(bill>hi){
     const over=(bill-hi)/hi;
@@ -766,13 +795,14 @@ function judge(scenario, order, options={}) {
   }else if(bill<lo){
     note(43,anchor,'低于预算下限'+(lo-bill)+'元','账上还留着钱，先看看桌上有没有少照顾一双筷子。');
   }else note(48,anchor,'账目合规','全桌'+bill+'元，离红线还剩'+(hi-bill)+'元。签字的人不用陪你做算术。',true);
-  const short=hasIronPotStew?0:Math.max(0,h+(scenario.mode==='tycoon'?0:1)-n);
+  const minimumCourses=hasIronPotStew?h-1:h+(scenario.mode==='tycoon'?0:1);
+  const short=Math.max(0,minimumCourses-effectiveDishCount);
   const extra=Math.max(0,n-h-2);
   scores[1]-=short*5; scores[2]-=short*6+extra*4+Math.max(0,h-size)*5;
-  if(short)note(79,anchor,'菜数不足',h+'位客人只开'+n+'道。再加份也算同一道，转盘上不会多出花样。');
+  if(short)note(79,anchor,'菜数不足',hasIronPotStew?'整锅连贴饼算四道，这桌折足了也只有'+effectiveDishCount+'道。再添点清爽配菜，'+h+'位客人能多换两口味。':h+'位客人只开'+n+'道。再加份也算同一道，转盘上不会多出花样。');
   else if(extra)note(59,anchor,'菜数过多',n+'道菜，比这桌合宜的上限多'+extra+'道。你给打包盒也留座了？');
   else note(44,anchor,'菜数合宜',h+'位客人开'+n+'道，这张单子有分寸。',true);
-  if((!hasIronPotStew&&n<h*0.55)||size<h*0.5)limit(39,'菜量严重不足，整桌接待失格');
+  if(size<h*0.5||(effectiveDishCount<h*0.55&&(!hasIronPotStew||size<h)))limit(39,'菜量严重不足，整桌接待失格');
   if(size>h*2.6){scores[2]-=Math.min(40,(size/h-2.6)*17);note(73,anchor,'份量压桌','菜名数过了，份数也得数。别把明天的午餐也点了。');}
   if(hasIronPotStew){
     note(79,'铁锅炖大鹅','一锅出齐','整鹅、粉条和锅边贴饼都算在这一锅里，硬菜和主食都已有着落。',true);
@@ -879,7 +909,7 @@ const cats = ["海鲜水产","招牌硬菜","热炒小菜","砂锅炖煲","时�
 const pick = list => list[Math.floor(Math.random()*list.length)];
 const serial = () => String(Math.floor(100000+Math.random()*900000));
 let stage="cover", number=serial(), scene, table, order=[], cat=cats[0], report, removing=new Set();
-let reviewingOrder=false, categoryScroll=0;
+let reviewingOrder=false, categoryScroll=0, categoryListScroll=0;
 const detailChoices=new Map();
 let firstBriefOpen=true, menuBriefOpen=false;
 function resetMenuView(){
@@ -946,14 +976,17 @@ function readProgress(){
       saveMark(campaignKey+"migrated");
     }
     while(progress.level<=lastLevel&&hasMark(campaignKey+"pass."+progress.level))progress.level++;
-    const raw=localStorage.getItem(achievementKey);
-    let stored;
-    try{stored=JSON.parse(raw)}catch{stored=[]}
-    const ids=new Set(Array.isArray(stored)?stored:[]);
+    let raw=null,achievements;
+    try{
+      raw=localStorage.getItem(achievementKey);
+      const parsed=JSON.parse(raw);
+      achievements=Array.isArray(parsed)?parsed.filter(id=>typeof id==="string"&&id.startsWith("ach_")):[];
+    }catch{achievements=[]}
+    const ids=new Set(achievements);
     for(const a of ACHIEVEMENTS){
-      if(ids.has(a.id)||localStorage.getItem(savePrefix+a.id)==="1")progress.achievements.add(a.id);
+      if(ids.has(a.id)||hasMark(a.id))progress.achievements.add(a.id);
     }
-    // 旧版印章也留存于档案底单，新图鉴只统计本版十二枚。
+    // 旧版印章保留在底单；新图鉴只展示当前成就库收录的印章。
     const merged=JSON.stringify([...new Set([...ids,...progress.achievements])]);
     if(raw!==merged)localStorage.setItem(achievementKey,merged);
   }catch{storageOK=false}
@@ -971,17 +1004,18 @@ function updateTag(){
 }
 function archive(){
   function section(type,title){
-    const rows=ACHIEVEMENTS.filter(a=>a.type===type).map(a=>{
+    const entries=ACHIEVEMENTS.filter(a=>a.type===type);
+    const rows=entries.map(a=>{
       const earned=progress.achievements.has(a.id);
       let stamp='<span class="archive-stamp locked" role="img" aria-label="尚未盖章">?</span>';
       if(earned)stamp='<b class="archive-stamp">'+a.name+'</b>';
       else if(type==="regular")stamp='<b class="archive-stamp">'+a.name+'</b>';
       return '<li class="archive-row'+(earned?' earned':'')+'">'+stamp+'<p>'+(earned?a.comment:a.clue)+'</p></li>';
     }).join("");
-    return '<p class="archive-count">'+title+'</p><ul class="archive-list">'+rows+'</ul>';
+    return '<p class="archive-count">'+title+' · '+entries.length+' 枚</p><ul class="archive-list">'+rows+'</ul>';
   }
   return '<p class="archive-count">已盖 '+progress.achievements.size+' / '+ACHIEVEMENTS.length+' 枚</p>'+
-    section("regular","常规接待 · 八枚")+section("secret","席间彩蛋 · 四枚")+
+    section("regular","常规接待")+section("secret","席间彩蛋")+
     (storageOK?'':'<p>浏览器未开放本地存档，本次进度保留到关闭页面。</p>');
 }
 async function playPaperMotion(element,frames,options){
@@ -1312,10 +1346,11 @@ function menu(){
   const note=privateMenu?'已点 '+order.length+' 种 · '+servings+' / 7 份':'人均 ¥'+(sum/scene.headcount).toFixed(0);
   const limit=Number.isFinite(scene.budgetMax)?scene.budgetMax:'无上限';
   const issue=orderSubmissionIssue(scene,order);
-  const hint=frugal&&issue?'请至少点一份付费主食，再交后厨。':privateMenu?'五位客人，精挑 5～7 种，连加份最多 7 份。':'';
-  const benefits=freeItems.length?'<section aria-label="进店福利"><div class="subtitle"><h3>进店福利</h3><span class="tiny">每桌每样限领一份</span></div>'+freeItems.map(dishRow).join("")+'</section>':'';
+  const hint=frugal&&order.length&&sum===0?'这张水单上只有免费福利。':privateMenu?'五位客人，精挑 5～7 种，连加份最多 7 份。':'';
+  const claimed=frugal?order.filter(item=>item.dish.price===0).length:0;
+  const benefits=freeItems.length?'<section aria-label="进店福利"><div class="subtitle"><h3>进店福利</h3><span class="tiny">每桌任选一样 · 已勾 '+claimed+' 样</span></div>'+freeItems.map(dishRow).join("")+'</section>':'';
   const cost='<div class="order-cost'+(over||(privateMenu&&servings>7)?' over':'')+'">'+(over?'超预算':'预计')+' <b>¥'+sum+'</b> / '+limit+'<small>'+note+'</small></div>';
-  return [head+briefPanel(false)+benefits+tabs+'<section aria-label="'+(reviewingOrder?'本桌已点菜品':privateMenu?'私房馆十一道水单':cat)+'">'+list.map(dishRow).join("")+
+  return [head+briefPanel(false)+benefits+tabs+'<section class="order-list" aria-label="'+(reviewingOrder?'本桌已点菜品':privateMenu?'私房馆十一道水单':cat)+'">'+list.map(dishRow).join("")+
     (list.length?'':'<p class="empty">联单还是空的。点「继续点菜」，挑一道开单。</p>')+'</section>',
     (hint?'<p class="tiny">'+hint+'</p>':'')+'<div class="order-strip">'+orderLink+cost+'</div>'+action("kitchen","确认菜单并排上菜顺序","primary",!issue&&!removing.size?"":"disabled")];
 }
@@ -1330,12 +1365,12 @@ function courseLabel(dish,i){
   return position+" · "+course;
 }
 function kitchen(){
-  return [heading("第二联　／　排菜","后厨排单","按住右侧 ≡ 拖动，或点 ↑ ↓ 微调。排在前面的先上桌。")+'<div class="sliptop"><b>'+table+' · '+order.length+' 道</b>'+action("edit","返回勾菜")+'</div><div class="queue-list">'+order.map(({dish,qty},i)=>{
+  return [heading("第二联　／　排菜","后厨排单","按住右侧 ≡ 拖动，或点 ↑ ↓ 微调。排在前面的先上桌。")+'<div class="sliptop"><b>'+table+' · '+order.length+' 道</b>'+action("edit","返回勾菜")+'</div><div class="order-list queue-list">'+order.map(({dish,qty},i)=>{
     const attr='data-id="'+dish.id+'" aria-label="';
     return '<div class="queue" data-id="'+dish.id+'"><i class="seq">'+(i+1)+'</i><div class="detail"><span class="name">'+dish.name+'</span><div class="desc">'+qty+' 份　¥'+qty*dish.price+'</div><span class="course">'+courseLabel(dish,i)+'</span></div>'+action("up","↑","ctrl",attr+'上移'+dish.name+'" '+(i===0?'disabled':''))+action("down","↓","ctrl",attr+'下移'+dish.name+'" '+(i===order.length-1?'disabled':''))+'<button type="button" class="queue-grip" aria-label="调整'+dish.name+'顺序，拖动或使用上下方向键" '+(order.length===1?'disabled':'')+'>≡</button></div>';
   }).join("")+'</div>',summary()+action("serve","交后厨出菜","primary")];
 }
-// 排菜时只移动原有行。指针由不移动的列表捕获，插队过程中也能持续收到事件。
+// 只移动被越过的相邻行，抓手及其父行一直连在原节点上，持续捕获同一指针。
 let queueDrag=null;
 function moveQueueRow(row,to){
   const list=row.parentElement,from=Array.prototype.indexOf.call(list.children,row);
@@ -1345,8 +1380,13 @@ function moveQueueRow(row,to){
       .map(line=>({line,top:line.getBoundingClientRect().top}));
   const [item]=order.splice(from,1);
   order.splice(to,0,item);
-  const before=list.children[to+(to>from?1:0)]||null;
-  list.insertBefore(row,before);
+  const rows=Array.from(list.children);
+  if(from<to){
+    for(const sibling of rows.slice(from+1,to+1))list.insertBefore(sibling,row);
+  }else{
+    const after=row.nextSibling;
+    for(const sibling of rows.slice(to,from))list.insertBefore(sibling,after);
+  }
   Array.from(list.children).forEach((line,i)=>{
     line.querySelector(".seq").textContent=i+1;
     line.querySelector(".course").textContent=courseLabel(order[i].dish,i);
@@ -1359,9 +1399,15 @@ function moveQueueRow(row,to){
     line.animate([{transform:'translateY('+distance+'px)'},{transform:'translateY(0)'}],{duration:135,easing:"ease-out"});
   }
 }
+function queueViewport(drag){
+  const box=drag.list.getBoundingClientRect(),outer=drag.body.getBoundingClientRect();
+  return {top:Math.max(box.top,outer.top),bottom:Math.min(box.bottom,outer.bottom)};
+}
 function placeQueueRow(drag){
-  const {row,list,y,offset}=drag;
-  const listTop=list.getBoundingClientRect().top;
+  const {row,list,offset}=drag;
+  const box=queueViewport(drag);
+  const y=Math.max(box.top,Math.min(drag.y,box.bottom));
+  const listTop=list.getBoundingClientRect().top+list.clientTop-list.scrollTop;
   let to=0;
   for(const other of list.children){
     if(other===row)continue;
@@ -1369,19 +1415,23 @@ function placeQueueRow(drag){
     to++;
   }
   moveQueueRow(row,to);
-  const top=listTop+row.offsetTop;
-  row.style.setProperty("--slide",(y-offset-top)+"px");
+  const last=list.lastElementChild;
+  const limit=last.offsetTop+last.offsetHeight-row.offsetHeight;
+  const top=Math.max(0,Math.min(y-offset-listTop,limit));
+  row.style.setProperty("--slide",(top-row.offsetTop)+"px");
 }
 function queueDragFrame(){
   const drag=queueDrag;
   if(!drag)return;
   drag.frame=0;
-  const box=drag.body.getBoundingClientRect(),edge=Math.min(48,box.height/4);
+  const box=queueViewport(drag),edge=Math.max(1,Math.min(48,(box.bottom-box.top)/4));
   const depth=drag.y<box.top+edge?drag.y-box.top-edge:Math.max(0,drag.y-box.bottom+edge);
-  const before=drag.body.scrollTop;
-  drag.body.scrollTop+=Math.round(Math.max(-1,Math.min(1,depth/edge))*11);
+  const step=Math.round(Math.max(-1,Math.min(1,depth/edge))*11);
+  const listBefore=drag.list.scrollTop,bodyBefore=drag.body.scrollTop;
+  drag.list.scrollTop+=step;
+  if(step&&drag.list.scrollTop===listBefore)drag.body.scrollTop+=step;
   placeQueueRow(drag);
-  if(drag.body.scrollTop!==before)drag.frame=requestAnimationFrame(queueDragFrame);
+  if(drag.list.scrollTop!==listBefore||drag.body.scrollTop!==bodyBefore)drag.frame=requestAnimationFrame(queueDragFrame);
 }
 function finishQueueDrag(cancel){
   const drag=queueDrag;
@@ -1391,17 +1441,20 @@ function finishQueueDrag(cancel){
   if(cancel)moveQueueRow(drag.row,drag.start);
   else if(drag.moved)placeQueueRow(drag);
   drag.row.classList.remove("lifted");drag.row.style.removeProperty("--slide");
-  if(drag.list.hasPointerCapture(drag.pointer))drag.list.releasePointerCapture(drag.pointer);
+  document.body.classList.remove("queue-dragging");
+  if(drag.grip.hasPointerCapture(drag.pointer))drag.grip.releasePointerCapture(drag.pointer);
 }
 page.addEventListener("pointerdown",e=>{
-  const grip=e.target.closest(".queue-grip");
-  if(stage!=="kitchen"||!grip||grip.disabled||queueDrag||!e.isPrimary||e.button!==0)return;
+  const grip=e.target;
+  if(!grip.matches(".queue-grip"))return;
+  if(stage!=="kitchen"||grip.disabled||queueDrag||!e.isPrimary||e.button!==0)return;
   const row=grip.closest(".queue"),list=row.parentElement;
   row.getAnimations?.().forEach(animation=>animation.cancel());
-  list.setPointerCapture(e.pointerId);
-  queueDrag={row,list,body:list.closest(".body"),pointer:e.pointerId,start:Array.prototype.indexOf.call(list.children,row),
+  e.target.setPointerCapture(e.pointerId);
+  queueDrag={row,list,grip,body:list.closest(".body"),pointer:e.pointerId,start:Array.prototype.indexOf.call(list.children,row),
     startY:e.clientY,y:e.clientY,offset:e.clientY-row.getBoundingClientRect().top,moved:false,frame:0};
   e.preventDefault();
+  document.body.classList.add("queue-dragging");
   row.classList.add("lifted");
 });
 page.addEventListener("pointermove",e=>{
@@ -1418,7 +1471,7 @@ page.addEventListener("pointerup",e=>{
   finishQueueDrag(false);
 });
 page.addEventListener("pointercancel",e=>{if(queueDrag?.pointer===e.pointerId)finishQueueDrag(true)});
-page.addEventListener("lostpointercapture",e=>{if(queueDrag?.pointer===e.pointerId&&queueDrag.list===e.target)finishQueueDrag(true)});
+page.addEventListener("lostpointercapture",e=>{if(queueDrag?.pointer===e.pointerId&&queueDrag.grip===e.target)finishQueueDrag(true)});
 window.addEventListener("blur",()=>finishQueueDrag(true));
 page.addEventListener("keydown",e=>{
   const grip=e.target.closest(".queue-grip");
@@ -1543,13 +1596,23 @@ function awardStamp(award,id=""){
   return '<div'+(id?' id="'+id+'"':'')+' class="award-seal'+(award.name.length>7?' wordy':'')+
     '" role="img" aria-label="成就印章：'+award.name+'"><small>成就印</small><b>'+award.name+'</b></div>';
 }
+function guestCheck(){
+  const rows=order.map(({dish,qty})=>
+    '<tr><th scope="row">'+dish.name+'</th><td>×'+qty+'</td><td>¥'+dish.price+'</td></tr>'
+  ).join('');
+  return '<section class="guest-check" aria-labelledby="check-title">'+
+    '<h3 id="check-title">*** 结账单 / GUEST CHECK ***</h3><p>'+scene.restaurantName+'</p>'+
+    '<table aria-label="按上菜顺序列出的结账明细"><colgroup><col><col class="count-col"><col class="price-col"></colgroup>'+
+    '<thead><tr><th scope="col">菜名</th><th scope="col">数量</th><th scope="col">单价</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody><tfoot><tr><th scope="row" colspan="2">合计(TOTAL):</th><td>¥'+total()+'</td></tr></tfoot></table></section>';
+}
 function grade(){
   const stamp='<div id="grade-rank" class="seal" role="img" aria-label="职级核定：'+report.rank+'，'+report.stampNote+'">'+
     '<small>'+report.stampNote+'</small><b>'+report.rank+'</b></div>';
   const awards=ACHIEVEMENTS.filter(a=>report.achievements.includes(a.id));
   const fresh=awards.filter(a=>(report.newAchievements||[]).includes(a.id));
   const candidates=fresh.length?fresh:awards;
-  const featured=candidates.find(a=>a.id==="ach_beggar")||candidates[0];
+  const featured=awards.find(a=>a.id==="ach_shameless")||candidates.find(a=>a.id==="ach_beggar")||candidates[0];
   const otherAwards=awards.filter(a=>a!==featured).map(a=>a.name);
   const blue=featured?awardStamp(featured,"grade-award"):'';
   const header='<header class="stagehead">'+ticket("联单背面　／　经理批阅")+
@@ -1567,7 +1630,7 @@ function grade(){
   const scoreBlock='<div class="report"><div class="sliptop"><b>综合得分</b><span class="score">'+report.score+'<small> / 100</small></span></div>'+banner+summary()+cap+bars+'</div>';
   const notes='<ol class="notes">'+report.notes.map(n=>'<li><strong>'+n.dish+'</strong>　<u>'+n.reason+'</u>。'+n.text+'</li>').join('')+'</ol>';
   const actions='<div class="report-actions">'+action("share","晒出战绩","smallbtn share-btn",'aria-haspopup="dialog"')+action("bill","查原单")+'</div>';
-  return [header+meta()+scoreBlock+'<div class="subtitle"><h3>经理逐条批注</h3>'+actions+'</div>'+notes,foot+action("draw",next,"primary")+imprint()];
+  return [header+meta()+scoreBlock+'<div class="subtitle"><h3>经理逐条批注</h3>'+actions+'</div>'+notes+guestCheck(),foot+action("draw",next,"primary")+imprint()];
 }
 function render(fresh=false){
   finishQueueDrag(true);
@@ -1580,11 +1643,14 @@ function render(fresh=false){
   document.getElementById("brand-name").textContent=scene.restaurantName;
   updateTag();
   const scroll=page.querySelector(".body")?.scrollTop||0,focus=document.activeElement;
+  const listScroll=page.querySelector(".order-list")?.scrollTop||0;
   const current=focus?.dataset;
   const [body,foot]=stage==="brief"?briefView():stage==="menu"?menu():stage==="kitchen"?kitchen():grade();
   pad.classList.toggle("back",stage==="report");
 
   page.innerHTML='<div class="body">'+body+'</div><footer class="foot">'+foot+'</footer>';
+  const list=page.querySelector(".order-list");
+  if(list&&!fresh)list.scrollTop=listScroll;
   if(fresh){if(!turningPage)page.querySelector("h2,h1")?.focus({preventScroll:true})}
   else{page.querySelector(".body").scrollTop=scroll;if(current?.act){const candidates=Array.from(page.querySelectorAll("button"));const match=candidates.find(b=>!b.disabled&&b.dataset.act===current.act&&b.dataset.id===current.id&&b.dataset.cat===current.cat)||candidates.find(b=>!b.disabled&&current.id&&b.dataset.id===current.id);match?.focus({preventScroll:true})}}
 }
@@ -1634,10 +1700,9 @@ async function draw(){
 }
 document.addEventListener("click",e=>{
   const b=e.target.closest("button[data-act]");if(!b||b.disabled)return;
-  if(turningPage)return;
-  finishQueueDrag(true);
+  if(turningPage||queueDrag)return;
   const a=b.dataset.act,id=b.dataset.id,idx=order.findIndex(x=>x.dish.id===id);
-  if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。</p><p>主线共八关。第四关四人合用 24 元，第七关不限预算、最多七份。第八关达标后领取首席司长通关荣誉，之后可以自由接单。</p><p>关卡与十二枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
+  if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。交单后可在经理批注下方对照结账小票。</p><p>主线共八关。第四关四人合用 24 元，店里三样免费福利只能任选一样。第七关不限预算、最多七份。第八关达标后领取首席司长通关荣誉，之后可以自由接单。</p><p>关卡与 '+ACHIEVEMENTS.length+' 枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
   if(a==="archive"){
     readProgress();updateTag();
     archivePages.innerHTML=archive();
@@ -1665,13 +1730,22 @@ document.addEventListener("click",e=>{
   if(a==="bill")return modal("原单 · 后厨出菜次序",order.map(({dish,qty},i)=>'<p>'+(i+1)+'．'+dish.name+' × '+qty+'　¥'+dish.price*qty+'</p>').join("")+summary());
   if(a==="edit"){stage="menu";return render(true)}
   if(a==="review-order"&&stage==="menu"){
-    if(!reviewingOrder)categoryScroll=page.querySelector(".body").scrollTop;
+    if(!reviewingOrder){
+      categoryScroll=page.querySelector(".body").scrollTop;
+      categoryListScroll=page.querySelector(".order-list").scrollTop;
+    }
     reviewingOrder=!reviewingOrder;
     render();
     page.querySelector(".body").scrollTop=reviewingOrder?0:categoryScroll;
+    page.querySelector(".order-list").scrollTop=reviewingOrder?0:categoryListScroll;
     return;
   }
-  if(a==="cat"){cat=b.dataset.cat;render();page.querySelector(".body").scrollTop=0;return}
+  if(a==="cat"){
+    cat=b.dataset.cat;render();
+    page.querySelector(".body").scrollTop=0;
+    page.querySelector(".order-list").scrollTop=0;
+    return;
+  }
   if(a==="kitchen"&&!orderSubmissionIssue(scene,order)&&!removing.size){stage="kitchen";return render(true)}
   if(a==="serve"&&stage==="kitchen"&&order.length)return settle();
   if(removing.has(id))return;
