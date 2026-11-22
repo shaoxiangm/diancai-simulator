@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#21463d">
-<meta name="application-version" content="2.0.0">
+<meta name="application-version" content="2.1.0">
 <title>点菜模拟器 · 万家酒楼</title>
 <style>
 :root{--paper:#f6efe2;--pink:#f4dfd8;--red:#963c31;--line:#b98777;--green:#21463d;--ink:#322f29;--blue:#23438e;--pen:#c62828;--muted:#695d50;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
@@ -299,6 +299,10 @@ function menuCategoryLabel(dish){
   if(dish.category==="other")return "餐位杂项";
   return dish.category==="凉菜前菜"?"凉菜卤味":dish.category;
 }
+const MIN_TIER = {
+  dish_07:"luxury", dish_09:"luxury", dish_10:"luxury", dish_31:"luxury", dish_60:"luxury", dish_61:"luxury", dish_84:"luxury",
+  dish_02:"mid_high", dish_16:"mid_high", dish_59:"mid_high", dish_73:"mid_high", dish_74:"mid_high"
+};
 const DISHES = (() => {
   const areas = { 东:"mindong", 南:"minnan", 粤:"guangfu", 川:"chuanyu", 湘:"xiang", 鲁:"luyu", 沪:"shanghai", 北:"dongbei" };
   const traits = { 剥:"needs_peeling", 骨:"bony_messy", 制:"premade_suspect", 街:"street_heavy", 空:"showy_empty", 凉:"cold_dish", 老:"elder_friendly", 轻:"low_fat", 嫩:"boneless_easy", 饭:"down_rice", 地:"local_signature", 海:"seafood",
@@ -314,10 +318,11 @@ const DISHES = (() => {
       [6,"椒盐皮皮虾",118,"整盘约450克",1.1,75,42,63,1,"shrimp_crab","pan_fry","东南粤沪","剥","蒜酥和椒盐裹着带壳虾。"],
       [7,"波士顿龙虾伊面",368,"一只配伊面",1.4,98,44,65,0,"shrimp_crab","braised","粤沪","剥空","龙虾斩件，伊面垫盘吸汁。"],
       [8,"蒜蓉小鲍鱼",26,"每份一只",0.5,72,39,30,0,"mollusk","steamed","东南粤沪","空海","连壳蒸，面上铺蒜蓉粉丝。"],
-      [9,"刺身拼盘",268,"三款十二片",0.7,96,44,13,0,"fish","cold","通","空凉轻","鲜切鱼片铺在碎冰上。"],
+      [9,"刺身拼盘",268,"三款十二片",0.7,96,44,13,0,"fish","cold","东南粤沪","空凉轻","鲜切鱼片铺在碎冰上。"],
       [10,"清蒸东星斑",468,"整尾约900克",1.7,99,93,18,0,"fish","steamed","东南粤沪","老轻","头尾齐全，鱼肉配蒸鱼豉油。"],
       [69,"剁椒鱼头",148,"整颗大鱼头",1.6,85,82,56,3,"fish","steamed","湘","骨饭地海","鳙鱼头铺满坛子剁椒，出笼淋热油。"],
-      [70,"老坛酸菜鱼",118,"大盆黑鱼片",1.6,79,92,55,2,"fish","boiled","川","嫩饭地","无刺黑鱼片滑煮，配老坛酸菜与菊花。"]
+      [70,"老坛酸菜鱼",118,"大盆黑鱼片",1.6,79,92,55,2,"fish","boiled","川","嫩饭地","无刺黑鱼片滑煮，配老坛酸菜与菊花。"],
+      [96,"口味虾尾",98,"中盘450克",1.1,68,74,64,3,"shrimp_crab","braised","湘","剥街地海","去头小龙虾尾紫苏重辣焖烧，越嗦越辣。"]
     ]],
     ["招牌硬菜", [
       [11,"姜母鸭",118,"砂钵半只",1.7,78,85,73,0,"poultry","stew_pot","南","饭地","老姜铺底，麻油慢煸鸭块。"],
@@ -338,7 +343,8 @@ const DISHES = (() => {
       [64,"铁锅炖大鹅",188,"整鹅大锅配粉条、贴饼",2,84,92,76,0,"poultry","stew_pot","北","饭地","整鹅、粉条和配菜同锅慢炖，锅沿贴一圈玉米饼，四到八人分享。"],
       [65,"东北酱大骨",88,"六大块带手套",1.7,68,74,75,0,"pork","stew_pot","北","骨街饭地","老汤酱卤猪脊骨，需上手抓啃。"],
       [81,"湖南小炒黄牛肉",88,"中盘320克",1.3,76,94,58,2,"beef","stir_fry","湘","饭地","带皮黄牛肉配小米辣与香菜大火猛炒。"],
-      [83,"茶油炒土鸡",128,"大盘600克",1.5,82,90,52,1,"poultry","stir_fry","湘","老饭地","湘南山茶油爆炒散养走地鸡，微辣鲜香。"]
+      [83,"茶油炒土鸡",128,"大盘600克",1.5,82,90,52,1,"poultry","stir_fry","湘","老饭地","湘南山茶油爆炒散养走地鸡，微辣鲜香。"],
+      [98,"东北烤羊肉串",36,"十串一把",1.1,48,88,66,1,"mutton","pan_fry","北","街烤地","炭火现烤肥瘦相间羊肉串，撒孜然辣椒面。"]
     ]],
     ["热炒小菜", [
       [21,"海蛎煎",48,"圆盘一张",1.2,60,92,54,0,"mollusk","pan_fry","东南","饭地海","小海蛎拌薯粉蒜苗，双面煎香。"],
@@ -352,7 +358,8 @@ const DISHES = (() => {
       [66,"老式锅包肉",68,"中盘350克",1.4,72,91,64,0,"pork","pan_fry","北","饭地","里脊肉挂糊炸酥，泼糖醋汁急炒。"],
       [68,"农家小炒肉",58,"中盘300克",1.3,62,95,62,2,"pork","stir_fry","湘","饭地","五花肉片配螺丝椒大火猛炒。"],
       [71,"糖醋里脊",58,"中盘300克",1.3,66,93,54,0,"pork","pan_fry","通","老嫩饭","纯精肉条外酥里嫩，酸甜开胃。"],
-      [76,"黑椒菌菇牛柳",98,"中盘320克",1.3,78,92,46,1,"beef","stir_fry","通","嫩饭","嫩牛柳配杏鲍菇快炒，无骨易夹。"]
+      [76,"黑椒菌菇牛柳",98,"中盘320克",1.3,78,92,46,1,"beef","stir_fry","通","嫩饭","嫩牛柳配杏鲍菇快炒，无骨易夹。"],
+      [90,"宫保鸡丁",46,"中盘300克",1.3,62,94,52,1,"poultry","stir_fry","川","嫩饭地","鸡丁配炸花生米与干椒段，糊辣荔枝口。"]
     ]],
     ["砂锅炖煲", [
       [29,"萝卜牛腩煲",88,"中煲600克",1.6,76,95,71,0,"beef","stew_pot","通","老饭","牛腩和白萝卜炖透，整煲上桌。"],
@@ -391,7 +398,11 @@ const DISHES = (() => {
       [74,"虫草花炖老鸭盅",168,"分享汤盅",1.4,87,88,36,0,"soup","soup","通","老轻","老鸭去油慢炖，清润滋补不腻口。"],
       [77,"上海葱油拌面",28,"分享盘400克",1.4,44,90,42,0,"staple","boiled","沪","地","熬制焦香小葱油拌碱水面。"],
       [78,"手工三鲜水饺",36,"大盘24只",1.5,48,92,38,0,"staple","boiled","北","老地","现擀皮猪肉白菜馅水饺。"],
-      [79,"桂花酒酿圆子",48,"分享汤碗",1,68,89,24,0,"staple","soup","沪","老轻嫩地","糯米小圆子配甜酒酿与干桂花。"]
+      [79,"桂花酒酿圆子",48,"分享汤碗",1,68,89,24,0,"staple","soup","沪","老轻嫩地","糯米小圆子配甜酒酿与干桂花。"],
+      [93,"奶汤蒲菜",58,"汤盆700毫升",1.3,70,90,22,0,"soup","soup","鲁","老轻嫩地","大明湖嫩蒲菜心入奶白高汤，清鲜软滑。"],
+      [94,"水晶虾饺皇",36,"一笼四只",0.8,68,92,24,0,"shrimp_crab","steamed","粤","老嫩地海","澄面薄皮包整颗鲜虾仁，一笼四只。"],
+      [95,"干炒牛河",42,"中盘400克",1.5,56,92,58,0,"staple","stir_fry","粤","嫩饭地","猛火快炒宽河粉与嫩牛肉片，锅气十足。"],
+      [97,"闽南牛肉羹",58,"汤盆700毫升",1.3,66,92,32,0,"soup","soup","南","老嫩地","手打牛肉条滑入清鲜高汤，配姜丝香菜。"]
     ]],
     ["凉菜卤味", [
       [53,"土笋冻",48,"拼盘八枚",0.7,57,62,13,0,"marine_worm","cold","南","凉地海","沙虫汤凝成小冻，另跟蒜醋。"],
@@ -399,7 +410,10 @@ const DISHES = (() => {
       [55,"拍黄瓜",18,"小碟220克",0.7,27,86,11,0,"veg","cold","通","凉轻街","黄瓜拍裂，蒜泥和醋现拌。"],
       [56,"五香卤牛腱",68,"冷切200克",0.9,70,91,34,0,"beef","cold","通","凉嫩","牛腱卤熟切薄片，纹路带筋。"],
       [57,"沪式四喜烤麸",36,"小盘240克",0.9,47,86,36,0,"gluten","cold","沪","凉地","烤麸、木耳、香菇和金针菜收甜汁。"],
-      [58,"夫妻肺片",52,"中盘250克",1,58,84,64,3,"beef","cold","川","街凉地","牛肉牛杂切片，拌红油花生碎。"]
+      [58,"夫妻肺片",52,"中盘250克",1,58,84,64,3,"beef","cold","川","街凉地","牛肉牛杂切片，拌红油花生碎。"],
+      [91,"蒜泥白肉",42,"中盘250克",0.9,55,86,62,2,"pork","cold","川","街凉地","五花肉片卷黄瓜丝，浇红油蒜泥汁。"],
+      [92,"老醋蜇头",52,"小盘220克",0.8,64,78,16,0,"jellyfish","cold","鲁","凉轻地海","厚切海蜇头配白菜丝，老陈醋蒜蓉现拌。"],
+      [99,"老醋花生",18,"小碟200克",0.7,30,86,38,0,"veg","cold","通","凉轻街","炸酥花生米拌洋葱香菜，浇陈醋糖汁解酒。"]
     ]],
     ["凉菜前菜", [
       [82,"擂辣椒皮蛋",32,"中盘一份",1.0,56,88,34,2,"veg","cold","湘","街饭地","炭火烤虎皮青椒与松花蛋手工现擂。"]
@@ -415,11 +429,14 @@ const DISHES = (() => {
       [89,"茗茶与餐位费",8,"每位 ¥8",0,0,0,0,0,"service","table_service","东南粤","位","按实际到席人数开茶摆位，每位八元。"]
     ]]
   ];
-  return groups.flatMap(([category, rows]) => rows.map(([id, name, price, spec, portion, prestige, edibility, heaviness, spicy, ingredientType, cookMethod, area, flags, menuDesc]) => ({
-    id:"dish_" + String(id).padStart(2,"0"), name, category, price, spec, portion, prestige, edibility, heaviness, spicy, ingredientType, cookMethod,
-    regions:area === "通" ? Object.values(areas) : Array.from(area, key => areas[key]),
-    tags:Array.from(flags, key => traits[key]), menuDesc
-  }))).sort((a,b)=>a.id.localeCompare(b.id));
+  return groups.flatMap(([category, rows]) => rows.map(([id, name, price, spec, portion, prestige, edibility, heaviness, spicy, ingredientType, cookMethod, area, flags, menuDesc]) => {
+    const dishId = "dish_" + String(id).padStart(2,"0");
+    return {
+      id:dishId, name, category, price, spec, portion, prestige, edibility, heaviness, spicy, ingredientType, cookMethod,
+      regions:area === "通" ? Object.values(areas) : Array.from(area, key => areas[key]),
+      minTier:MIN_TIER[dishId] || "street", tags:Array.from(flags, key => traits[key]), menuDesc
+    };
+  })).sort((a,b)=>a.id.localeCompare(b.id));
 })();
 
 
@@ -574,27 +591,38 @@ function buildStoreMenu(scenario,allDishes=DISHES){
     seed=(Math.imul(1664525,seed)+1013904223)>>>0;
     return seed/4294967296;
   }
-  // 只从本地有售的品项里抽水单。限区食材和本地特色冷盘先全部占位，再轮换通用菜。
-  const deck=allDishes.filter(d=>d.regions.includes(region));
+  const tierOrder={street:1,mid_high:2,luxury:3};
+  const deck=allDishes.filter(d=>d.regions.includes(region)&&tierOrder[d.minTier]<=tierOrder[tier]);
   for(let i=deck.length-1;i>0;i--){
     const j=Math.floor(random()*(i+1));
     [deck[i],deck[j]]=[deck[j],deck[i]];
   }
+  // 赠品同样占水单行数。先算出付费项可用的位数，再给本地招牌和本关必需品留位。
+  let slots;
+  if(tier==="street")slots=18+Math.floor(random()*4)-(frugal?FRUGAL_FREEBIES.length:0);
+  else if(tier==="mid_high")slots=24+Math.floor(random()*4);
+  else slots=28+Math.floor(random()*5);
+
   const essentials=new Set(["dish_26","dish_36","dish_46","dish_50","dish_52"]);
   if(frugal)essentials.add("dish_49");
-  if(mode==="reunion"){essentials.add("dish_55");essentials.add("dish_56");}
+  if(mode==="reunion"){
+    for(const id of ["dish_55","dish_56","dish_86","dish_98","dish_99"])essentials.add(id);
+  }
+  if(scenario.requiresHeat){essentials.add("dish_87");essentials.add("dish_88");}
+  if(scenario.mustHighEndAlcohol)essentials.add("dish_84");
+  if(tier==="mid_high"||tier==="luxury"){
+    for(const id of ["dish_13","dish_15","dish_33","dish_54"])essentials.add(id);
+  }
   if(tier==="luxury"){
     for(const id of ["dish_29","dish_38","dish_59","dish_60","dish_63","dish_73","dish_75"])essentials.add(id);
   }
-  const cuisineCount=Object.keys(CUISINE_LABELS).length;
-  const selected=new Set(deck.filter(d=>d.regions.length<cuisineCount||d.tags.includes("local_signature")||
-    d.category==="drinks"||essentials.has(d.id)));
-  // 每个在本店可点的菜栏至少留一款；已有地方菜的栏位无需再占通用配额。
-  const represented=new Set([...selected].map(d=>d.category));
+  const selected=new Set(deck.filter(d=>essentials.has(d.id)||d.tags.includes("local_signature")||d.tags.includes("tea_fee")));
+  const represented=new Set([...selected].map(menuCategoryLabel));
   for(const d of deck){
-    if(!represented.has(d.category)){selected.add(d);represented.add(d.category);}
+    if(selected.size>=slots)break;
+    const category=menuCategoryLabel(d);
+    if(!represented.has(category)){selected.add(d);represented.add(category);}
   }
-  const slots=32+Math.floor(random()*5)-(frugal?FRUGAL_FREEBIES.length:0);
   for(const d of deck){
     if(selected.size>=slots)break;
     selected.add(d);
