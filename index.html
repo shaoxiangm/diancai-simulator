@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#21463d">
-<meta name="application-version" content="2.2.0">
+<meta name="theme-color" content="#9b352a">
+<meta name="application-version" content="2.4.0">
 <title>点菜模拟器 · 万家酒楼</title>
 <style>
-:root{--paper:#f6efe2;--pink:#f4dfd8;--red:#963c31;--line:#b98777;--green:#21463d;--ink:#322f29;--blue:#23438e;--pen:#c62828;--muted:#695d50;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
+:root{--paper:#f5ede0;--pink:#f3ddd6;--red:#9b352a;--line:#b88676;--green:#2b2520;--ink:#2b2520;--blue:#253c66;--pen:#b52b27;--muted:#6b5f52;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
 *{box-sizing:border-box}
 body{margin:0;height:100vh;height:100dvh;display:grid;place-items:center;overflow:hidden;color:var(--ink);font:16px/1.5 system-ui,"Microsoft YaHei",sans-serif;background:radial-gradient(ellipse at 48% 36%,#5a51412c 0%,#171a17a6 100%),repeating-linear-gradient(2deg,transparent 0 118px,#191b18b3 119px,#55504473 120px,transparent 123px 188px),repeating-linear-gradient(1deg,#39372e 0,#34342d 2px,#39382f 4px,#403d33 6px,#35352e 9px)}
 body::before{content:"";position:fixed;left:11%;bottom:12%;width:125px;aspect-ratio:1;border:4px solid #bd955c10;border-left-color:#c09a6424;border-radius:49% 52% 46% 50%;box-shadow:0 0 0 2px #1b20192c,inset 2px 1px 4px #181c1938;transform:rotate(23deg)}
@@ -98,12 +98,36 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 .summary{display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:13px;margin-bottom:8px}.summary b{font:700 18px var(--hand);color:var(--blue)}.over,.summary.over b{color:var(--pen)}
 .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:10px 0 2px}.tab{padding:6px 0;font-size:13px;color:var(--red)}.tab.active{background:var(--green);color:var(--paper);border-color:var(--green)}
 .order-strip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px 12px;margin-bottom:9px}
+.budget-meter{flex:0 0 100%;height:6px;background:color-mix(in srgb,var(--line) 17%,transparent);border-radius:1px;overflow:hidden;margin-top:2px}
+.budget-meter i{display:block;width:var(--to);height:100%;background:var(--blue)}
+.budget-meter.warn i{background:#c86d1f}
+.budget-meter.over i{background:var(--pen)}
+@keyframes budget-fill{from{width:var(--from)}to{width:var(--to)}}
+@keyframes budget-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}55%{transform:translateX(3px)}80%{transform:translateX(-1px)}}
+@media(prefers-reduced-motion:no-preference){
+  .budget-meter i{animation:budget-fill .28s ease-out}
+  .budget-meter.over.shake{animation:budget-shake .28s ease-out}
+}
 .order-link{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:5px 10px;border:1px solid #23438e80;border-radius:2px;background:#23438e09;color:var(--blue);font:700 16px/1.25 var(--serif)}
 .order-link .order-count{font:700 13px/1.3 var(--hand);white-space:nowrap}.order-link::after{content:"";width:6px;height:6px;border:solid currentColor;border-width:1.5px 1.5px 0 0;transform:rotate(45deg)}
 .order-link.return::after{order:-1;transform:rotate(-135deg)}
 .order-cost{margin-left:auto;text-align:right;font-size:13px;line-height:1.35}.order-cost b{color:var(--blue);font:700 17px var(--hand)}.order-cost.over b{color:inherit}.order-cost small{display:block;color:var(--muted);font-size:12px}
 .queue{padding:10px 0;border-bottom:1px dotted #b39682;display:flex;align-items:center;gap:7px}.detail{flex:1;min-width:0}.name{font:700 17px var(--serif)}.desc{font-size:13px;color:var(--muted)}.price{font:700 15px var(--mono)}.ctrl{border-color:#637797;color:var(--blue);min-width:32px;height:33px;padding:0 6px}
-.dish{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(150,60,49,.2)}
+.dish{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(150,60,49,.2)}
+.pen-whisper{
+  position:absolute;right:42px;top:4px;z-index:3;pointer-events:none;white-space:nowrap;
+  font:700 13px/1.2 var(--hand);color:var(--pen);background:var(--paper);
+  border:1px dashed var(--pen);padding:2px 6px;border-radius:2px;
+  box-shadow:1px 2px 4px color-mix(in srgb,var(--ink) 13%,transparent);
+}
+@keyframes whisper-float{
+  0%{opacity:0;transform:translateY(0) rotate(-4deg)}
+  12%,62%{opacity:1;transform:translateY(-2px) rotate(-2deg)}
+  100%{opacity:0;transform:translateY(-12px) rotate(-1deg)}
+}
+@media(prefers-reduced-motion:no-preference){
+  .pen-whisper{animation:whisper-float 1.55s ease-out both}
+}
 .dish-info{min-width:0;display:flex;align-items:center;gap:10px;padding:0;border:0;background:none;text-align:left}
 .dish-info .name,.dish-info .spec{display:block}.dish-info .name{line-height:1.35}.dish-info .spec{margin-top:3px;color:#7a6b5d;font:11px/1.45 var(--serif)}
 .dish-sale{display:flex;align-items:center;justify-content:flex-end;gap:5px}.dish-sale .price{white-space:nowrap}
@@ -134,6 +158,14 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
   width:85%;margin:20px auto 8px;padding:12px clamp(8px,3vw,15px);
   background:#fff;color:#333;border-block:1px dashed #bbb;box-shadow:1px 2px 4px #3332;
   font:11px/1.6 monospace,var(--font-sans,sans-serif);font-variant-numeric:tabular-nums;
+}
+@keyframes receipt-print{
+  from{clip-path:inset(0 0 100% 0);transform:translateY(-6px)}
+  to{clip-path:inset(0 0 0% 0);transform:translateY(0)}
+}
+@media(prefers-reduced-motion:no-preference){
+  .guest-check.printing{animation:receipt-print .72s steps(14,end) both}
+  .guest-check.printing.waiting{animation:none;opacity:0}
 }
 .guest-check h3,.guest-check p{margin:0;text-align:center;font:inherit;overflow-wrap:anywhere}
 .guest-check h3{font-weight:700}
@@ -1128,6 +1160,10 @@ function resetMenuView(){
   menuBriefOpen=false;
 }
 let storeMenu=[],menuEdits=0,menuElapsed=0,menuStarted=null;
+let lastBudgetPct=0,lastBudgetSum=0;
+const dishWhispers=new Map();
+const whisperDuration=1550;
+let receiptPrintPending=false,receiptObserver=null;
 const total = () => order.reduce((sum,item)=>sum+orderLineTotal(scene,item),0);
 const savePrefix="ronggang.diancai.v1.";
 // 音频设备只在玩家第一次操作后启动；各声部共用静音总线。
@@ -1518,6 +1554,7 @@ async function turnInOrder(){
   await playPaperMotion(sheetFace,[{transform:"rotateY(0deg)"},{transform:"rotateY(90deg)"}],
     {duration:280,easing:"ease-in"});
   stage="report";
+  receiptPrintPending=true;
   render(true);
   await playPaperMotion(sheetFace,[{transform:"rotateY(-90deg)"},{transform:"rotateY(0deg)"}],
     {duration:280,easing:"ease-out"});
@@ -1531,6 +1568,35 @@ async function turnInOrder(){
     },650);
   }
   await pressReportStamps();
+}
+function startReceiptPrint(){
+  const receipt=page.querySelector(".guest-check");
+  const motion=matchMedia("(prefers-reduced-motion: no-preference)");
+  if(!receipt||!motion.matches){receiptPrintPending=false;return}
+
+  receipt.classList.add("printing","waiting");
+  receipt.addEventListener("animationend",()=>receipt.classList.remove("printing"),{once:true});
+  function begin(){
+    if(!receipt.isConnected||stage!=="report"||!receipt.classList.contains("waiting"))return;
+    receiptObserver?.disconnect();
+    receiptObserver=null;
+    receiptPrintPending=false;
+    receipt.classList.remove("waiting");
+    if(!motion.matches){receipt.classList.remove("printing");return}
+    if(typeof SoundFX==="undefined"||typeof SoundFX.tick!=="function")return;
+    for(let step=1;step<=4;step++){
+      setTimeout(()=>{
+        if(stage!=="report"||!receipt.isConnected||!motion.matches)return;
+        try{SoundFX.tick()}catch{}
+      },step*140);
+    }
+  }
+  if(typeof IntersectionObserver==="undefined"){begin();return}
+  // 小票通常在首屏下方，露出纸头之后再开始走纸。
+  receiptObserver=new IntersectionObserver(entries=>{
+    if(entries.some(entry=>entry.isIntersecting&&entry.intersectionRect.height>0))begin();
+  },{root:receipt.closest(".body"),rootMargin:"0px 0px -16px"});
+  receiptObserver.observe(receipt);
 }
 function nextReportDialog(){
   if(turningPage||stage!=="report"||shareTimer||document.querySelector("dialog[open]"))return;
@@ -1734,6 +1800,37 @@ function dishSketch(dish){
     '<path class="hatch" d="M14 52q14 5 33-1m-26 5q10 2 20-1"/>'+steam+
     '<path d="'+sketchVessels[vessel]+'"/><path d="'+ink+'"/><path class="hatch" d="'+hatch+'"/></svg></span>';
 }
+function getDishWhisper(scene,dish){
+  const has=tag=>dish.tags.includes(tag);
+  if(has("salad_trap"))return "疯五点草，叛徒实锤！";
+  if(has("premium_alcohol"))return "好家伙，财务提刀来了";
+  if(scene.noAlcohol&&has("alcohol"))return "这桌禁酒，你想吹哨？";
+  if(scene.guestTraits?.avoidSeafood&&(dish.category==="海鲜水产"||has("seafood")))return "有人海鲜忌口，手滑了？";
+  if(scene.guestTraits?.avoidSpicy&&dish.spicy>0)return "客人口味忌辣，慎点！";
+  if(scene.mode==="family"&&(has("bony_messy")||["dish_14","dish_56","dish_61","dish_81"].includes(dish.id)))return "老丈人牙口可咬不动";
+  if(scene.tier!=="street"&&has("premade_suspect"))return "后厨撕包加热警告";
+  if(!scene.isSideQuest&&has("local_signature")&&!dish.regions.includes(scene.region))return "外地招牌，后厨得现学";
+  if(dish.price===0)return "老板：这桌算你白嫖";
+  if(dish.spicy>=3)return "够劲！小心辣冒汗";
+  if(has("coconut")||has("spice_relief"))return "懂行，解辣神器备上";
+  if(dish.prestige>=90)return "硬菜镇桌，排面拉满";
+  return "";
+}
+function pinDishWhisper(dish){
+  const text=getDishWhisper(scene,dish);
+  if(!text)return;
+  // 点菜会重绘整张水单，按最初出现的时间接着播放浮签。
+  const whisper={text,startedAt:performance.now()};
+  dishWhispers.set(dish.id,whisper);
+  setTimeout(()=>{
+    if(dishWhispers.get(dish.id)!==whisper)return;
+    dishWhispers.delete(dish.id);
+    page.querySelector('[data-dish="'+dish.id+'"] .pen-whisper')?.remove();
+  },whisperDuration);
+}
+function budgetPct(sum,limit){
+  return Number.isFinite(limit)&&limit>0?Math.min(100,Math.round(sum/limit*100)):0;
+}
 function dishRow(d){
   const item=order.find(({dish})=>dish.id===d.id);
   const open=detailChoices.get(d.id)??Boolean(item);
@@ -1748,9 +1845,13 @@ function dishRow(d){
     action("minus","−","ctrl",attrs+'aria-label="减少'+d.name+'一份"')+
     '<span class="qty">'+item.qty+' 份</span>'+
     action("add","＋","ctrl",attrs+'aria-label="增加'+d.name+'一份"')+'</div>':'';
+  const whisper=dishWhispers.get(d.id);
+  const elapsed=whisper?Math.floor(performance.now()-whisper.startedAt):0;
+  const note=whisper&&elapsed<whisperDuration
+    ?'<span class="pen-whisper" aria-hidden="true" style="animation-delay:-'+elapsed+'ms">'+whisper.text+'</span>':'';
   return '<article class="dish'+(open?' open-detail':'')+'" data-dish="'+d.id+'">'+detail+
     '<div class="dish-sale"><span class="price">¥'+d.price+'</span>'+check+'</div>'+
-    '<div class="dish-desc" id="'+detailsId+'" aria-hidden="'+!open+'"><span>'+d.menuDesc+'</span></div>'+quantity+'</article>';
+    '<div class="dish-desc" id="'+detailsId+'" aria-hidden="'+!open+'"><span>'+d.menuDesc+'</span></div>'+quantity+note+'</article>';
 }
 function menu(){
   const frugal=scene.mode==="frugal";
@@ -1765,6 +1866,16 @@ function menu(){
   const count=reviewingOrder?'共 '+order.length+' 项':'本店共 '+storeMenu.length+' 项';
   const head='<div class="stagehead menu-head">'+ticket("第二联　／　勾菜")+'<div class="menu-title"><h2 tabindex="-1">'+title+'</h2><span>'+count+'</span></div></div>';
   const sum=total(),over=sum>scene.budgetMax;
+  let meter="";
+  if(Number.isFinite(scene.budgetMax)&&scene.budgetMax>0){
+    const ratio=sum/scene.budgetMax;
+    const currPct=budgetPct(sum,scene.budgetMax);
+    const state=over?(sum!==lastBudgetSum?" over shake":" over"):ratio>=0.85?" warn":"";
+    meter='<div class="budget-meter'+state+'" aria-hidden="true">'+
+      '<i style="--from:'+lastBudgetPct+'%;--to:'+currPct+'%"></i></div>';
+    lastBudgetPct=currPct;
+    lastBudgetSum=sum;
+  }
   const orderLink=reviewingOrder?action("review-order","继续点菜","order-link return"):action("review-order",'已点菜单 <span class="order-count">'+order.length+' 项</span>',"order-link");
   const note='人均 ¥'+(sum/scene.headcount).toFixed(0);
   const limit=Number.isFinite(scene.budgetMax)?scene.budgetMax:'无上限';
@@ -1775,7 +1886,7 @@ function menu(){
   const cost='<div class="order-cost'+(over?' over':'')+'">'+(over?'超预算':'预计')+' <b>¥'+sum+'</b> / '+limit+'<small>'+note+'</small></div>';
   return [head+briefPanel(false)+benefits+tabs+'<section class="order-list" aria-label="'+(reviewingOrder?'本桌已点菜品':cat)+'">'+list.map(dishRow).join("")+
     (list.length?'':'<p class="empty">联单还是空的。点「继续点菜」，挑一道开单。</p>')+'</section>',
-    (hint?'<p class="tiny">'+hint+'</p>':'')+'<div class="order-strip">'+orderLink+cost+'</div>'+action("kitchen","确认菜单并排上菜顺序","primary",!issue&&!removing.size?"":"disabled")];
+    (hint?'<p class="tiny">'+hint+'</p>':'')+'<div class="order-strip">'+orderLink+cost+meter+'</div>'+action("kitchen","确认菜单并排上菜顺序","primary",!issue&&!removing.size?"":"disabled")];
 }
 function courseLabel(dish,i){
   if(dish.tags.includes("tea_fee"))return "全桌 · 按位计费";
@@ -1912,7 +2023,7 @@ function drawShareCard(model){
   canvas.width=600;canvas.height=820;
   const c=canvas.getContext("2d");
   if(!c)throw new Error("canvas unavailable");
-  const red="#963c31",blue="#23438e",green="#21463d";
+  const red="#9b352a",blue="#253c66",green="#2b2520";
   const serif='"Songti SC","SimSun","Noto Serif CJK SC",serif',pen='"KaiTi","STKaiti","FangSong",'+serif;
   function rule(x1,y1,x2,y2,color,width=1){
     c.strokeStyle=color;c.lineWidth=width;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();
@@ -2059,6 +2170,8 @@ function grade(){
   return [header+meta()+scoreBlock+'<div class="subtitle"><h3>经理逐条批注</h3>'+actions+'</div>'+notes+guestCheck(),foot+action("draw",next,"primary")+imprint()];
 }
 function render(fresh=false){
+  receiptObserver?.disconnect();
+  receiptObserver=null;
   finishQueueDrag(true);
   syncMenuClock();
   if(stage==="cover"){
@@ -2075,6 +2188,7 @@ function render(fresh=false){
   pad.classList.toggle("back",stage==="report");
 
   page.innerHTML='<div class="body">'+body+'</div><footer class="foot">'+foot+'</footer>';
+  if(stage==="report"&&receiptPrintPending)startReceiptPrint();
   const list=page.querySelector(".order-list");
   if(list&&!fresh)list.scrollTop=listScroll;
   if(fresh){if(!turningPage)page.querySelector("h2,h1")?.focus({preventScroll:true})}
@@ -2111,6 +2225,10 @@ async function draw(){
     storeMenu=buildStoreMenu({...scene,menuSeed:Math.floor(Math.random()*4294967296)},DISHES);
     menuEdits=0;menuElapsed=0;menuStarted=null;
     order=initialOrderFor(scene,storeMenu);cat=scene.mode==="frugal"?"汤羹主食":cats.find(c=>storeMenu.some(d=>menuCategoryLabel(d)===c));reviewingOrder=false;categoryScroll=0;
+    lastBudgetSum=total();
+    lastBudgetPct=budgetPct(lastBudgetSum,scene.budgetMax);
+    dishWhispers.clear();
+    receiptPrintPending=false;
     report=null;removing.clear();resetMenuView();
     stage="brief";render(true);
     if(openingCover)await openBookCover();
@@ -2198,6 +2316,7 @@ document.addEventListener("click",e=>{
     const newlyChecked=idx<0,animateDetails=newlyChecked&&!detailChoices.get(id);
     if(newlyChecked){order.push({dish,qty:orderLineQuantity(scene,{dish,qty:1})});detailChoices.delete(id)}
     else order[idx].qty++;
+    if(newlyChecked)pinDishWhisper(dish);
     SoundFX.check();
     menuEdits++;
     render();
@@ -2210,6 +2329,7 @@ document.addEventListener("click",e=>{
     SoundFX.uncheck();
     menuEdits++;
     if(a==="minus"&&order[idx].qty>1){order[idx].qty--;return render()}
+    dishWhispers.delete(id);
     removing.add(id);render();
     setTimeout(()=>{
       const focusInRow=document.activeElement.closest(".dish")?.dataset.dish===id;
