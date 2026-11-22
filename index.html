@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#21463d">
-<meta name="application-version" content="2.1.0">
+<meta name="application-version" content="2.1.1">
 <title>点菜模拟器 · 万家酒楼</title>
 <style>
 :root{--paper:#f6efe2;--pink:#f4dfd8;--red:#963c31;--line:#b98777;--green:#21463d;--ink:#322f29;--blue:#23438e;--pen:#c62828;--muted:#695d50;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
@@ -2068,6 +2068,23 @@ window.addEventListener("storage",event=>{
 readProgress();
 render();
 if(window.location.protocol==="http:"||window.location.protocol==="https:"){
+  function offsetBusuanzi(id,offset){
+    const el=document.getElementById(id);
+    if(!el||typeof MutationObserver==="undefined")return;
+    const observer=new MutationObserver(updateDisplay);
+    function updateDisplay(){
+      const text=el.textContent.trim();
+      if(!/^(?:\d+|\d{1,3}(?:,\d{3})+)$/.test(text))return;
+      const count=Number(text.replace(/,/g,""))+offset;
+      if(!Number.isSafeInteger(count))return;
+      el.textContent=count.toLocaleString("zh-CN");
+      observer.takeRecords(); // 忽略本次格式化写入，继续接收服务端的新数值。
+    }
+    observer.observe(el,{childList:true,characterData:true,subtree:true});
+    updateDisplay();
+  }
+  offsetBusuanzi("busuanzi_value_site_pv",1500);
+  offsetBusuanzi("busuanzi_value_site_uv",1000);
   const counterScript=document.createElement("script");
   counterScript.async=true;
   counterScript.src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
