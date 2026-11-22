@@ -51,14 +51,25 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 .cross{position:relative}.cross::after{content:"";position:absolute;left:0;top:37%;width:100%;height:3px;border-block:1px solid var(--blue);transform:rotate(-2deg);transform-origin:left;animation:stroke .19s ease-out}.empty{color:var(--muted);font-size:14px;padding:24px 0}
 .sliptop{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.sliptop b{color:var(--red);font-family:var(--serif)}
 .report{border-top:3px double var(--red);margin-top:13px;padding-top:10px}.score{color:var(--pen);font:italic 700 51px/1 var(--hand)}.score small{font-size:18px}.bars{margin:12px 0}.bar{display:grid;grid-template-columns:72px 1fr 26px;align-items:center;gap:8px;font-size:13px;margin:6px 0}.track{background:#b985712a;height:7px}.track i{display:block;height:100%;background:var(--blue)}.bar b{color:var(--blue);text-align:right}
-.notes{padding-left:23px;color:var(--pen);font:600 16px/1.65 var(--hand)}.notes li{padding:6px 0;border-bottom:1px dotted #bc998b}.notes strong{border:1px solid;border-radius:49%;padding:1px 4px}.notes u{text-underline-offset:3px}.seal{margin:17px 5px 8px auto;width:max-content;max-width:94%;border:4px double currentColor;padding:5px 11px;color:var(--pen);font:900 19px var(--serif);letter-spacing:.07em;transform:rotate(-5deg);background:repeating-linear-gradient(103deg,transparent 0 9px,#f9ebe890 10px,transparent 11px);background-clip:text}
+.notes{padding-left:23px;color:var(--pen);font:600 16px/1.65 var(--hand)}.notes li{padding:6px 0;border-bottom:1px dotted #bc998b}.notes strong{border:1px solid;border-radius:49%;padding:1px 4px}.notes u{text-underline-offset:3px}
+.grade-title{display:grid;grid-template-columns:minmax(0,1fr) clamp(112px,31vw,128px);gap:10px;align-items:center;margin:12px 5px 0 0}
+.grade-title h2{margin:0;font-size:clamp(20px,6.4vw,27px);text-wrap:balance}
+.seal{position:relative;display:grid;align-content:center;justify-items:center;min-height:80px;border:3px solid currentColor;border-radius:50%;color:#a42b23;transform:rotate(-7deg);font-family:var(--serif);line-height:1.13;white-space:nowrap}
+.seal::before{content:"";position:absolute;inset:3px;border:1px solid currentColor;border-radius:inherit;pointer-events:none}
+.seal small{font:700 10px/1.1 var(--serif);letter-spacing:.11em}
+.seal small::before,.seal small::after{content:"·";margin:0 3px}
+.seal b{margin:2px 0 1px;font-size:20px;letter-spacing:.04em}
+.seal strong{font-size:16px}.seal.long strong{font-size:13px}
+.seal.special b{font-size:clamp(14px,3.9vw,16px);letter-spacing:0}
+.seal::after{content:"";position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;background:repeating-linear-gradient(112deg,transparent 0 13px,#f9ebe89c 13.5px,transparent 14.3px 24px)}
+@media(prefers-reduced-motion:no-preference){.turn .seal{animation:stamp-in .29s ease-out both}}
+@keyframes stamp-in{from{opacity:0;transform:translateY(-5px) rotate(-11deg) scale(1.14)}65%{opacity:1;transform:rotate(-7deg) scale(.98)}to{transform:rotate(-7deg) scale(1)}}
 dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;background:var(--paper);border:2px solid var(--red);border-radius:4px;box-shadow:0 12px 40px #16181266}dialog::backdrop{background:#171813a8}dialog h2{font-size:23px}dialog p{margin:10px 0;font-size:15px}dialog .primary{margin-top:14px}
 .reveal{animation:sheet .24s ease-out}.turn{animation:flip .34s ease-out}.arrived{animation:ink .55s ease-out}
 @keyframes stroke{from{transform:scaleX(0) rotate(-2deg)}}@keyframes sheet{from{opacity:.5;transform:translateY(-7px)}}@keyframes flip{from{opacity:.4;transform:perspective(700px) rotateY(-12deg)}}@keyframes ink{from{background:#23438e24}}
 @media(min-height:820px){.cover{padding-block:24px}.poster{padding-block:24px 16px}.steps li{padding-block:10px}}
 @media(max-width:490px){body::before,body::after{display:none}.pad{width:min(414px,100vw);height:100vh;height:100dvh;border-radius:0}.foot{padding-bottom:max(13px,env(safe-area-inset-bottom))}}
 .binding{position:relative}.binding::after{content:"";position:absolute;inset:auto 0 -3px;height:3px;background:linear-gradient(135deg,#d8c8ae 25%,transparent 26%) 0 0/7px 4px repeat-x;pointer-events:none}
-.seal{position:relative}.seal::after{content:"";position:absolute;inset:-2px;pointer-events:none;background:repeating-linear-gradient(112deg,transparent 0 13px,#f9ebe884 13.5px,transparent 14.4px 24px)}
 @media(max-height:760px){.binding{height:16px}.brand{padding-block:7px}.cover{gap:10px;padding-block:12px}.poster{padding-block:9px}.poster h1{font-size:44px}#fish{height:95px}.steps li{padding-block:5px}.imprint{margin-top:7px}}
 @media(max-width:350px){.body{padding-inline:14px}.brand{margin-inline:14px}.foot{padding-inline:14px}.meta b{margin-left:4px}.steps li{gap:4px}.tab{font-size:12px}}
 @media(prefers-reduced-motion:reduce){*,*::after{animation-duration:.001ms!important;transition:none!important}}
@@ -114,10 +125,10 @@ const DISHES = (() => {
     ]],
     ["砂锅炖煲", [
       [29,"萝卜牛腩煲",88,"中煲600克",1.6,76,95,71,0,"beef","stew_pot","通","老饭","牛腩和白萝卜炖透，整煲上桌。"],
-      [30,"胡椒猪肚煲",98,"中煲650克",1.6,75,82,78,1,"pork","stew_pot","粤","地","猪肚条慢煲，汤里撒白胡椒。"],
+      [30,"胡椒猪肚煲",98,"中煲650克",1.6,75,82,78,1,"pork","stew_pot","东南粤","地","猪肚条慢煲，汤里撒白胡椒。"],
       [31,"闽式佛跳墙",488,"六位分享盅",1.8,99,85,82,0,"soup","stew_pot","东","老地海","坛内叠放海参、鲍鱼和蹄筋，酒香入汤。"],
       [32,"沙茶鱼头煲",88,"一煲约650克",1.6,73,65,74,1,"fish","stew_pot","南","骨饭地","鱼头过油，和蒜头沙茶同煨。"],
-      [33,"砂锅千页豆腐",38,"小煲350克",1.2,45,82,56,1,"tofu","stew_pot","通","饭","千页豆腐吸汤，垫洋葱上桌。"],
+      [33,"砂锅千页豆腐",38,"小煲350克",1.2,45,82,56,1,"tofu","stew_pot","通","饭制","千页豆腐吸汤，垫洋葱上桌。"],
       [34,"板栗焖鸡煲",78,"中煲550克",1.5,73,88,66,0,"poultry","stew_pot","通","饭","鸡块带皮焖，栗子炖至粉糯。"],
       [35,"砂锅狮子头",98,"大丸四只",1.6,79,90,74,0,"pork","stew_pot","沪","老嫩饭","手斩肉丸慢炖，配青菜心。"]
     ]],
@@ -135,9 +146,9 @@ const DISHES = (() => {
       [44,"老火靓汤",68,"汤盅一窝",1.3,72,88,42,0,"soup","soup","粤","老地","猪骨、玉米和胡萝卜慢火煲汤。"],
       [45,"腌笃鲜",98,"大汤碗800毫升",1.5,78,91,57,0,"soup","soup","沪","老地","春笋、咸肉和百叶结小火笃汤。"],
       [46,"西湖牛肉羹",48,"汤盆700毫升",1.2,60,91,26,0,"soup","soup","通","老轻嫩","牛肉末拌入蛋花，薄芡成羹。"],
-      [47,"紫菜蛋花汤",22,"汤碗600毫升",1,34,87,13,0,"soup","soup","通","老轻嫩","紫菜沸汤里打蛋花，撒葱末。"],
-      [48,"厦门炒米粉",32,"中盘400克",1.5,42,91,47,0,"staple","stir_fry","南","地海","细米粉炒卷心菜、虾米和肉丝。"],
-      [49,"扬州炒饭",38,"中盘450克",1.6,48,91,43,0,"staple","stir_fry","通","海","米饭炒鸡蛋、虾仁和火腿丁。"],
+      [47,"紫菜蛋花汤",22,"汤碗600毫升",1,34,87,13,0,"soup","soup","通","老轻嫩街","紫菜沸汤里打蛋花，撒葱末。"],
+      [48,"厦门炒米粉",32,"中盘400克",1.5,42,91,47,0,"staple","stir_fry","南","地","细米粉炒卷心菜、虾米和肉丝。"],
+      [49,"扬州炒饭",38,"中盘450克",1.6,48,91,43,0,"staple","stir_fry","通","","米饭炒鸡蛋、虾仁和火腿丁。"],
       [50,"白米饭",12,"小桶约六碗",1.8,22,93,4,0,"staple","steamed","通","老轻","小木桶盛热米饭，随桌分碗。"],
       [51,"福州鱼丸汤",48,"大碗十二粒",1.3,62,89,27,0,"soup","soup","东","老地海","鱼糜包肉馅，清汤里撒点葱花。"],
       [52,"冬瓜老鸭汤",68,"汤盆800毫升",1.4,64,87,37,0,"soup","soup","通","老","冬瓜切厚块，老鸭熬清汤。"]
@@ -145,7 +156,7 @@ const DISHES = (() => {
     ["凉菜卤味", [
       [53,"土笋冻",48,"拼盘八枚",0.7,57,62,13,0,"marine_worm","cold","南","凉地海","沙虫汤凝成小冻，另跟蒜醋。"],
       [54,"凉拌海蜇",48,"小盘200克",0.7,55,65,14,0,"jellyfish","cold","通","制凉轻海","海蜇丝配黄瓜，拌陈醋香油。"],
-      [55,"拍黄瓜",18,"小碟220克",0.7,27,86,11,0,"veg","cold","通","凉轻","黄瓜拍裂，蒜泥和醋现拌。"],
+      [55,"拍黄瓜",18,"小碟220克",0.7,27,86,11,0,"veg","cold","通","凉轻街","黄瓜拍裂，蒜泥和醋现拌。"],
       [56,"五香卤牛腱",68,"冷切200克",0.9,70,91,34,0,"beef","cold","通","凉嫩","牛腱卤熟切薄片，纹路带筋。"],
       [57,"沪式四喜烤麸",36,"小盘240克",0.9,47,86,36,0,"gluten","cold","沪","凉地","烤麸、木耳、香菇和金针菜收甜汁。"],
       [58,"夫妻肺片",52,"中盘250克",1,58,84,64,3,"beef","cold","川","街凉地","牛肉牛杂切片，拌红油花生碎。"]
@@ -185,21 +196,55 @@ const SCENARIOS = (() => {
 })();
 
 // ==================== [MODULE 3: JUDGE_ENGINE] 纯评分与批注引擎 ====================
+function budgetPoints(bill,lo,hi){
+  if(bill>hi)return 100-(9+(bill-hi)/hi*170);
+  if(bill<lo)return 100-Math.min(42,(lo-bill)/lo*55);
+  return 100;
+}
 function judge(scenario, order) {
   const {headcount:h,budgetMin:lo,budgetMax:hi,region,tier,guestTraits:t}=scenario;
-  const ds=order.map(r=>r.dish), n=ds.length, scores=[100,96,98,94,95], notes=[];
+  const n=order.length;
   const labels=['预算把控','面子排场','食客体感','识菜避坑','上菜节奏'];
+  const clamp=v=>Math.max(0,Math.min(100,Math.round(v)));
+  if(h>=4&&n===1){
+    const {dish,qty}=order[0],bill=dish.price*qty;
+    let verdict;
+    if(dish.ingredientType==='staple'){
+      verdict='一桌人就点一盘主食，怎么，今天包厢里搞饥荒演习、一人分三粒米？建议直接去楼下沙县一人一碗拌面，别占着人家大圆桌吹空调。';
+    }else if(dish.ingredientType==='veg'){
+      verdict='请客只上一盘青菜，你是打算带领导和客户集体辟谷修仙，还是明天一早已经准备好递辞职信了？';
+    }else if(dish.price>=200||dish.tags.includes('showy_empty')){
+      verdict='预算全砸这一道上，一桌子人干瞪眼围着一只盘子转圈，客人没吃饱不说，场面尴尬得能抠出三室一厅。';
+    }else{
+      verdict='满桌人盯着这一盘菜转转盘，筷子都不好意思伸第二次——这哪是请客吃饭，这是大型服从性测试。';
+    }
+    const coverage=Math.min(1,dish.portion*qty/h)*dish.edibility/100;
+    const score=15+Math.round(10*coverage);
+    const points=[budgetPoints(bill,lo,hi),dish.prestige/4,coverage*40,dish.edibility/2,0];
+    return {
+      score,rank:'职场自爆卡车',stampNote:'人事约谈',
+      dimensions:labels.map((label,i)=>({label,value:clamp(points[i])})),
+      fatal:h+' 人一桌只开一道菜，触发单菜结局，本局最高 25 分。',
+      notes:[
+        {dish:dish.name,reason:'全桌只有这一道',text:verdict,good:false},
+        {dish:dish.name,reason:'后厨核单',text:h+' 位客人，传菜记录上是 '+qty+' 份同一道菜。第一道端上来，末道也就齐了。',good:false},
+        {dish:dish.name,reason:'账单复核',text:'每份 '+dish.price+' 元，合计 '+bill+' 元。报账时菜单就这一行，倒是省纸。',good:false}
+      ]
+    };
+  }
+  const ds=order.map(r=>r.dish),notes=[];
   const ranks=['编外打杂实习生','局促见习办事员','中规中矩接待科员','精打细算副科长','稳妥得体接待科长','老练圆滑副处长','滴水不漏正处长','定海神针·资深办公室主任'];
   const money=k=>order.reduce((a,r)=>a+r.dish[k]*r.qty,0);
   const bill=money('price'), size=money('portion'), servings=order.reduce((a,r)=>a+r.qty,0);
+  const scores=[budgetPoints(bill,lo,hi),96,98,94,95];
   const edible=money('edibility')/Math.max(1,servings);
   const tagged=(d,k)=>d.tags.includes(k), withTag=k=>ds.filter(d=>tagged(d,k));
-  const heavy=d=>d.cookMethod==='stew_pot'||d.heaviness>=70;
+  const heavy=d=>d.heaviness>=70;
   const seafood=d=>d.category==='海鲜水产'||['fish','shrimp_crab'].includes(d.ingredientType)||tagged(d,'seafood');
   const suitable=d=>!(t.avoidSeafood&&seafood(d))&&!(t.avoidSpicy&&d.spicy>0);
   const names=list=>list.slice(0,2).map(d=>d.name).join('、');
   const first=ds[0], biggest=order.slice().sort((a,b)=>b.dish.price*b.qty-a.dish.price*a.qty)[0];
-  const anchor=biggest?biggest.dish.name:'', clamp=v=>Math.max(0,Math.min(100,Math.round(v)));
+  const anchor=biggest?biggest.dish.name:'';
   let cap=100,fatal='';
   function limit(v,s){if(v<cap){cap=v;fatal=s+'，本局最高 '+v+' 分。';}}
   function note(priority,dish,reason,text,good=false){notes.push({priority,dish,reason,text,good});}
@@ -210,12 +255,10 @@ function judge(scenario, order) {
   }
   if(bill>hi){
     const over=(bill-hi)/hi;
-    scores[0]-=9+over*170;
     note(over>=0.2?99:72,anchor,'超出红线'+(bill-hi)+'元','排面撑起来了，报销单谁签？光这一项就花了'+biggest.dish.price*biggest.qty+'元。');
     if(over>=0.4)limit(39,'总额超预算四成，财务退单');
     else if(over>=0.2)limit(64,'总额超预算两成，接待降级');
   }else if(bill<lo){
-    scores[0]-=Math.min(42,(lo-bill)/lo*55);
     note(43,anchor,'低于预算下限'+(lo-bill)+'元','账上还留着钱，先看看桌上有没有少照顾一双筷子。');
   }else note(48,anchor,'账目合规','全桌'+bill+'元，离红线还剩'+(hi-bill)+'元。签字的人不用陪你做算术。',true);
   const short=Math.max(0,h+1-n), extra=Math.max(0,n-h-2);
@@ -241,9 +284,10 @@ function judge(scenario, order) {
     fault(withTag('bony_messy'),2,12,81,'吐骨碍谈','客人刚想接话，嘴里还在找骨碟。谈事的节奏给这道菜掐断了。');
   }
   if(tier!=='street'){
-    fault(withTag('street_heavy'),1,19,84,'场合错配','留给夜宵摊多好，偏往正式桌上端。先想想今天是谁作陪。');
+    fault(withTag('street_heavy'),1,19,84,'场合错配','食堂、大排档里吃着挺合适，端上正式宴席，接待费愣是花出了工作餐的味道。');
     fault(withTag('premade_suspect'),3,22,88,'半成品嫌疑','酒楼收你现做价，这道却最容易从冻包或泡发盆里来。冤枉钱花得挺利索。');
-    fault(withTag('cold_dish'),3,16,83,'另买餐前凉碟','酒楼已经送了几碟，再买一盘占钱占桌。正式接待还多一项冷食存放的风险。');
+    const appetizers=withTag('cold_dish').filter(d=>!tagged(d,'showy_empty')&&d.price<150);
+    fault(appetizers,3,16,83,'另买餐前凉碟','酒楼已经送了几碟，再买一盘占钱占桌。正式接待还多一项冷食存放的风险。');
   }
   const sea=ds.filter(seafood);
   if(t.avoidSeafood&&sea.length){fault(sea,2,35,103,'忘了海鲜忌口','客人交代过忌口，菜一转到跟前，只好再转给别人。');limit(54,'海鲜忌口未落实');}
@@ -263,6 +307,7 @@ function judge(scenario, order) {
     :dialect[region]+'的席偏挑'+dialect[wrong[0].regions[0]]+'的招牌。客人想尝本地味，你让厨子带团出省。');
   const seen=new Map(), clashes=[];
   for(const d of ds){
+    if(['veg','soup','staple'].includes(d.ingredientType))continue;
     const key=d.ingredientType+'/'+d.cookMethod;
     if(seen.has(key))clashes.push([seen.get(key),d]);else seen.set(key,d);
   }
@@ -372,7 +417,16 @@ function kitchen(){
   }).join(""),summary()+action("serve","交后厨出菜","primary")];
 }
 function grade(){
-  return [heading("联单背面　／　经理批阅","接待考评定级单",scene.title)+meta()+'<div class="report"><div class="sliptop"><b>综合得分</b><span class="score">'+report.score+'<small> / 100</small></span></div>'+summary()+'<div class="bars">'+report.dimensions.map(x=>'<div class="bar"><span>'+x.label+'</span><div class="track"><i style="width:'+x.value+'%"></i></div><b>'+x.value+'</b></div>').join("")+'</div></div><div class="subtitle"><h3>经理逐条批注</h3>'+action("bill","查原单")+'</div>'+(report.fatal?'<p class="over">'+report.fatal+'</p>':'')+'<ol class="notes">'+report.notes.map(n=>'<li><strong>'+n.dish+'</strong>　<u>'+n.reason+'</u>。'+n.text+'</li>').join("")+'</ol><div class="seal">'+report.rank+'</div>',action("draw","再抽一单","primary")+imprint()];
+  // 八档称号都由四字评语和职务组成，印面分两行保留完整职务。
+  const remark=report.stampNote?report.rank:report.rank.slice(0,4);
+  const role=report.stampNote||report.rank.slice(4).replace(/^·/,"");
+  const stampClass=report.stampNote?' special':role.length>5?' long':'';
+  const stamp='<div id="grade-rank" class="seal'+stampClass+'" role="img" aria-label="最终职级：'+report.rank+(report.stampNote?'，'+report.stampNote:'')+'">'+
+    '<small>职级核定</small><b>'+remark+'</b><strong>'+role+'</strong></div>';
+  const header='<header class="stagehead">'+ticket("联单背面　／　经理批阅")+
+    '<div class="grade-title"><div><h2 tabindex="-1" aria-describedby="grade-rank">接待考评定级单</h2><p>'+
+    scene.title+'</p></div>'+stamp+'</div></header>';
+  return [header+meta()+'<div class="report"><div class="sliptop"><b>综合得分</b><span class="score">'+report.score+'<small> / 100</small></span></div>'+summary()+'<div class="bars">'+report.dimensions.map(x=>'<div class="bar"><span>'+x.label+'</span><div class="track"><i style="width:'+x.value+'%"></i></div><b>'+x.value+'</b></div>').join("")+'</div></div><div class="subtitle"><h3>经理逐条批注</h3>'+action("bill","查原单")+'</div>'+(report.fatal?'<p class="over">'+report.fatal+'</p>':'')+'<ol class="notes">'+report.notes.map(n=>'<li><strong>'+n.dish+'</strong>　<u>'+n.reason+'</u>。'+n.text+'</li>').join("")+'</ol>',action("draw","再抽一单","primary")+imprint()];
 }
 function render(fresh=false){
   const scroll=page.querySelector(".body")?.scrollTop||0,focus=document.activeElement;
