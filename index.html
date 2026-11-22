@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#21463d">
-<meta name="application-version" content="2.1.1">
+<meta name="application-version" content="2.2.0">
 <title>点菜模拟器 · 万家酒楼</title>
 <style>
 :root{--paper:#f6efe2;--pink:#f4dfd8;--red:#963c31;--line:#b98777;--green:#21463d;--ink:#322f29;--blue:#23438e;--pen:#c62828;--muted:#695d50;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
@@ -200,7 +200,11 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 .pad.flipping-slip{background-color:#d5c4ad}
 .flipping-slip .sheet-face{transform-origin:center center;backface-visibility:hidden;box-shadow:0 2px 12px #59463435}
 .binding{z-index:2}
-.brand strong{display:flex;align-items:center;min-width:0;font-size:clamp(17px,4.7vw,20px);line-height:1.25;letter-spacing:.045em}.brand strong i{flex:none}.brand>.smallbtn{justify-self:end;min-height:29px;white-space:nowrap}
+.brand strong{display:flex;align-items:center;min-width:0;font-size:clamp(17px,4.7vw,20px);line-height:1.25;letter-spacing:.045em}.brand strong i{flex:none}
+.brand-actions{display:flex;align-items:center;gap:5px;justify-self:end}
+.brand-actions .smallbtn{min-height:29px;white-space:nowrap}
+.mute-btn{min-width:32px;padding-inline:6px;text-align:center}
+.mute-btn[aria-pressed="true"]{opacity:.55;text-decoration:line-through}
 #brand-name{overflow-wrap:anywhere;text-wrap:balance}
 .brand-level,.archive-link{color:var(--blue);font:700 12px/1.4 var(--hand)}
 .archive-link{display:flex;align-items:center;justify-self:end;gap:6px;min-height:28px;padding:2px 6px;border:0;border-bottom:1px solid #23438e44;background:none}
@@ -217,7 +221,7 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 .exam-line{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
 .percentile{margin:0 0 9px;padding:4px 6px;color:var(--blue);border-block:1px dotted #23438e55;font:700 16px/1.3 var(--hand);background:#23438e07}
 .exam-line span{font:12px var(--serif);color:var(--muted)}.exam-line{margin-bottom:5px;color:var(--red);font:700 16px var(--hand)}
-@media(max-width:390px){.brand>.smallbtn{padding-inline:6px}.grade-title.has-award{gap:6px}}
+@media(max-width:390px){.brand-actions .smallbtn{padding-inline:6px}.brand-actions .mute-btn{min-width:29px;padding-inline:4px}.grade-title.has-award{gap:6px}}
 @media(max-width:350px){.brand strong i{width:20px;height:20px;margin-right:5px}.stamp-pair{gap:7px}.stamp-pair .seal b{font-size:16px}}
 @media(prefers-reduced-motion:no-preference){
   .tearing::before{content:"";position:absolute;inset:16px 0 0;background:repeating-linear-gradient(0deg,transparent 0 26px,#b9877740 26px 27px),linear-gradient(#d2b4a8,#f0dcd3 24%);pointer-events:none}
@@ -258,7 +262,10 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
   <div class="sheet-face">
   <header class="brand">
     <strong><i aria-hidden="true">单</i><span id="brand-name">万家酒楼 · 点菜联单</span></strong>
-    <button class="smallbtn" data-act="help" aria-haspopup="dialog" aria-controls="dialog">玩法说明</button>
+    <div class="brand-actions">
+      <button type="button" class="smallbtn mute-btn" id="muteBtn" data-act="mute" aria-pressed="false" aria-label="关闭音效" title="音效开关">🔊</button>
+      <button class="smallbtn" data-act="help" aria-haspopup="dialog" aria-controls="dialog">玩法说明</button>
+    </div>
     <span class="brand-level" id="tag-level">第 1 关 · 须达 60 分</span>
     <button id="progress-tag" class="archive-link" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-count">成就 0/18</span></button>
   </header>
@@ -1123,6 +1130,172 @@ function resetMenuView(){
 let storeMenu=[],menuEdits=0,menuElapsed=0,menuStarted=null;
 const total = () => order.reduce((sum,item)=>sum+orderLineTotal(scene,item),0);
 const savePrefix="ronggang.diancai.v1.";
+// 音频设备只在玩家第一次操作后启动；各声部共用静音总线。
+const SoundFX=(()=>{
+  let context=null,master=null,noiseBuffer=null,muted=false;
+  let pending=null,lastTick=-Infinity;
+  const active=new Set();
+
+  function syncMute(){
+    try{
+      const button=document.getElementById("muteBtn");
+      button.textContent=muted?"🔇":"🔊";
+      button.setAttribute("aria-pressed",String(muted));
+      button.setAttribute("aria-label",muted?"开启音效":"关闭音效");
+      if(master)master.gain.value=muted?0:1;
+      if(muted){
+        pending=null;
+        for(const source of active){try{source.stop()}catch{}}
+      }
+    }catch{}
+  }
+  function init(){
+    try{
+      try{muted=localStorage.getItem(savePrefix+"muted")==="true"}catch{}
+      syncMute();
+    }catch{}
+  }
+  function flush(){
+    try{
+      if(!pending||context?.state!=="running")return;
+      const cue=pending;
+      pending=null;
+      if(!muted&&performance.now()-cue.time<=220)synthesize(cue.name);
+    }catch{}
+  }
+  function unlock(){
+    try{
+      if(muted)return;
+      if(!context||context.state==="closed"){
+        const Audio=window.AudioContext||window.webkitAudioContext;
+        if(!Audio)return;
+        context=new Audio();
+        master=context.createGain();
+        master.gain.value=1;
+        master.connect(context.destination);
+        noiseBuffer=null;
+        context.onstatechange=flush;
+      }
+      if(context.state!=="running")context.resume()?.then(flush,()=>{});
+    }catch{}
+  }
+  function toggle(){
+    try{
+      muted=!muted;
+      syncMute();
+      try{localStorage.setItem(savePrefix+"muted",String(muted))}catch{}
+      if(!muted){unlock();play("tap")}
+    }catch{}
+  }
+  function voice(source,filter,start,duration,volume,attack){
+    let envelope;
+    function release(){
+      try{
+        active.delete(source);
+        source.disconnect();filter?.disconnect();envelope?.disconnect();
+      }catch{}
+    }
+    try{
+      envelope=context.createGain();
+      const gain=envelope.gain;
+      gain.setValueAtTime(0.0001,start);
+      gain.linearRampToValueAtTime(volume,start+attack);
+      if(filter&&duration>0.1)gain.linearRampToValueAtTime(volume*0.75,start+duration*0.55);
+      gain.exponentialRampToValueAtTime(0.0001,start+duration);
+      if(filter){source.connect(filter);filter.connect(envelope)}else source.connect(envelope);
+      envelope.connect(master);
+      source.onended=release;
+      active.add(source);
+      source.start(start);
+      source.stop(start+duration);
+    }catch{release()}
+  }
+  function tone(type,from,to,start,duration,volume,attack=0.002){
+    try{
+      const osc=context.createOscillator();
+      osc.type=type;
+      osc.frequency.setValueAtTime(from,start);
+      if(from!==to)osc.frequency.exponentialRampToValueAtTime(to,start+duration);
+      voice(osc,null,start,duration,volume,attack);
+    }catch{}
+  }
+  function noise(type,from,to,q,start,duration,volume){
+    try{
+      if(!noiseBuffer){
+        noiseBuffer=context.createBuffer(1,Math.ceil(context.sampleRate*0.22),context.sampleRate);
+        const samples=noiseBuffer.getChannelData(0);
+        // 独立的白噪声，不消耗抽单使用的随机数。
+        let seed=0x6d2b79f5;
+        for(let i=0;i<samples.length;i++){
+          seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;
+          samples[i]=(seed>>>0)/2147483648-1;
+        }
+      }
+      const source=context.createBufferSource(),filter=context.createBiquadFilter();
+      source.buffer=noiseBuffer;
+      filter.type=type;
+      filter.Q.value=q;
+      filter.frequency.setValueAtTime(from,start);
+      if(from!==to)filter.frequency.exponentialRampToValueAtTime(to,start+duration);
+      voice(source,filter,start,duration,volume,0.003);
+    }catch{}
+  }
+  function synthesize(name){
+    try{
+      const now=context.currentTime;
+      switch(name){
+        case "paper":
+          noise("bandpass",850,1750,1.2,now,0.22,0.19);break;
+        case "check":
+          noise("highpass",2200,2200,0.7,now,0.05,0.12);
+          tone("sine",650,980,now,0.025,0.05);break;
+        case "uncheck":
+          noise("bandpass",2400,1500,1.1,now,0.042,0.16);
+          noise("bandpass",2400,1500,1.1,now+0.06,0.038,0.12);break;
+        case "tap":
+          tone("triangle",190,85,now,0.03,0.045);break;
+        case "tick":
+          tone("sine",440,160,now,0.025,0.10);break;
+        case "bell":
+          tone("sine",1320,1320,now,0.65,0.14,0.005);
+          tone("sine",2640,2640,now,0.40,0.055,0.005);
+          tone("sine",3960,3960,now,0.24,0.025,0.005);break;
+        case "stamp":
+          tone("sine",145,42,now,0.12,0.23);
+          noise("lowpass",1150,650,0.7,now,0.03,0.25);break;
+      }
+    }catch{}
+  }
+  function play(name){
+    try{
+      if(muted||!context)return;
+      if(context.state!=="running"){
+        pending={name,time:performance.now()};
+        return;
+      }
+      pending=null;
+      synthesize(name);
+    }catch{}
+  }
+  return {
+    init,unlock,toggle,
+    paper(){try{play("paper")}catch{}},
+    check(){try{play("check")}catch{}},
+    uncheck(){try{play("uncheck")}catch{}},
+    tap(){try{play("tap")}catch{}},
+    tick(){
+      try{
+        const now=performance.now();
+        if(now-lastTick<35)return;
+        lastTick=now;
+        play("tick");
+      }catch{}
+    },
+    bell(){try{play("bell")}catch{}},
+    stamp(){try{play("stamp")}catch{}}
+  };
+})();
+
 const achievementKey="ronggang_achievements";
 const campaignKey="campaign140.";
 const lastLevel=8;
@@ -1278,6 +1451,7 @@ async function playPaperMotion(element,frames,options){
   }
 }
 function pressReportStamps(){
+  setTimeout(()=>SoundFX.stamp(),220);
   sheetFace.classList.remove("awaiting-imprint");
   const stamps=sheetFace.querySelectorAll(".grade-title .seal,.grade-title .award-seal");
   const press=[
@@ -1339,6 +1513,7 @@ async function turnInOrder(){
     saveMark(campaignKey+"retry."+roundLevel);
   }
   pad.classList.add("flipping-slip");
+  SoundFX.bell();
   sheetFace.classList.add("awaiting-imprint");
   await playPaperMotion(sheetFace,[{transform:"rotateY(0deg)"},{transform:"rotateY(90deg)"}],
     {duration:280,easing:"ease-in"});
@@ -1630,6 +1805,7 @@ function moveQueueRow(row,to){
       .map(line=>({line,top:line.getBoundingClientRect().top}));
   const [item]=order.splice(from,1);
   order.splice(to,0,item);
+  SoundFX.tick();
   const rows=Array.from(list.children);
   if(from<to){
     for(const sibling of rows.slice(from+1,to+1))list.insertBefore(sibling,row);
@@ -1924,6 +2100,7 @@ async function draw(){
   clearTimeout(shareTimer);shareTimer=0;shareDue=false;awardNoticePending=false;
   const tear=!openingCover&&!matchMedia("(prefers-reduced-motion: reduce)").matches;
   try{
+    if(openingCover||tear)SoundFX.paper();
     if(tear){
       pad.classList.add("tearing");
       await new Promise(done=>setTimeout(done,290));
@@ -1946,8 +2123,12 @@ async function draw(){
     finishPageTurn();
   }
 }
+document.addEventListener("pointerdown",SoundFX.unlock,{capture:true,passive:true});
+document.addEventListener("keydown",SoundFX.unlock,{capture:true});
 document.addEventListener("click",e=>{
   const b=e.target.closest("button[data-act]");if(!b||b.disabled)return;
+  if(b.dataset.act==="mute"){SoundFX.toggle();return}
+  SoundFX.unlock();
   if(turningPage||queueDrag)return;
   const a=b.dataset.act,id=b.dataset.id,idx=order.findIndex(x=>x.dish.id===id);
   if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。交单后可在经理批注下方对照结账小票。</p><p>主线共八关，依次接待家常川菜、长辈寿宴、西关早茶、发薪前夜、重辣湘宴、商务请托、同学撸串和驻京办终宴。留意谁喝酒、汤何时上；粤闽的茶位按人数入账。主线第 2 至 7 关过关后，下一张派单有四成机会夹进快餐支线，每种每次会话最多遇到一次。支线结账后继续原关。第八关达标后可自由接单。</p><p>关卡与 '+ACHIEVEMENTS.length+' 枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
@@ -1969,6 +2150,7 @@ document.addEventListener("click",e=>{
   if(a==="save-share"&&activeShare)return saveShareImage(activeShare);
   if(a==="draw"&&(stage==="cover"||stage==="report"))return draw();
   if(a==="brief"&&(stage==="brief"||stage==="menu")){
+    SoundFX.tap();
     const open=b.getAttribute("aria-expanded")!=="true";
     if(stage==="brief")firstBriefOpen=open;else menuBriefOpen=open;
     b.setAttribute("aria-expanded",String(open));
@@ -1976,8 +2158,9 @@ document.addEventListener("click",e=>{
     return;
   }
   if(a==="bill")return modal("原单 · 后厨出菜次序",order.map(({dish,qty},i)=>'<p>'+(i+1)+'．'+dish.name+' × '+qty+'　¥'+dish.price*qty+'</p>').join("")+summary());
-  if(a==="edit"){stage="menu";return render(true)}
+  if(a==="edit"){SoundFX.tap();stage="menu";return render(true)}
   if(a==="review-order"&&stage==="menu"){
+    SoundFX.tap();
     if(!reviewingOrder){
       categoryScroll=page.querySelector(".body").scrollTop;
       categoryListScroll=page.querySelector(".order-list").scrollTop;
@@ -1989,15 +2172,17 @@ document.addEventListener("click",e=>{
     return;
   }
   if(a==="cat"){
+    SoundFX.tap();
     cat=b.dataset.cat;render();
     page.querySelector(".body").scrollTop=0;
     page.querySelector(".order-list").scrollTop=0;
     return;
   }
-  if(a==="kitchen"&&!orderSubmissionIssue(scene,order)&&!removing.size){stage="kitchen";return render(true)}
+  if(a==="kitchen"&&!orderSubmissionIssue(scene,order)&&!removing.size){SoundFX.tap();stage="kitchen";return render(true)}
   if(a==="serve"&&stage==="kitchen"&&order.length)return settle();
   if(removing.has(id))return;
   if(a==="dish-detail"&&stage==="menu"){
+    SoundFX.tap();
     const open=b.getAttribute("aria-expanded")!=="true";
     detailChoices.set(id,open);
     const row=b.closest(".dish");
@@ -2013,6 +2198,7 @@ document.addEventListener("click",e=>{
     const newlyChecked=idx<0,animateDetails=newlyChecked&&!detailChoices.get(id);
     if(newlyChecked){order.push({dish,qty:orderLineQuantity(scene,{dish,qty:1})});detailChoices.delete(id)}
     else order[idx].qty++;
+    SoundFX.check();
     menuEdits++;
     render();
     if(newlyChecked){
@@ -2021,6 +2207,7 @@ document.addEventListener("click",e=>{
       row.querySelector(".dish-check").focus({preventScroll:true});
     }
   }else if((a==="minus"||a==="uncheck")&&stage==="menu"&&idx>=0){
+    SoundFX.uncheck();
     menuEdits++;
     if(a==="minus"&&order[idx].qty>1){order[idx].qty--;return render()}
     removing.add(id);render();
@@ -2059,12 +2246,14 @@ document.addEventListener("visibilitychange",syncMenuClock);
 dialog.addEventListener("close",nextReportDialog);
 achModal.addEventListener("close",nextReportDialog);
 window.addEventListener("storage",event=>{
+  if(event.key===savePrefix+"muted"){SoundFX.init();return}
   if(event.key!==achievementKey&&!event.key?.startsWith(savePrefix))return;
   readProgress();
   if(turningPage){progressRefreshPending=true;return}
   if(stage==="cover"||stage==="report")render();else updateTag();
   if(achModal.open)archivePages.innerHTML=archive();
 });
+SoundFX.init();
 readProgress();
 render();
 if(window.location.protocol==="http:"||window.location.protocol==="https:"){
