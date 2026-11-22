@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#21463d">
 <title>点菜模拟器 · 万家酒楼</title>
 <style>
-:root{--paper:#f6efe2;--pink:#f9ebe8;--red:#963c31;--line:#b98777;--green:#21463d;--ink:#322f29;--blue:#23438e;--pen:#c62828;--muted:#695d50;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
+:root{--paper:#f6efe2;--pink:#f4dfd8;--red:#963c31;--line:#b98777;--green:#21463d;--ink:#322f29;--blue:#23438e;--pen:#c62828;--muted:#695d50;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
 *{box-sizing:border-box}
 body{margin:0;height:100vh;height:100dvh;display:grid;place-items:center;overflow:hidden;color:var(--ink);font:16px/1.5 system-ui,"Microsoft YaHei",sans-serif;background:radial-gradient(ellipse at 48% 36%,#5a51412c 0%,#171a17a6 100%),repeating-linear-gradient(2deg,transparent 0 118px,#191b18b3 119px,#55504473 120px,transparent 123px 188px),repeating-linear-gradient(1deg,#39372e 0,#34342d 2px,#39382f 4px,#403d33 6px,#35352e 9px)}
 body::before{content:"";position:fixed;left:11%;bottom:12%;width:125px;aspect-ratio:1;border:4px solid #bd955c10;border-left-color:#c09a6424;border-radius:49% 52% 46% 50%;box-shadow:0 0 0 2px #1b20192c,inset 2px 1px 4px #181c1938;transform:rotate(23deg)}
@@ -17,7 +17,7 @@ button:focus-visible,[tabindex="-1"]:focus-visible{outline:3px solid var(--blue)
 .pad{position:relative;z-index:1;width:min(414px,100vw);height:min(860px,calc(100dvh - 24px));border-radius:9px 9px 6px 6px;overflow:hidden;display:flex;flex-direction:column;background-color:var(--paper);background-image:repeating-linear-gradient(7deg,#66513506 0 1px,transparent 1px 4px),radial-gradient(ellipse at 15% 12%,#fff8,transparent 65%);box-shadow:0 2px #dcc5b6,0 4px #b59080,0 6px #dbc5a8,0 8px #79695b,0 21px 52px #080b08a6}
 .pad.back{background-color:var(--pink)}
 .binding{height:22px;flex:none;border-bottom:1px dashed #98705a90;background:radial-gradient(ellipse at center,#37392f 0 2.6px,#ac927c 3px,transparent 3.8px) 2px 1px/23px 17px repeat-x,linear-gradient(#dacbb4,#f0e3cd)}
-.brand{display:flex;align-items:center;justify-content:space-between;margin:0 23px;padding:12px 0 9px;border-bottom:3px double var(--red);color:var(--red)}
+.brand{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:3px 10px;margin:0 23px;padding:9px 0 6px;border-bottom:3px double var(--red);color:var(--red)}
 .brand strong{font:900 19px var(--serif);letter-spacing:.1em}.brand strong i{font:700 15px var(--serif);border:1px solid;border-radius:50%;display:inline-grid;place-items:center;width:23px;height:23px;margin-right:7px;letter-spacing:0}
 .smallbtn,.tab,.ctrl{background:transparent;border:1px solid var(--line);border-radius:2px;font-weight:600}.smallbtn{font-size:13px;padding:4px 9px;color:var(--red)}
 #page{flex:1;min-height:0;display:flex;flex-direction:column}
@@ -26,20 +26,57 @@ button:focus-visible,[tabindex="-1"]:focus-visible{outline:3px solid var(--blue)
 .ticket{display:flex;align-items:center;justify-content:space-between;gap:8px;font:600 12px var(--mono),var(--serif);letter-spacing:.09em;color:var(--red)}
 .ticket b{font-weight:normal;letter-spacing:.04em}
 h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-height:1.23;color:var(--green)}h3{font-size:18px}
-.cover{display:flex;flex-direction:column;gap:16px;justify-content:space-between}
-.poster{position:relative;text-align:center;color:var(--green);border:1px solid var(--green);outline:1px solid #54736680;outline-offset:-4px;padding:16px 8px 10px;background:radial-gradient(ellipse at 45% 55%,#e0d9af35,transparent 74%)}
-.poster::before,.poster::after{position:absolute;content:"✦";font-size:13px;top:5px;line-height:1;background:var(--paper);padding:1px}.poster::before{left:5px}.poster::after{right:5px}
-.poster small{font:600 12px var(--serif);letter-spacing:.27em}.poster h1{font:900 clamp(39px,12.2vw,52px)/1.15 var(--serif);letter-spacing:.055em;margin:6px 0 1px;text-shadow:.6px 0 currentColor}
-#fish{width:100%;height:auto;display:block;aspect-ratio:340/116}
-.edition{display:flex;align-items:center;justify-content:center;gap:9px;font:600 12px var(--serif);letter-spacing:.18em}.edition::before,.edition::after{content:"";width:33px;border-top:1px solid #668075}
+.pad{perspective:1500px}
+.book-cover{
+  position:absolute;inset:0;z-index:4;overflow:auto;overscroll-behavior:contain;
+  padding:14px 13px 14px 23px;border-radius:inherit;transform-origin:left center;
+  background-color:#efe4ce;
+  background-image:linear-gradient(90deg,#94775a80,#e4d0b0 5px,#efdfc3 10px,#9c79574d 13px,#fff3dcb3 15px,transparent 19px),
+    repeating-linear-gradient(13deg,transparent 0 3px,#78563708 3px 4px),
+    radial-gradient(ellipse at 65% 22%,#fff6e280,transparent 65%);
+  box-shadow:inset -2px 0 0 #ab9270,inset 0 -2px 1px #a78a6766;
+  transition:transform 0.68s cubic-bezier(0.22, 0.85, 0.32, 1), opacity 0.55s ease 0.12s;
+}
+.book-cover[hidden],.cover-bookmark[hidden]{display:none}
+.book-cover::before{content:"";position:absolute;inset:0 auto 0 0;width:18px;z-index:1;pointer-events:none;transition:box-shadow .45s ease}
+.book-cover.opening{transform:rotateY(-172deg) translateZ(4px);opacity:0;pointer-events:none}
+.book-cover.opening::before{box-shadow:inset 12px 0 14px #4c301ed9,5px 0 12px #4c301e73}
+.cover-board{
+  min-height:100%;border:4px double #963c31;padding:clamp(15px,3.5vh,29px) clamp(13px,4.2vw,22px);
+  display:grid;grid-template-rows:auto 1fr auto;gap:12px;
+}
+.cover-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.cover-plaque{flex:none;padding:3px 8px;border:3px double var(--red);color:var(--red);font:700 14px/1.3 var(--serif);letter-spacing:.13em}
+.cover-bookmark{
+  position:relative;width:clamp(118px,38vw,147px);padding:9px 9px 8px;margin:-10px -6px 0 0;
+  border:1px solid #b5a17c;background:#f5e7bd;color:var(--blue);transform:rotate(3deg);
+  box-shadow:1px 2px 2px #59452a26;font:600 12px/1.45 var(--hand);overflow-wrap:anywhere;
+}
+.cover-bookmark::before{content:"";position:absolute;right:9px;top:-6px;width:5px;height:12px;border:1px solid #776f5e;border-radius:5px}
+.cover-titleblock{display:flex;flex-direction:column;justify-content:center;align-items:center;padding-block:clamp(10px,4vh,36px);text-align:center}
+.cover-title{color:var(--green);line-height:1.12}
+.cover-title span,.cover-title strong{display:block}
+.cover-title span{font:700 clamp(23px,7.6vw,32px)/1.2 var(--serif);letter-spacing:.15em;text-indent:.15em}
+.cover-title strong{margin-top:7px;font:900 clamp(36px,11.8vw,49px)/1.25 var(--serif);letter-spacing:.035em;text-shadow:.5px 0 currentColor}
+.cover-title::after{content:"";display:block;width:31px;height:1px;background:var(--red);margin:15px auto 0}
+.cover-chop{
+  display:grid;grid-template-columns:repeat(2,1em);margin-top:clamp(17px,4vh,36px);padding:5px;
+  border:4px double currentColor;border-radius:6px 4px 7px 4px;color:var(--red);transform:rotate(-8deg);
+  font:900 22px/1 var(--serif);text-shadow:.4px 0 currentColor;
+}
+.cover-bottom{display:grid;gap:9px;align-content:end}
+.primary.cover-open{min-height:48px;border-radius:2px;box-shadow:inset 0 0 0 3px var(--red),inset 0 0 0 4px #ebc7aa80,0 2px #d6b999,0 4px #713b2d,0 5px 9px #5c452530}
+@media(max-height:520px){.cover-board{gap:6px;padding-block:10px}.cover-titleblock{padding-block:6px}.cover-title::after{margin-top:6px}.cover-chop{margin-top:9px;font-size:16px}.cover-bottom{gap:4px}}
+@media(max-height:420px) and (orientation:landscape){
+  .cover-titleblock{flex-direction:row;gap:18px}.cover-title span{font-size:20px}.cover-title strong{font-size:34px}
+  .cover-title::after{display:none}.cover-chop{margin:0}
+}
 .meta{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);border-left:1px solid var(--line);color:var(--red)}
 .meta div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:5px 9px;font:13px/1.55 var(--serif);white-space:nowrap}
 .pen,.meta b,.price,.seq{color:var(--blue);font-family:var(--hand);font-weight:bold}.meta b{display:inline-block;transform:rotate(-1.5deg);font-size:16px;margin-left:8px}
-.introhead,.subtitle{display:flex;align-items:center;justify-content:space-between;color:var(--red);border-bottom:1px solid var(--line);padding-bottom:5px}
-.introhead span,.tiny{font-size:12px;color:var(--muted)}.steps{padding:0;margin:0;list-style:none}
-.steps li{display:grid;grid-template-columns:28px 78px 1fr;align-items:center;gap:8px;border-bottom:1px dotted #b99e8a;padding:8px 0}
-.steps i,.seq{font:700 16px/24px var(--hand);width:25px;height:25px;text-align:center;border:1px solid var(--blue);border-radius:48% 54% 46% 52%;color:var(--blue);transform:rotate(-5deg)}
-.steps b{font:700 17px var(--serif)}.steps span{font-size:13px;color:var(--muted)}
+.subtitle{display:flex;align-items:center;justify-content:space-between;color:var(--red);border-bottom:1px solid var(--line);padding-bottom:5px}
+.tiny{font-size:12px;color:var(--muted)}
+.seq{font:700 16px/24px var(--hand);width:25px;height:25px;text-align:center;border:1px solid var(--blue);border-radius:48% 54% 46% 52%;color:var(--blue);transform:rotate(-5deg)}
 .primary{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;min-height:46px;padding:9px 8px;border:1px solid #7d332a;border-radius:3px;background:#963c31;color:#fff7e8;box-shadow:inset 0 0 0 3px #963c31,inset 0 0 0 4px #dca79370,0 2px 0 #6e392b;font:700 17px/1.4 var(--serif);letter-spacing:.055em}
 .primary:active:not(:disabled){transform:translateY(1px);box-shadow:none}.primary .cut{font-size:24px;line-height:.9}
 .imprint{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:var(--muted);font:12px var(--serif);letter-spacing:.07em}.inks{color:var(--red);margin-right:4px;text-shadow:6px 0 var(--blue)}
@@ -47,26 +84,47 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 .ledger-counter>span{border-bottom:1px dashed #963c3133;white-space:nowrap}
 .ledger-counter b{color:#23438e;font-family:var(--mono);font-weight:700}
 .stagehead{margin-bottom:15px}.stagehead h2{margin-top:9px}.stagehead p{color:var(--muted);font-size:14px;margin-top:6px}
+.menu-head{margin-bottom:0}.menu-title{display:flex;align-items:baseline;justify-content:space-between;gap:9px;margin-top:6px}
+.menu-title h2{margin:0}.menu-title span{color:var(--muted);font:12px/1.4 var(--serif);white-space:nowrap}
 .info{padding:14px 0;border-bottom:1px dotted #aa9181}.info h3{color:var(--red);font-size:15px;margin-bottom:5px}.info p{font-size:15px}
+.brief-panel{margin-top:12px;border-block:1px solid rgba(150,60,49,.2)}
+.brief-toggle{display:flex;align-items:center;width:100%;min-height:38px;padding:5px 0;border:0;background:transparent;text-align:left;color:var(--red);font:700 14px/1.4 var(--serif)}
+.brief-toggle .brief-context{min-width:0;margin-left:10px;color:var(--muted);font:12px/1.5 var(--serif)}
+.brief-toggle::after{content:"";flex:none;width:6px;height:6px;margin:0 5px 3px auto;border:solid currentColor;border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
+.brief-toggle[aria-expanded="true"]::after{transform:rotate(225deg);margin-bottom:-3px}
+.brief-panel .info{padding:8px 0;border-bottom:0}.brief-panel .info:first-child{padding-top:2px}.brief-panel .info:last-child{padding-bottom:12px}
+.brief-panel .info h3{font-size:13px}.brief-panel .info p{line-height:1.55}
 .summary{display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:13px;margin-bottom:8px}.summary b{font:700 18px var(--hand);color:var(--blue)}.over,.summary.over b{color:var(--pen)}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:12px 0}.tab{padding:6px 0;font-size:13px;color:var(--red)}.tab.active{background:var(--green);color:var(--paper);border-color:var(--green)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:10px 0 2px}.tab{padding:6px 0;font-size:13px;color:var(--red)}.tab.active{background:var(--green);color:var(--paper);border-color:var(--green)}
 .order-strip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px 12px;margin-bottom:9px}
 .order-link{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:5px 10px;border:1px solid #23438e80;border-radius:2px;background:#23438e09;color:var(--blue);font:700 16px/1.25 var(--serif)}
 .order-link .order-count{font:700 13px/1.3 var(--hand);white-space:nowrap}.order-link::after{content:"";width:6px;height:6px;border:solid currentColor;border-width:1.5px 1.5px 0 0;transform:rotate(45deg)}
 .order-link.return::after{order:-1;transform:rotate(-135deg)}
 .order-cost{margin-left:auto;text-align:right;font-size:13px;line-height:1.35}.order-cost b{color:var(--blue);font:700 17px var(--hand)}.order-cost.over b{color:inherit}.order-cost small{display:block;color:var(--muted);font-size:12px}
-.dish,.queue{padding:10px 0;border-bottom:1px dotted #b39682;display:flex;align-items:center;gap:7px}.detail{flex:1;min-width:0}.name{font:700 17px var(--serif)}.desc,.spec{font-size:13px;color:var(--muted)}.spec{margin-left:7px}.price{font:700 15px var(--mono)}.ctrl{border-color:#637797;color:var(--blue);min-width:32px;height:33px;padding:0 6px}.checked{background:#23438e12}.qty{font:700 16px var(--hand);color:var(--blue)}.orderbtns{display:flex;align-items:center;gap:5px}
+.queue{padding:10px 0;border-bottom:1px dotted #b39682;display:flex;align-items:center;gap:7px}.detail{flex:1;min-width:0}.name{font:700 17px var(--serif)}.desc{font-size:13px;color:var(--muted)}.price{font:700 15px var(--mono)}.ctrl{border-color:#637797;color:var(--blue);min-width:32px;height:33px;padding:0 6px}
+.dish{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(150,60,49,.2)}
+.dish-info{min-width:0;display:flex;align-items:center;gap:10px;padding:0;border:0;background:none;text-align:left}
+.dish-info .name,.dish-info .spec{display:block}.dish-info .name{line-height:1.35}.dish-info .spec{margin-top:3px;color:#7a6b5d;font:11px/1.45 var(--serif)}
+.dish-sale{display:flex;align-items:center;justify-content:flex-end;gap:5px}.dish-sale .price{white-space:nowrap}
+.dish-check{display:grid;place-items:center;min-width:38px;min-height:42px;padding:0;border:0;background:none;color:var(--blue)}
+.dish-check span{display:grid;place-content:center;width:21px;height:21px;border:1px solid #23438e91;border-radius:2px 1px 3px 1px;font:700 24px/1 var(--hand)}
+.dish-check[aria-pressed="true"] span{border-color:var(--blue);transform:rotate(-4deg)}
+.dish-desc{grid-column:1/-1;max-height:0;overflow:hidden;margin-left:56px;color:var(--muted);font:13px/1.6 var(--serif);opacity:0;transition:max-height .24s ease,opacity .18s ease}
+.dish-desc span{display:block;padding-top:6px}.dish.open-detail .dish-desc{max-height:12em;opacity:1}
+@keyframes dish-unfold{from{max-height:0;opacity:0}to{max-height:12em;opacity:1}}
+@media(prefers-reduced-motion:no-preference){.dish.just-checked .dish-desc{animation:dish-unfold .24s ease}}
+.orderbtns{grid-column:1/-1;justify-self:end;display:flex;align-items:center;gap:3px;margin-top:5px;color:var(--blue)}
+.orderbtns .ctrl{height:32px;min-width:32px;border-color:#23438e55}.qty{min-width:30px;text-align:center;font:700 14px/1.3 var(--hand)}
 .queue-list{position:relative;overflow-anchor:none}
 .queue{position:relative;gap:6px}.queue .seq{flex:none}.queue .ctrl{width:28px;min-width:28px;height:38px;padding:0}
 .queue .course{display:block;color:var(--blue);font:600 13px/1.4 var(--hand)}
 .queue-grip{flex:0 0 36px;height:44px;padding:0;border:1px dashed #23438e77;border-radius:2px;background:#23438e07;color:var(--blue);font:700 23px var(--serif);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 .queue-grip:disabled{cursor:default}.queue.lifted{z-index:1;background:var(--paper);box-shadow:0 3px 9px #492f2240;transform:translateY(var(--slide,0px)) scale(1.02)}.queue.lifted .queue-grip{cursor:grabbing}
-.sketch{position:relative;flex:none;width:52px;height:52px;overflow:hidden;border:1px solid #23438e66;border-radius:2px;color:#23438e}
+.sketch{position:relative;flex:none;width:46px;height:46px;overflow:hidden;border:1px solid #23438e66;border-radius:2px;color:#23438e}
 .sketch svg,.sketch img{width:100%;height:100%;display:block}.sketch img{position:absolute;inset:0;object-fit:cover;background:var(--paper)}
 .sketch svg{fill:none;stroke:#23438e;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}.sketch .hatch{stroke:#23438e55;stroke-width:1.2}.sketch .steam{stroke-width:1.15}
 .cross{position:relative}.cross::after{content:"";position:absolute;left:0;top:37%;width:100%;height:3px;border-block:1px solid var(--blue);transform:rotate(-2deg);transform-origin:left;animation:stroke .19s ease-out}.empty{color:var(--muted);font-size:14px;padding:24px 0}
 .sliptop{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.sliptop b{color:var(--red);font-family:var(--serif)}
-.meta+.sliptop{margin-top:16px}
 .report{border-top:3px double var(--red);margin-top:13px;padding-top:10px}.score{color:var(--pen);font:italic 700 51px/1 var(--hand)}.score small{font-size:18px}.bars{margin:12px 0}.bar{display:grid;grid-template-columns:72px 1fr 26px;align-items:center;gap:8px;font-size:13px;margin:6px 0}.track{background:#b985712a;height:7px}.track i{display:block;height:100%;background:var(--blue)}.bar b{color:var(--blue);text-align:right}
 .notes{padding-left:23px;color:var(--pen);font:600 16px/1.65 var(--hand)}.notes li{padding:6px 0;border-bottom:1px dotted #bc998b}.notes strong{border:1px solid;border-radius:49%;padding:1px 4px}.notes u{text-underline-offset:3px}
 .grade-title{display:grid;grid-template-columns:minmax(0,1fr) clamp(112px,31vw,128px);gap:10px;align-items:center;margin:12px 5px 0 0}
@@ -77,8 +135,8 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 .seal small::before,.seal small::after{content:"·";margin:0 3px}
 .seal b{display:block;max-width:100%;padding:0 5px;margin:4px 0 0;font:900 clamp(16px,4.6vw,19px)/1.1 var(--serif);white-space:normal;text-align:center;text-wrap:balance}
 .seal::after{content:"";position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;background:repeating-linear-gradient(112deg,transparent 0 13px,#f9ebe89c 13.5px,transparent 14.3px 24px)}
-@media(prefers-reduced-motion:no-preference){.turn .seal{animation:stamp-in .29s ease-out both}}
-@keyframes stamp-in{from{opacity:0;transform:translateY(-5px) rotate(-11deg) scale(1.14)}65%{opacity:1;transform:rotate(-7deg) scale(.98)}to{transform:rotate(-7deg) scale(1)}}
+.grade-title :is(.seal,.award-seal){transform:scale(1) rotate(-6deg)}
+.awaiting-imprint .grade-title :is(.seal,.award-seal){opacity:0}
 dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;background:var(--paper);border:2px solid var(--red);border-radius:4px;box-shadow:0 12px 40px #16181266}dialog::backdrop{background:#171813a8}dialog h2{font-size:23px}dialog p{margin:10px 0;font-size:15px}dialog .primary{margin-top:14px}
 #achModal{width:min(430px,94vw);padding:0;overflow:hidden}
 #achModal[open]{display:flex;flex-direction:column}
@@ -99,7 +157,6 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 .subtitle:has(.report-actions){flex-wrap:wrap;gap:4px 6px}
 .copy-field{position:fixed;inset:0 auto auto 0;width:1px;height:1px;opacity:0;font-size:16px}
 .copy-field.manual{position:static;display:block;width:100%;height:7em;margin:8px 0;opacity:1;padding:8px;color:var(--blue);background:var(--paper);border:1px solid var(--line)}
-.challenge-note{margin:0 2px;padding:9px 13px;border-left:3px solid #7484a8;background:repeating-linear-gradient(transparent 0 22px,#23438e12 22px 23px),#efeadb;box-shadow:1px 2px 2px #66513524;color:var(--blue);font:700 15px/1.52 var(--hand);overflow-wrap:anywhere}
 #shareModal{width:min(424px,94vw);max-height:min(91dvh,760px);padding:0;border:4px double var(--red);border-radius:2px;background:repeating-linear-gradient(7deg,#66513506 0 1px,transparent 1px 4px),var(--paper);overflow:hidden}
 #shareModal[open]{display:flex;flex-direction:column}
 .share-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 16px;padding:8px 0;border-bottom:3px double var(--red)}
@@ -116,21 +173,22 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 .share-url{display:block;width:100%;min-width:0;padding:6px 8px;border:1px solid #23438e66;border-radius:2px;background:#23438e07;color:var(--blue);font:16px/1.3 var(--mono)}
 .share-body .primary{margin:10px 0 5px}.share-save{display:block;width:100%;min-height:40px;border:0;background:transparent;text-decoration:underline;text-underline-offset:4px}
 .share-body #shareStatus{margin:2px 0;font-size:13px;color:var(--blue)}#shareStatus:empty{display:none}
-.reveal{animation:sheet .24s ease-out}.turn{animation:flip .34s ease-out}.arrived{animation:ink .55s ease-out}
-@keyframes stroke{from{transform:scaleX(0) rotate(-2deg)}}@keyframes sheet{from{opacity:.5;transform:translateY(-7px)}}@keyframes flip{from{opacity:.4;transform:perspective(700px) rotateY(-12deg)}}@keyframes ink{from{background:#23438e24}}
-@media(min-height:820px){.cover{padding-block:24px}.poster{padding-block:24px 16px}.steps li{padding-block:10px}}
+@keyframes stroke{from{transform:scaleX(0) rotate(-2deg)}}
 @media(max-width:490px){body::before,body::after{display:none}.pad{width:min(414px,100vw);height:100vh;height:100dvh;border-radius:0}.foot{padding-bottom:max(13px,env(safe-area-inset-bottom))}}
 .binding{position:relative}.binding::after{content:"";position:absolute;inset:auto 0 -3px;height:3px;background:linear-gradient(135deg,#d8c8ae 25%,transparent 26%) 0 0/7px 4px repeat-x;pointer-events:none}
-@media(max-height:760px){.binding{height:16px}.brand{padding-block:7px}.cover{gap:10px;padding-block:12px}.poster{padding-block:9px}.poster h1{font-size:44px}#fish{height:95px}.steps li{padding-block:5px}.imprint{margin-top:7px}}
-@media(max-width:350px){.body{padding-inline:14px}.brand{margin-inline:14px}.foot{padding-inline:14px}.meta b{margin-left:4px}.steps li{gap:4px}.tab{font-size:12px}}
+@media(max-height:760px){.binding{height:16px}.brand{padding-block:7px}.imprint{margin-top:7px}}
+@media(max-width:350px){.body{padding-inline:14px}.brand{margin-inline:14px}.foot{padding-inline:14px}.meta b{margin-left:4px}.tab{font-size:12px}}
 @media(prefers-reduced-motion:reduce){*,*::after{animation-duration:.001ms!important;transition:none!important}}
 .sheet-face{--face:var(--paper);position:relative;display:flex;flex:1;min-height:0;flex-direction:column;background-color:var(--face);background-image:inherit;transform-origin:8px 0}
 .back .sheet-face{--face:var(--pink)}
+.pad.flipping-slip{background-color:#d5c4ad}
+.flipping-slip .sheet-face{transform-origin:center center;backface-visibility:hidden;box-shadow:0 2px 12px #59463435}
 .binding{z-index:2}
-.brand{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px}.brand strong{display:flex;align-items:center;min-width:0;font-size:clamp(15px,4.3vw,18px);line-height:1.25;letter-spacing:.035em}.brand strong i{flex:none}.brand>.smallbtn{margin-left:auto;white-space:nowrap}
-#brand-name{overflow-wrap:anywhere;text-wrap:balance}.edition b{padding:2px 7px;border:3px double var(--red);color:var(--red);font:700 16px/1.2 var(--serif);letter-spacing:.1em;transform:rotate(-3deg)}
-.clip-note{position:relative;flex:none;margin:-5px 0 -4px 4px;padding:4px 10px 4px 7px;border:1px solid #d0b879;border-radius:1px 1px 5px 1px;background:linear-gradient(145deg,#fff0b8,#f6dfa0 86%,#ead18b);box-shadow:1px 2px 2px #735a3529;transform:rotate(3deg);color:var(--blue);font:700 12px/1.22 var(--hand);text-align:left}
-.clip-note span{display:block;white-space:nowrap}.clip-note::before,.clip-note::after{content:"";position:absolute;right:3px;top:-7px;width:5px;height:15px;border:1.3px solid #726d59;border-radius:5px;transform:rotate(17deg);pointer-events:none}.clip-note::after{right:4px;top:-5px;width:2px;height:8px;border-top:0}
+.brand strong{display:flex;align-items:center;min-width:0;font-size:clamp(17px,4.7vw,20px);line-height:1.25;letter-spacing:.045em}.brand strong i{flex:none}.brand>.smallbtn{justify-self:end;min-height:29px;white-space:nowrap}
+#brand-name{overflow-wrap:anywhere;text-wrap:balance}
+.brand-level,.archive-link{color:var(--blue);font:700 12px/1.4 var(--hand)}
+.archive-link{display:flex;align-items:center;justify-self:end;gap:6px;min-height:28px;padding:2px 6px;border:0;border-bottom:1px solid #23438e44;background:none}
+.archive-link::after{content:"";width:5px;height:5px;border:solid currentColor;border-width:1px 1px 0 0;transform:rotate(45deg)}
 .grade-title.has-award{grid-template-columns:minmax(0,1fr) auto}
 .grade-title h2 span{display:inline-block}
 .stamp-pair{display:flex;align-items:center;justify-content:flex-end;gap:9px}
@@ -143,19 +201,17 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 .exam-line{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
 .percentile{margin:0 0 9px;padding:4px 6px;color:var(--blue);border-block:1px dotted #23438e55;font:700 16px/1.3 var(--hand);background:#23438e07}
 .exam-line span{font:12px var(--serif);color:var(--muted)}.exam-line{margin-bottom:5px;color:var(--red);font:700 16px var(--hand)}
-@media(max-width:390px){.brand>.smallbtn{padding-inline:6px}.brand .help-tail{display:none}.clip-note{margin-left:0}.grade-title.has-award{gap:6px}}
-@media(max-width:350px){.brand{gap:4px}.brand strong{font-size:16px;letter-spacing:.05em}.brand strong i{width:20px;height:20px;margin-right:3px}.clip-note{padding-inline:4px 6px;font-size:11px;word-spacing:-.12em}.stamp-pair{gap:7px}.stamp-pair .seal b{font-size:16px}}
+@media(max-width:390px){.brand>.smallbtn{padding-inline:6px}.grade-title.has-award{gap:6px}}
+@media(max-width:350px){.brand strong i{width:20px;height:20px;margin-right:5px}.stamp-pair{gap:7px}.stamp-pair .seal b{font-size:16px}}
 @media(prefers-reduced-motion:no-preference){
   .tearing::before{content:"";position:absolute;inset:16px 0 0;background:repeating-linear-gradient(0deg,transparent 0 26px,#b9877740 26px 27px),linear-gradient(#d2b4a8,#f0dcd3 24%);pointer-events:none}
   .tearing .sheet-face{animation:tear-away .29s ease-in both;box-shadow:0 -4px 12px #3b2c2760}
   .tearing .sheet-face::before{content:"";position:absolute;top:-6px;left:0;right:0;height:7px;background:radial-gradient(circle at 6px 0,transparent 3px,var(--face) 3.7px) 0 0/12px 7px repeat-x;animation:rip-holes .19s ease-out both}
-  .landing .sheet-face{animation:paper-land .34s ease-out both}.landing .reveal{animation:none}
-  .turn .award-seal{animation:award-press .28s .09s ease-out both}
+  .landing .sheet-face{animation:paper-land .34s ease-out both}
 }
 @keyframes rip-holes{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0)}}
 @keyframes tear-away{0%{transform:none}36%{transform:translateY(1%) rotate(1.6deg)}66%{transform:translate(1%,5%) rotate(4deg)}100%{transform:translate(9%,62%) rotate(7deg);opacity:.16}}
 @keyframes paper-land{0%{transform:translate(-3%,-8%) rotate(-3deg);opacity:.55}74%{transform:translateY(1%) rotate(.5deg);opacity:1}100%{transform:none}}
-@keyframes award-press{from{opacity:0;transform:scale(1.14) rotate(8deg)}to{opacity:1;transform:scale(1) rotate(5deg)}}
 #shareImagePreview{margin-top:15px;border-top:1px dashed var(--line)}
 #shareImagePreview p{margin:9px 0;font-size:13px;color:var(--muted)}
 #shareImagePreview img{display:block;width:100%;height:auto;-webkit-touch-callout:default;user-select:auto}
@@ -163,14 +219,33 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 </head>
 <body>
 <main class="pad" id="pad">
+  <section class="book-cover" id="book-cover" aria-labelledby="cover-title">
+    <div class="cover-board">
+      <div class="cover-top">
+        <span class="cover-plaque">接待水单</span>
+        <aside class="cover-bookmark" id="cover-bookmark" hidden></aside>
+      </div>
+      <div class="cover-titleblock">
+        <h1 class="cover-title" id="cover-title" tabindex="-1" aria-label="中国式饭局 · 点菜模拟器"><span>中国式饭局</span><strong>点菜模拟器</strong></h1>
+        <b class="cover-chop" aria-label="请客之道"><span>请</span><span>客</span><span>之</span><span>道</span></b>
+      </div>
+      <div class="cover-bottom">
+        <div class="ledger-counter" aria-live="polite">
+          <span id="busuanzi_container_site_pv" style="display:none">全国累计已开出 <b id="busuanzi_value_site_pv"></b> 桌水单</span><span id="busuanzi_container_site_uv" style="display:none"> · 累计 <b id="busuanzi_value_site_uv"></b> 位经手人到店</span>
+        </div>
+        <button class="primary cover-open" type="button" data-act="draw">翻开菜单 · 接第 1 关派单</button>
+      </div>
+    </div>
+  </section>
   <div class="binding" aria-hidden="true"></div>
   <div class="sheet-face">
-  <header class="brand"><strong><i aria-hidden="true">单</i><span id="brand-name">万家酒楼 · 点菜联单</span></strong><button class="smallbtn" data-act="help" aria-label="玩法说明">玩法<span class="help-tail">说明</span></button><button id="progress-tag" class="clip-note" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-level">第 1 关 · 须达 60 分</span><span id="tag-count">成就 0/10</span></button></header>
-  <div id="page">
-    <div class="ledger-counter" aria-live="polite">
-      <span id="busuanzi_container_site_pv" style="display:none">全国累计已开出 <b id="busuanzi_value_site_pv"></b> 桌水单</span><span id="busuanzi_container_site_uv" style="display:none"> · 累计 <b id="busuanzi_value_site_uv"></b> 位经手人到店</span>
-    </div>
-  </div>
+  <header class="brand">
+    <strong><i aria-hidden="true">单</i><span id="brand-name">万家酒楼 · 点菜联单</span></strong>
+    <button class="smallbtn" data-act="help" aria-haspopup="dialog" aria-controls="dialog">玩法说明</button>
+    <span class="brand-level" id="tag-level">第 1 关 · 须达 60 分</span>
+    <button id="progress-tag" class="archive-link" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-count">成就 0/10</span></button>
+  </header>
+  <div id="page"></div>
   </div>
 </main>
 <dialog id="dialog" aria-labelledby="dialogTitle"><h2 id="dialogTitle"></h2><div id="dialogText"></div><button class="primary" data-act="close">收好联单</button></dialog>
@@ -631,7 +706,9 @@ function judge(scenario, order, options={}) {
 }
 // ==================== [MODULE 4: UI_APP] 页面交互与渲染 ====================
 const page = document.querySelector("#page"), pad = document.querySelector("#pad"), dialog = document.querySelector("#dialog");
-const ledgerCounter=page.querySelector(".ledger-counter");
+const sheetFace=pad.querySelector(".sheet-face");
+let turningPage=false,progressRefreshPending=false;
+const bookCover=document.getElementById("book-cover");
 const achModal=document.querySelector("#achModal"), archivePages=achModal.querySelector(".archive-pages");
 const shareModal=document.querySelector("#shareModal");
 // 旧版喜报仍须按好友当时取得的职级原样展示。
@@ -645,6 +722,13 @@ const pick = list => list[Math.floor(Math.random()*list.length)];
 const serial = () => String(Math.floor(100000+Math.random()*900000));
 let stage="cover", number=serial(), scene, table, order=[], cat=cats[0], report, removing=new Set();
 let reviewingOrder=false, categoryScroll=0;
+const detailChoices=new Map();
+let firstBriefOpen=true, menuBriefOpen=false;
+function resetMenuView(){
+  detailChoices.clear();
+  firstBriefOpen=true;
+  menuBriefOpen=false;
+}
 let storeMenu=[],menuEdits=0,menuElapsed=0,menuStarted=null;
 const total = () => order.reduce((sum,x)=>sum+x.qty*x.dish.price,0);
 const savePrefix="ronggang.diancai.v1.";
@@ -677,7 +761,7 @@ function syncMenuClock(){
   if(!active&&menuStarted!==null){menuElapsed+=now-menuStarted;menuStarted=null}
 }
 function updateTag(){
-  const level=(stage==="cover"||stage==="report")?progress.level:roundLevel;
+  const level=stage==="cover"?progress.level:roundLevel;
   document.querySelector("#tag-level").textContent="第 "+level+" 关 · 须达 "+passScore(level)+" 分";
   document.querySelector("#tag-count").textContent="成就 "+progress.achievements.size+"/"+ACHIEVEMENTS.length;
 }
@@ -690,7 +774,50 @@ function archive(){
   return '<p class="archive-count">已盖 '+progress.achievements.size+' / '+ACHIEVEMENTS.length+' 枚</p>'+
     '<ul class="archive-list">'+rows+'</ul>'+(storageOK?'':'<p>浏览器未开放本地存档，本次进度保留到关闭页面。</p>');
 }
-function settle(){
+async function playPaperMotion(element,frames,options){
+  if(!element.animate||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  let animation,timer;
+  try{
+    animation=element.animate(frames,options);
+    // Some in-app browsers suspend their animation timeline when the tab loses focus.
+    const fallback=new Promise(done=>{timer=setTimeout(done,options.duration+(options.delay||0)+80)});
+    await Promise.race([animation.finished,fallback]);
+  }catch{}finally{
+    clearTimeout(timer);
+    animation?.cancel();
+  }
+}
+function pressReportStamps(){
+  sheetFace.classList.remove("awaiting-imprint");
+  const stamps=sheetFace.querySelectorAll(".grade-title .seal,.grade-title .award-seal");
+  const press=[
+    {opacity:0,transform:"scale(1.65) rotate(-14deg)"},
+    {opacity:1,transform:"scale(.94) rotate(-5deg)",offset:.46},
+    {opacity:1,transform:"scale(1.025) rotate(-6.4deg)",offset:.72},
+    {opacity:1,transform:"scale(1) rotate(-6deg)"}
+  ];
+  const motions=Array.from(stamps,stamp=>playPaperMotion(stamp,press,
+    {duration:280,delay:120,fill:"backwards",easing:"ease-out"}));
+  motions.push(playPaperMotion(sheetFace,[
+    {transform:"translateY(0)"},{transform:"translateY(2px)"},
+    {transform:"translateY(-1px)"},{transform:"translateY(0)"}
+  ],{duration:110,delay:210,easing:"ease-out"}));
+  return Promise.all(motions);
+}
+async function settle(){
+  if(turningPage||stage!=="kitchen"||!order.length)return;
+  turningPage=true;
+  sheetFace.inert=true;
+  try{
+    await turnInOrder();
+  }finally{
+    sheetFace.classList.remove("awaiting-imprint");
+    pad.classList.remove("flipping-slip");
+    finishPageTurn();
+  }
+  nextReportDialog();
+}
+async function turnInOrder(){
   readProgress();
   report=judge(scene,order,{level:roundLevel,storeMenu,menuSeconds:menuElapsed/1000,edits:menuEdits});
   report.newAchievements=report.achievements.filter(id=>!progress.achievements.has(id));
@@ -703,8 +830,15 @@ function settle(){
     saveMark("pass."+roundLevel);
     progress.level=Math.max(progress.level,roundLevel+1);
   }
+  pad.classList.add("flipping-slip");
+  sheetFace.classList.add("awaiting-imprint");
+  await playPaperMotion(sheetFace,[{transform:"rotateY(0deg)"},{transform:"rotateY(90deg)"}],
+    {duration:280,easing:"ease-in"});
   stage="report";
   render(true);
+  await playPaperMotion(sheetFace,[{transform:"rotateY(-90deg)"},{transform:"rotateY(0deg)"}],
+    {duration:280,easing:"ease-out"});
+  pad.classList.remove("flipping-slip");
   awardNoticePending=report.newAchievements.length>0;
   if(report.passed){
     shareTimer=setTimeout(()=>{
@@ -712,10 +846,11 @@ function settle(){
       shareDue=true;
       nextReportDialog();
     },650);
-  }else nextReportDialog();
+  }
+  await pressReportStamps();
 }
 function nextReportDialog(){
-  if(stage!=="report"||shareTimer||document.querySelector("dialog[open]"))return;
+  if(turningPage||stage!=="report"||shareTimer||document.querySelector("dialog[open]"))return;
   if(shareDue)return openShare();
   if(awardNoticePending){
     awardNoticePending=false;
@@ -802,50 +937,54 @@ function info(label,value){return '<section class="info"><h3>'+label+'</h3><p>'+
 function scenarioInfo(){
   return info("席面",scene.regionLabel+'<br>'+scene.tierLabel)+info("到席客人",scene.guestsSummary)+info("这顿饭的由头",scene.purpose)+info("可用预算",'<b class="pen">¥'+scene.budgetMin+' ～ ¥'+scene.budgetMax+'</b>　总额封顶');
 }
+function briefPanel(first){
+  const open=first?firstBriefOpen:menuBriefOpen;
+  const context=first?"":'<span class="brief-context">'+scene.headcount+' 位 · 预算 ¥'+scene.budgetMax+'</span>';
+  return '<section class="brief-panel">'+
+    action("brief","派单简报"+context,"brief-toggle",'aria-expanded="'+open+'" aria-controls="dispatch-details"')+
+    '<div id="dispatch-details"'+(open?'':' hidden')+'>'+(first?'':meta())+scenarioInfo()+'</div></section>';
+}
+function briefView(){
+  return [heading("第一联　／　接待派单",scene.title)+meta()+briefPanel(true),action("edit","接单，开始勾菜","primary")+imprint()];
+}
 function summary(){
   const sum=total(),over=sum>scene.budgetMax;
   return '<div class="summary'+(over?' over':'')+'"><span>已点 <b>'+order.length+'</b> 道</span><span>'+(over?'超预算':'预计')+' <b>¥'+sum+'</b> / '+scene.budgetMax+'</span><span>人均 ¥'+(sum/scene.headcount).toFixed(0)+'</span></div>';
 }
-function cover(){
-  const steps=[["看客接单","看清谁入席、谁做东。"],["联单勾菜","照着预算，勾好这一桌。"],["后厨排单","排妥先后，领接待考评。"]];
-  let challengeNote="";
+function renderCover(){
+  bookCover.hidden=false;
+  bookCover.inert=false;
+  bookCover.querySelector(".cover-open").textContent="翻开菜单 · 接第 "+progress.level+" 关派单";
+  const bookmark=bookCover.querySelector("#cover-bookmark");
+  bookmark.hidden=!challenge;
   if(challenge){
     const {level,rank,score,beat}=challenge;
-    const verb=score>=passScore(level)?"刚闯过":"刚挑战";
-    challengeNote='<p class="challenge-note">好友【'+rank+'】'+verb+'第 '+level+' 关（'+score+' 分，击败全国 '+beat+'% 经手人），点下方撕单踢馆！</p>';
+    const verb=score>=passScore(level)?"闯过":"挑战";
+    bookmark.textContent="好友「"+rank+"」"+verb+"第 "+level+" 关，"+score+" 分，击败全国 "+beat+"% 经手人。翻开踢馆！";
   }
-  return [ticket("第一联　／　接待存根")+challengeNote+'<section class="poster"><small>中国式饭局 · 接待水单</small><h1 tabindex="-1">点菜模拟器</h1><img id="fish" width="680" height="232" alt="青墨木刻风的大黄鱼插画"><div class="edition"><b>请客之道</b></div></section>'+meta()+'<section><div class="introhead"><h3>接单须知</h3><span>经手人阅</span></div><ol class="steps">'+steps.map(([a,b],i)=>'<li><i>'+(i+1)+'</i><b>'+a+'</b><span>'+b+'</span></li>').join("")+'</ol></section>',
-    action("draw",'<span class="cut" aria-hidden="true">✂</span>'+(progress.level===1?'撕开今日派单':'撕开第 '+progress.level+' 关派单'),"primary")+imprint()];
 }
-function fishPrint(){
-  const canvas=document.createElement("canvas");canvas.width=680;canvas.height=232;
-  const c=canvas.getContext("2d");
-  c.scale(2,2);c.lineCap="round";c.lineJoin="round";
-  const ink="#214e42",paper="#f3ecdb";
-  function line(d,w=1,fill=""){const p=new Path2D(d);if(fill){c.fillStyle=fill;c.fill(p)}c.strokeStyle=ink;c.lineWidth=w;c.stroke(p)}
-  c.save();c.translate(9,5);c.rotate(-.045);
-  line("M93 44 Q103 28 111 16 L114 25 122 12 125 22 132 10 134 21 144 11 145 21 154 13 156 23 Q178 15 201 35 L208 44 Z",1.5,paper);
-  for(let i=0;i<22;i++){let x=105+i*4.3;line('M'+x+' '+(43+Math.sin(i/4)*2)+' q0 -9 '+(5+i/4)+' '+(-18+Math.abs(i-8)*.72),.85)}
-  line("M207 56 Q230 48 254 25 Q253 44 248 57 Q255 65 268 75 Q242 78 216 66 Z",1.8,paper);
-  for(let i=0;i<17;i++){let y=29+i*2.65;line('M218 '+(57+i*.46)+' Q240 59 '+(y<56?253-(y-29)*.18:249+(y-56)*.68)+' '+y,.8)}
-  line("M150 78 Q161 96 176 97 L173 87 Q193 90 209 70 Z",1.4,paper);
-  for(let i=0;i<13;i++)line('M'+(154+i*3.4)+' 76 l'+(8-i*.3)+' '+(15-i*.6),.85);
-  line("M103 77 Q103 92 115 100 L119 84 Z",1.3,paper);
-  const body="M38 58 Q45 53 50 49 C72 28 103 22 144 25 C180 26 199 42 219 53 Q225 56 232 55 L230 65 Q213 64 201 72 C176 92 121 92 93 83 Q65 79 51 67 L40 64 49 61 Z";
-  line(body,2,paper);c.save();c.clip(new Path2D(body));
-  for(let r=0;r<11;r++){for(let j=0;j<19;j++){const x=88+j*7+(r%2)*3.5,y=27+r*5.2+3*Math.sin(j/4);line('M'+x+' '+y+' q6 1.3 7 -2.5',r<4?1.15:.62)}}
-  for(let i=0;i<9;i++)line('M53 '+(45+i*1.7)+' Q93 '+(13+i*1.7)+' 156 '+(23+i*1.1),.72);
-  line("M89 55 C118 40 161 42 183 48 Q205 55 222 57",.95);
-  c.restore();
-  line("M52 48 Q66 36 86 37 Q87 49 95 57 Q94 72 83 77 Q63 73 51 64 L44 62 54 59",1.15,paper);
-  line("M84 41 Q88 54 83 64 Q81 70 74 71 M87 56 Q86 72 79 75 M49 61 Q56 63 63 61 M55 66 Q64 68 70 65",1.05);
-  for(let i=0;i<7;i++)line('M'+(65+i*2)+' '+(56+i*.5)+' l'+(5-i*.35)+' -2.5',.65);
-  c.fillStyle=ink;c.beginPath();c.ellipse(67,48,5.3,4.5,-.2,0,Math.PI*2);c.fill();c.fillStyle=paper;c.beginPath();c.arc(66,47,1.5,0,Math.PI*2);c.fill();
-  line("M96 62 Q113 53 135 52 Q122 66 101 70 Z",1.1,paper);
-  for(let i=0;i<5;i++)line('M99 '+(63+i)+' Q116 '+(57+i)+' '+(131-i*2)+' '+(54+i*2),.7);
-  c.restore();
-  for(let i=0;i<3;i++){line('M30 '+(86+i*4)+' q18 3 41 -2 t36 -2',.65);line('M190 '+(93+i*4)+' q15 1 33 -3 t32 -3',.65)}
-  document.querySelector("#fish").src=canvas.toDataURL();
+function openBookCover(){
+  bookCover.inert=true;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){
+    bookCover.hidden=true;
+    return Promise.resolve();
+  }
+  return new Promise(resolve=>{
+    const finish=()=>{
+      clearTimeout(fallback);
+      bookCover.removeEventListener("transitionend",onTurnEnd);
+      bookCover.hidden=true;
+      bookCover.classList.remove("opening");
+      resolve();
+    };
+    const onTurnEnd=event=>{
+      if(event.target===bookCover&&event.propertyName==="transform")finish();
+    };
+    const fallback=setTimeout(finish,720);
+    bookCover.addEventListener("transitionend",onTurnEnd);
+    bookCover.getBoundingClientRect(); // 先落实封皮起始位置，再沿书脊翻开。
+    bookCover.classList.add("opening");
+  });
 }
 // 速写只取公开菜名、类别、器皿与食材。每幅分为轮廓和淡墨排线。
 const sketchVessels={
@@ -903,19 +1042,37 @@ function dishSketch(dish){
     '<path class="hatch" d="M14 52q14 5 33-1m-26 5q10 2 20-1"/>'+steam+
     '<path d="'+sketchVessels[vessel]+'"/><path d="'+ink+'"/><path class="hatch" d="'+hatch+'"/></svg></span>';
 }
+function dishRow(d){
+  const item=order.find(({dish})=>dish.id===d.id);
+  const open=detailChoices.get(d.id)??Boolean(item);
+  const attrs='data-id="'+d.id+'" ';
+  const detailsId="desc-"+d.id;
+  const name='<span class="name'+(removing.has(d.id)?' cross':'')+'">'+d.name+'</span>';
+  const detail=action("dish-detail",dishSketch(d)+'<span class="detail">'+name+'<span class="spec">'+d.spec+'</span></span>',"dish-info",
+    attrs+'aria-label="'+d.name+'，'+d.spec+'，菜品详情" aria-expanded="'+open+'" aria-controls="'+detailsId+'"');
+  const check=action(item?"uncheck":"add",'<span aria-hidden="true">'+(item?'✓':'')+'</span>',"dish-check",
+    attrs+'aria-label="勾选'+d.name+'" aria-pressed="'+Boolean(item)+'"');
+  const quantity=item?'<div class="orderbtns">'+
+    action("minus","−","ctrl",attrs+'aria-label="减少'+d.name+'一份"')+
+    '<span class="qty">'+item.qty+' 份</span>'+
+    action("add","＋","ctrl",attrs+'aria-label="增加'+d.name+'一份"')+'</div>':'';
+  return '<article class="dish'+(open?' open-detail':'')+'" data-dish="'+d.id+'">'+detail+
+    '<div class="dish-sale"><span class="price">¥'+d.price+'</span>'+check+'</div>'+
+    '<div class="dish-desc" id="'+detailsId+'" aria-hidden="'+!open+'"><span>'+d.menuDesc+'</span></div>'+quantity+'</article>';
+}
 function menu(){
   const list=reviewingOrder?order.map(x=>x.dish):storeMenu.filter(d=>d.category===cat);
   const available=cats.filter(c=>storeMenu.some(d=>d.category===c));
   const tabs=reviewingOrder?'':'<nav class="tabs" aria-label="菜品分类">'+available.map(c=>action("cat",c,"tab"+(cat===c?" active":""),'data-cat="'+c+'" aria-pressed="'+(cat===c)+'"')).join("")+'</nav>';
-  const head=heading("第二联　／　勾菜",reviewingOrder?"已点菜单":"联单勾菜",reviewingOrder?"":"本店水单 · 共 "+storeMenu.length+" 道");
-  const sectionTitle=reviewingOrder?'本桌共 '+order.length+' 道':cat;
+  const title=reviewingOrder?"已点菜单":"联单勾菜";
+  const count=reviewingOrder?'共 '+order.length+' 道':'本店共 '+storeMenu.length+' 道';
+  const head='<div class="stagehead menu-head">'+ticket("第二联　／　勾菜")+'<div class="menu-title"><h2 tabindex="-1">'+title+'</h2><span>'+count+'</span></div></div>';
   const sum=total(),over=sum>scene.budgetMax;
   const orderLink=reviewingOrder?action("review-order","继续点菜","order-link return"):action("review-order",'已点菜单 <span class="order-count">'+order.length+' 道</span>',"order-link");
   const cost='<div class="order-cost'+(over?' over':'')+'">'+(over?'超预算':'预计')+' <b>¥'+sum+'</b> / '+scene.budgetMax+'<small>人均 ¥'+(sum/scene.headcount).toFixed(0)+'</small></div>';
-  return [head+meta()+tabs+'<div class="sliptop"><b>'+sectionTitle+'</b>'+action("brief","看派单")+'</div>'+list.map(d=>{
-    const x=order.find(e=>e.dish.id===d.id),id='data-id="'+d.id+'" ',label=(a,t)=>id+'aria-label="'+a+d.name+t+'"';
-    return '<article class="dish'+(x?' checked':'')+'">'+dishSketch(d)+'<div class="detail"><div class="name'+(removing.has(d.id)?' cross':'')+'">'+d.name+'</div><div class="desc">'+d.menuDesc+'</div><span class="price">¥'+d.price+'</span><span class="spec">'+d.spec+'</span></div><div class="orderbtns">'+(x?action("minus","−","ctrl",label("减少","一份"))+'<span class="qty">✓'+x.qty+'</span>':'')+action("add","＋","ctrl",label("增加","一份"))+'</div></article>';
-  }).join("")+(list.length?'':'<p class="empty">联单还是空的。点「继续点菜」，挑一道开单。</p>'),'<div class="order-strip">'+orderLink+cost+'</div>'+action("kitchen","确认菜单并排上菜顺序","primary",order.length&&!removing.size?"":"disabled")];
+  return [head+briefPanel(false)+tabs+'<section aria-label="'+(reviewingOrder?'本桌已点菜品':cat)+'">'+list.map(dishRow).join("")+
+    (list.length?'':'<p class="empty">联单还是空的。点「继续点菜」，挑一道开单。</p>')+'</section>',
+    '<div class="order-strip">'+orderLink+cost+'</div>'+action("kitchen","确认菜单并排上菜顺序","primary",order.length&&!removing.size?"":"disabled")];
 }
 function courseLabel(dish,i){
   const position=i===0?"头道":i===order.length-1?"收尾":"席中";
@@ -1161,48 +1318,70 @@ function grade(){
 function render(fresh=false){
   finishQueueDrag(true);
   syncMenuClock();
-  document.getElementById("brand-name").textContent=stage==="cover"?"万家酒楼 · 点菜联单":scene.restaurantName;
+  if(stage==="cover"){
+    sheetFace.inert=true;
+    renderCover();
+    return;
+  }
+  document.getElementById("brand-name").textContent=scene.restaurantName;
   updateTag();
   const scroll=page.querySelector(".body")?.scrollTop||0,focus=document.activeElement;
   const current=focus?.dataset;
-  const [body,foot]=stage==="cover"?cover():stage==="brief"?[heading("第一联　／　接待派单",scene.title)+meta()+scenarioInfo(),action("edit","接单，开始勾菜","primary")+imprint()]:stage==="menu"?menu():stage==="kitchen"?kitchen():grade();
+  const [body,foot]=stage==="brief"?briefView():stage==="menu"?menu():stage==="kitchen"?kitchen():grade();
   pad.classList.toggle("back",stage==="report");
-  page.innerHTML='<div class="body '+(stage==="cover"?"cover ":"")+(fresh?(stage==="report"?"turn":"reveal"):"")+'">'+body+'</div><footer class="foot">'+foot+'</footer>';
-  if(stage==="cover"){
-    page.querySelector(".foot .imprint").before(ledgerCounter);
-    fishPrint();
-  }
-  if(fresh){page.querySelector("h2,h1")?.focus({preventScroll:true})}
+  page.innerHTML='<div class="body">'+body+'</div><footer class="foot">'+foot+'</footer>';
+  if(fresh){if(!turningPage)page.querySelector("h2,h1")?.focus({preventScroll:true})}
   else{page.querySelector(".body").scrollTop=scroll;if(current?.act){const candidates=Array.from(page.querySelectorAll("button"));const match=candidates.find(b=>!b.disabled&&b.dataset.act===current.act&&b.dataset.id===current.id&&b.dataset.cat===current.cat)||candidates.find(b=>!b.disabled&&current.id&&b.dataset.id===current.id);match?.focus({preventScroll:true})}}
+}
+function finishPageTurn(){
+  turningPage=false;
+  sheetFace.inert=false;
+  if(progressRefreshPending){
+    progressRefreshPending=false;
+    render();
+  }
+  page.querySelector("h2,h1")?.focus({preventScroll:true});
 }
 function modal(title,html){
   document.querySelector("#dialogTitle").textContent=title;document.querySelector("#dialogText").innerHTML=html;dialog.showModal();syncMenuClock();
 }
 async function draw(){
-  if(pad.classList.contains("tearing"))return;
+  if(turningPage)return;
+  turningPage=true;
+  sheetFace.inert=true;
+  const openingCover=stage==="cover";
   clearTimeout(shareTimer);shareTimer=0;shareDue=false;awardNoticePending=false;
-  const animate=!matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if(animate){
-    page.inert=true;
-    pad.classList.add("tearing");
-    await new Promise(done=>setTimeout(done,290));
-    pad.classList.remove("tearing");
-    page.inert=false;
-    pad.classList.add("landing");
-    setTimeout(()=>pad.classList.remove("landing"),340);
+  const tear=!openingCover&&!matchMedia("(prefers-reduced-motion: reduce)").matches;
+  try{
+    if(tear){
+      pad.classList.add("tearing");
+      await new Promise(done=>setTimeout(done,290));
+      pad.classList.remove("tearing");
+    }
+    readProgress();
+    roundLevel=progress.level;
+    scene=pick(SCENARIOS.filter(s=>s!==scene));table=pick(scene.tableNames);number=serial();
+    storeMenu=buildStoreMenu({...scene,menuSeed:Math.floor(Math.random()*4294967296)},DISHES);
+    menuEdits=0;menuElapsed=0;menuStarted=null;
+    order=[];cat=cats.find(c=>storeMenu.some(d=>d.category===c));reviewingOrder=false;categoryScroll=0;
+    report=null;removing.clear();resetMenuView();
+    stage="brief";render(true);
+    if(openingCover)await openBookCover();
+    else if(tear){
+      pad.classList.add("landing");
+      await new Promise(done=>setTimeout(done,340));
+    }
+  }finally{
+    pad.classList.remove("tearing","landing");
+    finishPageTurn();
   }
-  readProgress();
-  roundLevel=progress.level;
-  scene=pick(SCENARIOS.filter(s=>s!==scene));table=pick(scene.tableNames);number=serial();
-  storeMenu=buildStoreMenu({...scene,menuSeed:Math.floor(Math.random()*4294967296)},DISHES);
-  menuEdits=0;menuElapsed=0;menuStarted=null;
-  order=[];cat=cats.find(c=>storeMenu.some(d=>d.category===c));reviewingOrder=false;categoryScroll=0;report=null;removing.clear();stage="brief";render(true);
 }
 document.addEventListener("click",e=>{
   const b=e.target.closest("button[data-act]");if(!b||b.disabled)return;
+  if(turningPage)return;
   finishQueueDrag(true);
   const a=b.dataset.act,id=b.dataset.id,idx=order.findIndex(x=>x.dish.id===id);
-  if(a==="help")return modal("接单须知",'<p>每家酒楼各开一张水单。先看菜系、客人和预算，再用「＋」「−」勾菜、改份数。点底部「已点菜单」能核对整桌，超预算也能下单。</p><p>排菜时，按住菜名右边的「≡」上下拖动，或点 ↑ ↓ 微调一位。达到便签上的分数就能接下一关，未达标可以重考。</p><p>点黄色便签可翻看十枚成就章。关卡和成就保存在当前浏览器。</p>');
+  if(a==="help")return modal("接单须知",'<p>先看本桌的客人和预算。点菜名或速写可看做法，勾选框点菜，＋、− 改份数。用底部「已点菜单」核对整桌。</p><p>在后厨按住「≡」拖动菜品，或点 ↑ ↓ 微调。达到表头写的分数就能接下一关，未达标可以重考。</p><p>点表头的「成就」可翻看十枚章。关卡和成就保存在当前浏览器。</p>');
   if(a==="archive"){
     readProgress();updateTag();
     archivePages.innerHTML=archive();
@@ -1214,7 +1393,13 @@ document.addEventListener("click",e=>{
   if(a==="copy-share")return copyShare();
   if(a==="save-share"&&activeShare)return saveShareImage(activeShare);
   if(a==="draw"&&(stage==="cover"||stage==="report"))return draw();
-  if(a==="brief")return modal(scene.title,scenarioInfo());
+  if(a==="brief"&&(stage==="brief"||stage==="menu")){
+    const open=b.getAttribute("aria-expanded")!=="true";
+    if(stage==="brief")firstBriefOpen=open;else menuBriefOpen=open;
+    b.setAttribute("aria-expanded",String(open));
+    document.getElementById("dispatch-details").hidden=!open;
+    return;
+  }
   if(a==="bill")return modal("原单 · 后厨出菜次序",order.map(({dish,qty},i)=>'<p>'+(i+1)+'．'+dish.name+' × '+qty+'　¥'+dish.price*qty+'</p>').join("")+summary());
   if(a==="edit"){stage="menu";return render(true)}
   if(a==="review-order"&&stage==="menu"){
@@ -1228,17 +1413,42 @@ document.addEventListener("click",e=>{
   if(a==="kitchen"&&order.length&&!removing.size){stage="kitchen";return render(true)}
   if(a==="serve"&&stage==="kitchen"&&order.length)return settle();
   if(removing.has(id))return;
+  if(a==="dish-detail"&&stage==="menu"){
+    const open=b.getAttribute("aria-expanded")!=="true";
+    detailChoices.set(id,open);
+    const row=b.closest(".dish");
+    row.classList.remove("just-checked");
+    row.classList.toggle("open-detail",open);
+    b.setAttribute("aria-expanded",String(open));
+    document.getElementById(b.getAttribute("aria-controls")).setAttribute("aria-hidden",String(!open));
+    return;
+  }
   if(a==="add"&&stage==="menu"){
     const dish=storeMenu.find(d=>d.id===id);
     if(!dish)return;
-    if(idx<0)order.push({dish,qty:1});else order[idx].qty++;
+    const newlyChecked=idx<0,animateDetails=newlyChecked&&!detailChoices.get(id);
+    if(newlyChecked){order.push({dish,qty:1});detailChoices.delete(id)}
+    else order[idx].qty++;
     menuEdits++;
     render();
-  }else if(a==="minus"&&stage==="menu"&&idx>=0){
+    if(newlyChecked){
+      const row=page.querySelector('[data-dish="'+id+'"]');
+      if(animateDetails)row.classList.add("just-checked");
+      row.querySelector(".dish-check").focus({preventScroll:true});
+    }
+  }else if((a==="minus"||a==="uncheck")&&stage==="menu"&&idx>=0){
     menuEdits++;
-    if(order[idx].qty>1){order[idx].qty--;return render()}
+    if(a==="minus"&&order[idx].qty>1){order[idx].qty--;return render()}
     removing.add(id);render();
-    setTimeout(()=>{order=order.filter(x=>x.dish.id!==id);removing.delete(id);render()},matchMedia("(prefers-reduced-motion: reduce)").matches?0:210);
+    setTimeout(()=>{
+      const focusInRow=document.activeElement.closest(".dish")?.dataset.dish===id;
+      order=order.filter(x=>x.dish.id!==id);removing.delete(id);detailChoices.delete(id);
+      render();
+      if(focusInRow){
+        const target=reviewingOrder?(page.querySelectorAll(".dish-check")[Math.min(idx,order.length-1)]||page.querySelector('[data-act="review-order"]')):page.querySelector('[data-dish="'+id+'"] .dish-check');
+        target?.focus({preventScroll:true});
+      }
+    },matchMedia("(prefers-reduced-motion: reduce)").matches?0:210);
   }else if((a==="up"||a==="down")&&idx>=0&&stage==="kitchen"){
     const next=idx+(a==="up"?-1:1);if(next<0||next>=order.length)return;
     const row=b.closest(".queue");
@@ -1255,6 +1465,7 @@ achModal.addEventListener("close",nextReportDialog);
 window.addEventListener("storage",event=>{
   if(event.key!==achievementKey&&!event.key?.startsWith(savePrefix))return;
   readProgress();
+  if(turningPage){progressRefreshPending=true;return}
   if(stage==="cover"||stage==="report")render();else updateTag();
   if(achModal.open)archivePages.innerHTML=archive();
 });
