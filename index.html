@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#9b352a">
-<meta name="application-version" content="2.4.0">
+<meta name="application-version" content="3.0.0">
 <title>点菜模拟器 · 万家酒楼</title>
 <style>
 :root{--paper:#f5ede0;--pink:#f3ddd6;--red:#9b352a;--line:#b88676;--green:#2b2520;--ink:#2b2520;--blue:#253c66;--pen:#b52b27;--muted:#6b5f52;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
@@ -132,6 +132,7 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 .dish-info .name,.dish-info .spec{display:block}.dish-info .name{line-height:1.35}.dish-info .spec{margin-top:3px;color:#7a6b5d;font:11px/1.45 var(--serif)}
 .dish-sale{display:flex;align-items:center;justify-content:flex-end;gap:5px}.dish-sale .price{white-space:nowrap}
 .dish-check{display:grid;place-items:center;min-width:38px;min-height:42px;padding:0;border:0;background:none;color:var(--blue)}
+.dish-sale .sold-out{color:var(--muted);border-color:var(--line);padding-inline:4px;white-space:nowrap}
 .dish-check span{display:grid;place-content:center;width:21px;height:21px;border:1px solid #23438e91;border-radius:2px 1px 3px 1px;font:700 24px/1 var(--hand)}
 .dish-check[aria-pressed="true"] span{border-color:var(--blue);transform:rotate(-4deg)}
 .dish-desc{grid-column:1/-1;max-height:0;overflow:hidden;margin-left:56px;color:var(--muted);font:13px/1.6 var(--serif);opacity:0;transition:max-height .24s ease,opacity .18s ease}
@@ -287,6 +288,7 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
         </div>
         <p class="tiny" id="resumeNote" hidden>旧版成就已留档。新版八桌饭局从第一关开席。</p>
         <button class="primary cover-open" type="button" data-act="draw">翻开菜单 · 接第 1 关派单</button>
+        <button class="smallbtn" type="button" data-act="daily-exam">今日全网统考</button>
       </div>
     </div>
   </section>
@@ -594,10 +596,107 @@ function selectSideQuest(completedLevel,seenIds,random=Math.random){
   return remaining[Math.floor(random()*remaining.length)];
 }
 
-function drawScenario(level,previous,random=Math.random){
-  if(Number.isInteger(level)&&level>=1&&level<=SCENARIOS.length)return SCENARIOS[level-1];
-  const choices=SCENARIOS.filter(s=>s.id!==previous?.id);
-  return choices[Math.floor(random()*choices.length)];
+const ROGUE_RESTAURANTS={
+  mindong:{city:"福州",names:["南门口排档","三坊七巷酒楼","榕江迎宾馆"]},
+  minnan:{city:"泉州",names:["西街姜鸭铺","古城闽南菜馆","刺桐海丝宴"]},
+  guangfu:{city:"广州",names:["荔湾小饭馆","泮塘茶楼","珠江雅宴"]},
+  chuanyu:{city:"成都",names:["巷里川菜馆","锦里川味楼","锦江会客厅"]},
+  xiang:{city:"长沙",names:["湘江口小馆","麓山湘味楼","岳麓迎宾馆"]},
+  luyu:{city:"济南",names:["泉边家常菜","趵突泉鲁菜楼","明湖接待馆"]},
+  shanghai:{city:"上海",names:["弄堂小饭桌","石库门酒楼","外滩会客厅"]},
+  dongbei:{city:"沈阳",names:["北市铁锅铺","关东家宴楼","盛京迎宾馆"]}
+};
+const ROGUE_TIERS=[
+  {id:"street",name:"街边小馆",perGuest:82,tables:["靠墙方桌","门口长桌"]},
+  {id:"mid_high",name:"中高档酒楼",perGuest:120,tables:["临窗圆桌","迎客小间"]},
+  {id:"luxury",name:"高端接待席",perGuest:168,tables:["雅席一号","主宾包厢"]}
+];
+const ROGUE_OCCASIONS=[
+  {title:"好友小聚",purpose:"难得凑齐老朋友，这顿是为了多聊会儿近况。"},
+  {title:"接风宴",purpose:"外地客人刚放下行李，想趁热尝尝本地馆子。"},
+  {title:"项目答谢饭",purpose:"几位同事忙完项目，约在下班后一起吃顿饭。"},
+  {title:"邻里会餐",purpose:"几家邻居难得坐满一桌，热闹归热闹，点单要有人把关。"},
+  {title:"故友回乡",purpose:"旧相识回城探亲，特意约在曾经常走的那条街吃饭。"}
+];
+const ROGUE_AFFIXES=[
+  {name:"全桌痛风预警",hint:"这桌客人都少碰海鲜，厚重的肉菜也别堆满一桌。",goutAlert:true,trait:"avoidSeafood"},
+  {name:"全桌开车禁酒",hint:"全员自驾赴宴，滴酒不沾。",noAlcohol:true},
+  {name:"主宾只吃软食",hint:"主宾刚拔完智齿，全桌偏爱软嫩好夹菜肴。",trait:"hasElderOrLeader"},
+  {name:"一山不容二虎",hint:"主宾讲究一山不容二虎，同类荤菜只选一道。",noDuplicateMeat:true},
+  {name:"极致抠门财务",hint:"财务死卡报销红线，少花多花都难交差。",tightBudget:true}
+];
+
+function createSeededRng(seedNum){
+  let state=seedNum>>>0;
+  return ()=>{
+    state=(state+0x6d2b79f5)>>>0;
+    let mixed=Math.imul(state^(state>>>15),state|1);
+    mixed^=mixed+Math.imul(mixed^(mixed>>>7),mixed|61);
+    return ((mixed^(mixed>>>14))>>>0)/4294967296;
+  };
+}
+
+function generateRoguelikeScenario(rng=Math.random,{daily=false}={}){
+  const regions=Object.keys(CUISINE_LABELS);
+  const pick=items=>items[Math.floor(rng()*items.length)];
+  const region=pick(regions);
+  const place=ROGUE_RESTAURANTS[region];
+  const tierIndex=daily?1+Math.floor(rng()*2):Math.floor(rng()*ROGUE_TIERS.length);
+  const tier=ROGUE_TIERS[tierIndex];
+  const headcount=daily?5+Math.floor(rng()*4):3+Math.floor(rng()*6);
+  const occasion=pick(ROGUE_OCCASIONS);
+  const available=ROGUE_AFFIXES.slice();
+  const affixCount=daily?2:1+Math.floor(rng()*2);
+  const affixes=[];
+  while(affixes.length<affixCount){
+    affixes.push(available.splice(Math.floor(rng()*available.length),1)[0]);
+  }
+
+  const guestTraits={needsPrestigeface:tier.id==="luxury"};
+  const goutAlert=affixes.some(affix=>affix.goutAlert);
+  const noAlcohol=affixes.some(affix=>affix.noAlcohol);
+  const noDuplicateMeat=affixes.some(affix=>affix.noDuplicateMeat);
+  const tightBudget=affixes.some(affix=>affix.tightBudget);
+  for(const affix of affixes){
+    if(affix.trait)guestTraits[affix.trait]=true;
+  }
+  let hiddenTrait="",hiddenClue="";
+  if(rng()<(daily?0.6:0.4)){
+    hiddenTrait=goutAlert?"avoidSeafood":"avoidSpicy";
+    guestTraits[hiddenTrait]=true;
+    hiddenClue=goutAlert
+      ?"有位来宾翻到水产那页便把菜单往外推了推，夹菜前只问这桌会不会吃得太重。"
+      :"有位来宾一看菜单上的红油图样，就放下筷子，把茶杯攥得更紧了。";
+  }
+  const guidance=affixes.map(affix=>affix.trait==="avoidSeafood"&&hiddenTrait==="avoidSeafood"
+    ?"有两盘油重的肉菜就容易吃过量，肉菜别堆满一桌。"
+    :affix.hint);
+  if(hiddenClue)guidance.push(hiddenClue);
+
+  const teaCost=isTeaRegion(region)?8*headcount:0;
+  const budgetMax=tier.perGuest*headcount+teaCost+2*Math.floor(rng()*10);
+  const budgetMin=tightBudget?budgetMax-15:Math.round(budgetMax*0.7);
+  const menuSeed=Math.floor(rng()*4294967296);
+  const restaurantName=place.names[tierIndex];
+  const mode=daily?"daily":"roguelike";
+  return {
+    id:mode+"_"+menuSeed,mode,region,tier:tier.id,headcount,budgetMin,budgetMax,menuSeed,
+    title:occasion.title+"·"+restaurantName,restaurantName,
+    regionLabel:place.city+"·"+CUISINE_LABELS[region],
+    tierLabel:tier.name+" · 全桌最多 "+budgetMax+" 元",
+    tableNames:tier.tables.slice(),guestTraits,goutAlert,noAlcohol,noDuplicateMeat,
+    affixes:affixes.map(affix=>affix.name),hiddenTrait,hiddenClue,
+    guestsSummary:"你与"+(headcount-1)+"位来宾同桌。"+guidance.join(""),
+    purpose:occasion.purpose+(guestTraits.needsPrestigeface?"主宾想要一道撑得起席面的硬菜。":"")
+  };
+}
+
+function drawScenario(level,_previous,random=Math.random){
+  if(Number.isInteger(level)&&level>=1&&level<=SCENARIOS.length){
+    const scene=SCENARIOS[level-1];
+    return {...scene,guestTraits:{...scene.guestTraits},tableNames:scene.tableNames.slice()};
+  }
+  return generateRoguelikeScenario(random);
 }
 
 function isTeaRegion(region){
@@ -643,6 +742,10 @@ function buildStoreMenu(scenario,allDishes=DISHES){
   else slots=28+Math.floor(random()*5);
 
   const essentials=new Set(["dish_26","dish_36","dish_46","dish_50","dish_52"]);
+  if(mode==="roguelike"||mode==="daily"){
+    for(const id of ["dish_37","dish_63","dish_88"])essentials.add(id);
+    if(tier!=="street")essentials.add("dish_59");
+  }
   if(frugal)essentials.add("dish_49");
   if(mode==="reunion"){
     for(const id of ["dish_55","dish_56","dish_86","dish_98","dish_99"])essentials.add(id);
@@ -856,6 +959,19 @@ function judge(scenario, order, options={}) {
   const appetizers=formal?withTag('cold_dish').filter(d=>!tagged(d,'showy_empty')&&d.price<150&&!potSide(d)):[];
   const streetMismatch=formal?withTag('street_heavy').filter(d=>!potSide(d)):[];
   const sea=t.avoidSeafood?ds.filter(seafood):[],chili=t.avoidSpicy?ds.filter(d=>d.spicy>0):[];
+  const meatDishes=scenario.goutAlert||scenario.noDuplicateMeat
+    ? [...new Map(ds.filter(d=>['pork','beef','mutton','poultry'].includes(d.ingredientType)||seafood(d))
+        .map(d=>[d.id,d])).values()] : [];
+  const goutDishes=scenario.goutAlert?meatDishes.filter(d=>d.heaviness>=75):[];
+  const meatByType=new Map();
+  const duplicateMeats=[];
+  if(scenario.noDuplicateMeat){
+    for(const d of meatDishes){
+      const first=meatByType.get(d.ingredientType);
+      if(!first)meatByType.set(d.ingredientType,d);
+      else if(!duplicateMeats.length)duplicateMeats.push(first,d);
+    }
+  }
   const soft=withTag('elder_friendly'),light=withTag('low_fat'),show=withTag('showy_empty');
   const single=h>=4&&n===1;
   const beggar=single&&purchases.length===1&&ds[0].id==='dish_50'&&order[0].qty===1;
@@ -870,10 +986,10 @@ function judge(scenario, order, options={}) {
   function finish(result){
     const passed=result.score>=target;
     const existing=new Set(options.earnedAchievements||[]);
-    const hazardOnMenu=t.avoidSeafood||t.avoidSpicy||scenario.noAlcohol||scenario.requiresHeat||scenario.mustHighEndAlcohol||south||
+    const hazardOnMenu=t.avoidSeafood||t.avoidSpicy||scenario.noAlcohol||scenario.requiresHeat||scenario.mustHighEndAlcohol||scenario.goutAlert||scenario.noDuplicateMeat||south||
       (options.storeMenu||[]).some(d=>tagged(d,'local_signature')&&!d.regions.includes(region));
     const steppedOnTrap=sea.length||chili.length||wrong.length||peeling.length||bones.length||premade.length||appetizers.length||
-      streetMismatch.length||show.length>=2||edible<65||result.fatal||result.notes.some(n=>!n.good&&['技法撞车','少了清爽选择','缺道软嫩菜','长辈咬不动','少了实在肉菜','大肉堆桌'].includes(n.reason));
+      streetMismatch.length||goutDishes.length>=2||duplicateMeats.length||show.length>=2||edible<65||result.fatal||result.notes.some(n=>!n.good&&['技法撞车','少了清爽选择','缺道软嫩菜','长辈咬不动','少了实在肉菜','大肉堆桌'].includes(n.reason));
     const earned={
       ach_first:passed&&!existing.has('ach_first'),
       ach_budget:passed&&Number.isFinite(hi)&&bill>=lo&&bill<=hi&&result.dimensions[0].value===100,
@@ -924,9 +1040,11 @@ function judge(scenario, order, options={}) {
     }
     if(scenario.noAlcohol&&alcohol.length){
       scores[2]-=45; scores[3]-=40; limit(49,'这一桌交代了不喝酒');
-      note(100,alcohol[0].dish.name,'酒水犯忌',scenario.mode==='spicy'?
-        '客人全开车来的，你搁这硬点高度白酒，打算吃完饭集体在门口吹交警的酒精测试仪吗？':
-        '长辈家里这一桌早交代了不喝酒，还把酒瓶放到主座面前，叫人家怎么推？');
+      let alcoholRemark='全员自驾赴宴，早说了滴酒不沾。赶紧换壶茶，别让客人围着酒瓶犯难。';
+      if(scenario.drivingAnnounced)alcoholRemark='主宾刚说下午要开车巡检，这酒怎么还在单上？赶紧撤了，换壶茶。';
+      else if(scenario.mode==='spicy')alcoholRemark='客人全开车来的，你搁这硬点高度白酒，打算吃完饭集体在门口吹交警的酒精测试仪吗？';
+      else if(scenario.mode==='family'||scenario.mode==='tea')alcoholRemark='长辈家里这一桌早交代了不喝酒，还把酒瓶放到主座面前，叫人家怎么推？';
+      note(100,alcohol[0].dish.name,'酒水犯忌',alcoholRemark);
     }
     if(scenario.mustHighEndAlcohol&&!hasPremium){
       scores[1]-=55; scores[3]-=35; limit(54,'商务席缺了主人交代的飞天酒');
@@ -956,6 +1074,14 @@ function judge(scenario, order, options={}) {
     }else if(!soups.length&&(scenario.mode==='tea'||scenario.mode==='family')){
       scores[4]-=24;
       note(85,'汤盅','请添一道汤',south?'茶楼这桌开席要先喝汤，伙计走了一圈没找到汤单。':'寿席的热菜吃完，老丈人等着喝口汤溜溜缝。');
+    }
+    if(goutDishes.length>=2){
+      scores[2]-=26;
+      note(98,names(goutDishes),'高嘌呤重菜扎堆','痛风警报拉响，这桌吃完直奔骨科');
+    }
+    if(duplicateMeats.length){
+      scores[3]-=18;
+      note(97,names(duplicateMeats),'荤菜撞重样','主宾讲究一山不容二虎，同类肉菜点重样了');
     }
     const dimensions=labels.map((label,i)=>({label,value:clamp(scores[i])}));
     const average=clamp(dimensions.reduce((sum,d)=>sum+d.value,0)/dimensions.length);
@@ -1164,6 +1290,24 @@ let lastBudgetPct=0,lastBudgetSum=0;
 const dishWhispers=new Map();
 const whisperDuration=1550;
 let receiptPrintPending=false,receiptObserver=null;
+let eventTriggered=false;
+const soldOutIds=new Set();
+let dailyExam=null;
+
+function todayExam(now=new Date()){
+  const y=now.getFullYear(),m=String(now.getMonth()+1).padStart(2,"0"),d=String(now.getDate()).padStart(2,"0");
+  return {seed:Number(String(y)+m+d),label:y+"-"+m+"-"+d};
+}
+function examDate(value){
+  if(!/^\d{8}$/.test(value))return null;
+  const label=value.slice(0,4)+"-"+value.slice(4,6)+"-"+value.slice(6);
+  const date=new Date(label+"T00:00:00Z");
+  return Number.isFinite(date.valueOf())&&date.toISOString().slice(0,10)===label?label:null;
+}
+function deskRoundLabel(level){
+  if(dailyExam)return "今日统考 "+dailyExam.label;
+  return activeSideQuest?"支线彩蛋":roundLabel(level);
+}
 const total = () => order.reduce((sum,item)=>sum+orderLineTotal(scene,item),0);
 const savePrefix="ronggang.diancai.v1.";
 // 音频设备只在玩家第一次操作后启动；各声部共用静音总线。
@@ -1454,7 +1598,7 @@ function syncMenuClock(){
 }
 function updateTag(){
   const level=stage==="cover"?progress.level:roundLevel;
-  document.querySelector("#tag-level").textContent=activeSideQuest?"支线彩蛋":roundLabel(level)+" · 须达 "+passScore(level)+" 分";
+  document.querySelector("#tag-level").textContent=activeSideQuest?"支线彩蛋":deskRoundLabel(level)+" · 须达 "+passScore(level)+" 分";
   document.querySelector("#tag-count").textContent="成就 "+progress.achievements.size+"/"+ACHIEVEMENTS.length;
 }
 function archive(){
@@ -1521,32 +1665,34 @@ async function settle(){
 }
 async function turnInOrder(){
   readProgress();
-  const freePlay=!activeSideQuest&&roundLevel>lastLevel;
+  const freePlay=!dailyExam&&!activeSideQuest&&roundLevel>lastLevel;
   const run=freePlay?readFreeRun():null;
-  const clean=freePlay?run.ticket===freeTicket:
-    !activeSideQuest&&progress.level===roundLevel&&firstAttempt&&!hasMark(campaignKey+"retry."+roundLevel);
-  const streakBefore=freePlay?run.streak:activeSideQuest?0:precedingWins();
+  const clean=!dailyExam&&(freePlay?run.ticket===freeTicket:
+    !activeSideQuest&&progress.level===roundLevel&&firstAttempt&&!hasMark(campaignKey+"retry."+roundLevel));
+  const streakBefore=dailyExam||activeSideQuest?0:freePlay?run.streak:precedingWins();
   report=judge(scene,order,{level:roundLevel,storeMenu,freePlay,streakBefore,firstAttempt:clean,
     earnedAchievements:progress.achievements,menuSeconds:menuElapsed/1000,edits:menuEdits});
   report.freePlay=freePlay;
-  report.campaignWon=!activeSideQuest&&roundLevel===lastLevel&&report.passed;
+  report.campaignWon=!dailyExam&&!activeSideQuest&&roundLevel===lastLevel&&report.passed;
   report.newAchievements=report.achievements.filter(id=>!progress.achievements.has(id));
   for(const id of report.newAchievements){
     progress.achievements.add(id);
     saveMark(id);
   }
   if(report.newAchievements.length)readProgress();
-  if(activeSideQuest){
-    saveSideSession(null);
-  }else if(freePlay){
-    if(clean)writeFreeRun("",report.passed?streakBefore+1:0);
-  }else if(report.passed){
-    if(roundLevel===lastLevel&&progress.level===lastLevel)writeFreeRun("",clean?streakBefore+1:0);
-    if(clean)saveMark(campaignKey+"clean."+roundLevel);
-    saveMark(campaignKey+"pass."+roundLevel);
-    progress.level=Math.max(progress.level,roundLevel+1);
-  }else{
-    saveMark(campaignKey+"retry."+roundLevel);
+  if(!dailyExam){
+    if(activeSideQuest){
+      saveSideSession(null);
+    }else if(freePlay){
+      if(clean)writeFreeRun("",report.passed?streakBefore+1:0);
+    }else if(report.passed){
+      if(roundLevel===lastLevel&&progress.level===lastLevel)writeFreeRun("",clean?streakBefore+1:0);
+      if(clean)saveMark(campaignKey+"clean."+roundLevel);
+      saveMark(campaignKey+"pass."+roundLevel);
+      progress.level=Math.max(progress.level,roundLevel+1);
+    }else{
+      saveMark(campaignKey+"retry."+roundLevel);
+    }
   }
   pad.classList.add("flipping-slip");
   SoundFX.bell();
@@ -1622,7 +1768,8 @@ function readChallenge(search){
   const score=integer("score",0,100),beat=integer("beat",1,99);
   if(level===null||score===null||beat===null)return null;
   const side=SIDE_QUESTS.find(q=>q.id===params.get("side"));
-  return {level,rank,score,beat,side,freePlay:params.get("mode")==="free"};
+  const daily=params.getAll("daily").length===1?examDate(params.get("daily")):null;
+  return {level,rank,score,beat,side,daily,freePlay:params.get("mode")==="free"};
 }
 function shareDetails(){
   const {level,rank,stampNote,score,percentile,passed,notes}=report;
@@ -1630,10 +1777,11 @@ function shareDetails(){
   url.hash="";
   url.search=new URLSearchParams({lv:level,rank,score,beat:percentile}).toString();
   if(report.freePlay)url.searchParams.set("mode","free");
+  if(dailyExam)url.searchParams.set("daily",String(dailyExam.seed));
   if(report.sideQuestId)url.searchParams.set("side",report.sideQuestId);
   const best=notes.filter(n=>n.good).sort((a,b)=>b.priority-a.priority)[0]||notes[0];
   const restaurantName=scene.restaurantName;
-  const label=activeSideQuest?"支线彩蛋":roundLabel(level);
+  const label=deskRoundLabel(level);
   const text='【'+restaurantName+'】我在《点菜模拟器》'+label+'拿下'+score+'分，获封「'+rank+'」（'+stampNote+'），击败全国'+percentile+'%经手人！'+(report.campaignWon?'八关通关，收下首席司长荣誉。':'')+'不服来开单踢馆：'+url.href;
   return {level,roundLabel:label,campaignWon:report.campaignWon,rank,stampNote,score,percentile,passed,restaurantName,sceneTitle:scene.title,quote:best.text,url:url.href,text};
 }
@@ -1681,7 +1829,7 @@ async function copyShare(){
 function action(act,label,cls="smallbtn",attrs=""){
   return '<button class="'+cls+'" data-act="'+act+'" '+attrs+'>'+label+'</button>';
 }
-function ticket(title){return '<div class="ticket"><span>'+title+'</span><b>№ '+number+'</b></div>'}
+function ticket(title){return '<div class="ticket"><span>'+title+'</span><b>'+(dailyExam?'今日统考 · ':'')+'№ '+number+'</b></div>'}
 function meta(){
   return '<div class="meta">'+[["台号",table||"待派"],["人数",scene?scene.headcount+" 位":"待定"],["经手人","玩家"],["单号",number]].map(([k,v])=>'<div>'+k+'<b>'+v+'</b></div>').join("")+'</div>';
 }
@@ -1692,7 +1840,8 @@ function scenarioInfo(){
   const budget=Number.isFinite(scene.budgetMax)
     ? '<b class="pen">¥'+scene.budgetMin+' ～ ¥'+scene.budgetMax+'</b>　总额封顶'
     : '<b class="pen">¥ 无上限</b>';
-  return info("席面",scene.regionLabel+'<br>'+scene.tierLabel)+info("到席客人",scene.guestsSummary)+info("这顿饭的由头",scene.purpose)+info("可用预算",budget);
+  const rules=scene.affixes?.length?'<br><span class="pen">本席讲究 · '+scene.affixes.join("、")+'</span>':"";
+  return info("席面",scene.regionLabel+'<br>'+scene.tierLabel+rules)+info("到席客人",scene.guestsSummary)+info("这顿饭的由头",scene.purpose)+info("可用预算",budget);
 }
 function briefPanel(first){
   const open=first?firstBriefOpen:menuBriefOpen;
@@ -1711,6 +1860,7 @@ function summary(){
 function renderCover(){
   bookCover.hidden=false;
   bookCover.inert=false;
+  bookCover.querySelector('[data-act="daily-exam"]').textContent="今日全网统考（"+todayExam().label+"）";
   bookCover.querySelector("#resumeNote").hidden=progress.level!==1||!(hasMark("campaign8.pass.1")||hasMark("pass.1"));
   bookCover.querySelector(".cover-open").textContent=resumedSide()?"翻开菜单 · 继续支线彩蛋":progress.level>lastLevel?"翻开菜单 · 自由接单":"翻开菜单 · 接第 "+progress.level+" 关派单";
   const bookmark=bookCover.querySelector("#cover-bookmark");
@@ -1718,7 +1868,7 @@ function renderCover(){
   if(challenge){
     const {level,rank,score,beat}=challenge;
     const verb=score>=passScore(level)?"闯过":"挑战";
-    bookmark.textContent="好友「"+rank+"」"+(challenge.side?"挑战了支线「"+challenge.side.title+"」":challenge.freePlay?"完成自由局":verb+"第 "+level+" 关")+"，"+score+" 分，击败全国 "+beat+"% 经手人。翻开踢馆！";
+    bookmark.textContent="好友「"+rank+"」"+(challenge.daily?"作答 "+challenge.daily+" 统考":challenge.side?"挑战了支线「"+challenge.side.title+"」":challenge.freePlay?"完成自由局":verb+"第 "+level+" 关")+"，"+score+" 分，击败全国 "+beat+"% 经手人。翻开踢馆！";
   }
 }
 function openBookCover(){
@@ -1802,6 +1952,9 @@ function dishSketch(dish){
 }
 function getDishWhisper(scene,dish){
   const has=tag=>dish.tags.includes(tag);
+  if((scene.hiddenTrait==="avoidSpicy"&&dish.spicy>0)||
+    (scene.hiddenTrait==="avoidSeafood"&&(dish.category==="海鲜水产"||["fish","shrimp_crab"].includes(dish.ingredientType)||has("seafood"))))
+    return "秘书偷偷朝你使眼色（有人忌口！）";
   if(has("salad_trap"))return "疯五点草，叛徒实锤！";
   if(has("premium_alcohol"))return "好家伙，财务提刀来了";
   if(scene.noAlcohol&&has("alcohol"))return "这桌禁酒，你想吹哨？";
@@ -1833,13 +1986,14 @@ function budgetPct(sum,limit){
 }
 function dishRow(d){
   const item=order.find(({dish})=>dish.id===d.id);
+  const soldOut=soldOutIds.has(d.id);
   const open=detailChoices.get(d.id)??Boolean(item);
   const attrs='data-id="'+d.id+'" ';
   const detailsId="desc-"+d.id;
-  const name='<span class="name'+(removing.has(d.id)?' cross':'')+'">'+d.name+'</span>';
+  const name='<span class="name'+(soldOut||removing.has(d.id)?' cross':'')+'">'+d.name+'</span>';
   const detail=action("dish-detail",dishSketch(d)+'<span class="detail">'+name+'<span class="spec">'+d.spec+(d.maxQty===1?' · 进店免费':'')+'</span></span>',"dish-info",
     attrs+'aria-label="'+d.name+'，'+d.spec+'，菜品详情" aria-expanded="'+open+'" aria-controls="'+detailsId+'"');
-  const check=action(item?"uncheck":"add",'<span aria-hidden="true">'+(item?'✓':'')+'</span>',"dish-check",
+  const check=soldOut?action("add","已沽清","smallbtn sold-out",attrs+'disabled aria-label="'+d.name+'已沽清"'):action(item?"uncheck":"add",'<span aria-hidden="true">'+(item?'✓':'')+'</span>',"dish-check",
     attrs+'aria-label="勾选'+d.name+'" aria-pressed="'+Boolean(item)+'"');
   const quantity=item&&d.maxQty!==1&&!d.tags.includes("tea_fee")?'<div class="orderbtns">'+
     action("minus","−","ctrl",attrs+'aria-label="减少'+d.name+'一份"')+
@@ -2114,7 +2268,7 @@ function showShareContent(model){
     shareBeat:"击败全国 "+model.percentile+"% 经手人",shareQuote:model.quote,
     shareMessage:model.text.endsWith(model.url)?model.text.slice(0,-model.url.length).trimEnd():model.text,
     shareCopy:"一键复制战报与链接",shareStatus:"",
-    shareContinue:activeSideQuest?continueMainLabel():!model.passed?"关闭弹窗 · 返回复盘":
+    shareContinue:dailyExam?"收好战报 · 返回封面":activeSideQuest?continueMainLabel():!model.passed?"关闭弹窗 · 返回复盘":
       progress.level>lastLevel?"收下喜报 · 自由接单":"收下喜报 · 继续闯第 "+progress.level+" 关"
   };
   for(const [id,value] of Object.entries(fields))document.getElementById(id).textContent=value;
@@ -2138,7 +2292,7 @@ function guestCheck(){
     '<tr><th scope="row">'+dish.name+'</th><td>×'+qty+'</td><td>¥'+dish.price+'</td></tr>'
   ).join('');
   return '<section class="guest-check" aria-labelledby="check-title">'+
-    '<h3 id="check-title">*** 结账单 / GUEST CHECK ***</h3><p>'+scene.restaurantName+'</p>'+
+    '<h3 id="check-title">*** 结账单 / GUEST CHECK ***</h3><p>'+scene.restaurantName+(dailyExam?' · 今日统考 '+dailyExam.label:'')+'</p>'+
     '<table aria-label="按上菜顺序列出的结账明细"><colgroup><col><col class="count-col"><col class="price-col"></colgroup>'+
     '<thead><tr><th scope="col">菜名</th><th scope="col">数量</th><th scope="col">单价</th></tr></thead>'+
     '<tbody>'+rows+'</tbody><tfoot><tr><th scope="row" colspan="2">合计(TOTAL):</th><td>¥'+total()+'</td></tr></tfoot></table></section>';
@@ -2159,8 +2313,8 @@ function grade(){
     (otherAwards.length?'<p class="more-awards">同单另记：'+otherAwards.join('、')+'</p>':'')+'</header>';
   const result=report.campaignWon?'八关通关 · 首席司长荣誉':report.passed?'闯关成功':'差 '+(report.passScore-report.score)+' 分过关';
   const nextLevel=Math.max(progress.level,report.level+(report.passed?1:0));
-  const next=activeSideQuest?continueMainLabel():nextLevel>lastLevel?'自由接单 · 再来一桌':nextLevel>report.level?'撕开第 '+nextLevel+' 关派单':'重考第 '+report.level+' 关';
-  const foot='<div class="exam-line"><b>'+result+'</b><span>'+(activeSideQuest?'支线彩蛋':roundLabel(report.level))+' · 过关线 '+report.passScore+' 分</span></div>';
+  const next=dailyExam?"返回封面":activeSideQuest?continueMainLabel():nextLevel>lastLevel?'自由接单 · 再来一桌':nextLevel>report.level?'撕开第 '+nextLevel+' 关派单':'重考第 '+report.level+' 关';
+  const foot='<div class="exam-line"><b>'+result+'</b><span>'+deskRoundLabel(report.level)+' · 过关线 '+report.passScore+' 分</span></div>';
   const banner='<div class="percentile">击败全国 '+report.percentile+'% 经手人</div>';
   const bars='<div class="bars">'+report.dimensions.map(x=>'<div class="bar"><span>'+x.label+'</span><div class="track"><i style="width:'+x.value+'%"></i></div><b>'+x.value+'</b></div>').join('')+'</div>';
   const cap=report.fatal?'<p class="over">'+report.fatal+'</p>':'';
@@ -2206,7 +2360,74 @@ function finishPageTurn(){
 function modal(title,html){
   document.querySelector("#dialogTitle").textContent=title;document.querySelector("#dialogText").innerHTML=html;dialog.showModal();syncMenuClock();
 }
-async function draw(){
+function returnToCover(){
+  clearTimeout(shareTimer);
+  shareTimer=0;shareDue=false;awardNoticePending=false;
+  dailyExam=null;
+  receiptPrintPending=false;
+  stage="cover";
+  pad.classList.remove("back");
+  render(true);
+  bookCover.querySelector(".cover-open").focus({preventScroll:true});
+}
+function triggerTableEvent(rng){
+  const events=new Map();
+  const byId=(a,b)=>a.id.localeCompare(b.id);
+  const isPaidDish=d=>d.price>0&&!d.tags.includes("tea_fee");
+  const pickedIds=new Set(order.map(row=>row.dish.id));
+  const soldOut=order.map(row=>row.dish).filter(d=>isPaidDish(d)&&
+    !(scene.mustHighEndAlcohol&&d.tags.includes("premium_alcohol"))).sort(byId);
+  if(soldOut.length)events.set("soldout",()=>{
+    const target=soldOut[Math.floor(rng()*soldOut.length)];
+    soldOutIds.add(target.id);
+    dishWhispers.delete(target.id);
+    order=order.filter(row=>row.dish.id!==target.id);
+    if(reviewingOrder){
+      reviewingOrder=false;
+      cat=menuCategoryLabel(target);
+    }
+    return ["后厨临时沽清","传菜员小跑过来擦汗：「不好意思，刚最后一份【"+target.name+"】被隔壁桌抢走了！您看换道别的？」"];
+  });
+  if(scene.headcount<10&&!scene.guestTraits.hasFemaleWatchingDiet)events.set("guest",()=>{
+    scene.headcount++;
+    for(const row of order)if(row.dish.tags.includes("tea_fee"))row.qty=scene.headcount;
+    scene.guestTraits.hasFemaleWatchingDiet=true;
+    scene.guestsSummary+="　临时多了一位控油轻食的女同事。";
+    menuBriefOpen=true;
+    return ["微信临时来客","主宾低头看了眼手机：「刚到楼下，临时多带一位女同事过来，她最近控油轻食，大家多担待。」（全桌人数 +1，须备清爽素菜）"];
+  });
+  if(!scene.noAlcohol&&!scene.mustHighEndAlcohol)events.set("driving",()=>{
+    scene.noAlcohol=true;
+    scene.drivingAnnounced=true;
+    scene.guestsSummary+="　下午全员开车去工地巡检，今席以茶饮代酒。";
+    menuBriefOpen=true;
+    return ["下午临时开车","主宾刚挂断电话：「下午临时通知全员开车去工地巡检，今天谁也别碰酒，以茶水饮料代酒！」"];
+  });
+  const specials=storeMenu.filter(d=>isPaidDish(d)&&d.ingredientType!=="drink"&&
+    !pickedIds.has(d.id)&&!soldOutIds.has(d.id)).sort(byId);
+  if(specials.length)events.set("special",()=>{
+    const bonusDish=specials[Math.floor(rng()*specials.length)];
+    const featured={...bonusDish,name:bonusDish.name+"（今日主厨力荐）",prestige:Math.min(99,bonusDish.prestige+15)};
+    storeMenu=storeMenu.map(d=>d.id===featured.id?featured:d);
+    return ["经理塞来一张纸条","经理凑到你耳边低声说：「后厨刚到一批尖货，今天点【"+bonusDish.name+"】算我给您留的压轴面子菜！」"];
+  });
+  if(!events.size)return false;
+  const slots=dailyExam?["soldout","guest","driving","special"]:[...events.keys()];
+  const start=Math.floor(rng()*slots.length);
+  const next=slots.slice(start).concat(slots.slice(0,start)).find(key=>events.has(key));
+  const [title,message]=events.get(next)();
+  render();
+  modal(title,"<p>"+message+"</p>");
+  return true;
+}
+function maybeTableEvent(){
+  if(scene.isSideQuest||scene.mode==="frugal"||eventTriggered||order.length<2)return false;
+  // 本桌只抽一次；统考的事件随机数独立于抽单、音效和操作顺序。
+  eventTriggered=true;
+  const rng=dailyExam?createSeededRng(dailyExam.seed^0x65766e74):Math.random;
+  return rng()<0.55&&triggerTableEvent(rng);
+}
+async function draw(exam=null){
   if(turningPage)return;
   turningPage=true;
   sheetFace.inert=true;
@@ -2221,8 +2442,23 @@ async function draw(){
       pad.classList.remove("tearing");
     }
     readProgress();
-    scene=chooseNextScene();table=pick(scene.tableNames);number=serial();
-    storeMenu=buildStoreMenu({...scene,menuSeed:Math.floor(Math.random()*4294967296)},DISHES);
+    dailyExam=exam;
+    if(dailyExam){
+      const rng=createSeededRng(dailyExam.seed);
+      activeSideQuest=null;
+      roundLevel=lastLevel+1;
+      scene=generateRoguelikeScenario(rng,{daily:true});
+      table=scene.tableNames[Math.floor(rng()*scene.tableNames.length)];
+      number=String(Math.floor(100000+rng()*900000));
+    }else{
+      scene=chooseNextScene();
+      table=pick(scene.tableNames);
+      number=serial();
+    }
+    scene={...scene,guestTraits:{...scene.guestTraits}};
+    storeMenu=buildStoreMenu({...scene,menuSeed:scene.menuSeed??Math.floor(Math.random()*4294967296)},DISHES);
+    eventTriggered=false;
+    soldOutIds.clear();
     menuEdits=0;menuElapsed=0;menuStarted=null;
     order=initialOrderFor(scene,storeMenu);cat=scene.mode==="frugal"?"汤羹主食":cats.find(c=>storeMenu.some(d=>menuCategoryLabel(d)===c));reviewingOrder=false;categoryScroll=0;
     lastBudgetSum=total();
@@ -2259,14 +2495,15 @@ document.addEventListener("click",e=>{
   if(a==="share")return openShare();
   if(a==="close-share")return shareModal.close();
   if(a==="share-continue"&&shareModal.open){
-    const proceed=stage==="report"&&(report?.passed||activeSideQuest);
+    const proceed=stage==="report"&&(report?.passed||activeSideQuest||dailyExam);
     shareModal.close();
-    if(proceed)return draw();
+    if(proceed)return dailyExam?returnToCover():draw();
     return;
   }
   if(a==="copy-share")return copyShare();
   if(a==="save-share"&&activeShare)return saveShareImage(activeShare);
-  if(a==="draw"&&(stage==="cover"||stage==="report"))return draw();
+  if(a==="daily-exam"&&stage==="cover")return draw(todayExam());
+  if(a==="draw"&&(stage==="cover"||stage==="report"))return dailyExam?returnToCover():draw();
   if(a==="brief"&&(stage==="brief"||stage==="menu")){
     SoundFX.tap();
     const open=b.getAttribute("aria-expanded")!=="true";
@@ -2296,7 +2533,11 @@ document.addEventListener("click",e=>{
     page.querySelector(".order-list").scrollTop=0;
     return;
   }
-  if(a==="kitchen"&&!orderSubmissionIssue(scene,order)&&!removing.size){SoundFX.tap();stage="kitchen";return render(true)}
+  if(a==="kitchen"&&stage==="menu"&&!orderSubmissionIssue(scene,order)&&!removing.size){
+    SoundFX.tap();
+    if(maybeTableEvent())return;
+    stage="kitchen";return render(true);
+  }
   if(a==="serve"&&stage==="kitchen"&&order.length)return settle();
   if(removing.has(id))return;
   if(a==="dish-detail"&&stage==="menu"){
@@ -2312,7 +2553,7 @@ document.addEventListener("click",e=>{
   }
   if(a==="add"&&stage==="menu"){
     const dish=storeMenu.find(d=>d.id===id);
-    if(!dish||(idx>=0&&(dish.tags.includes("tea_fee")||order[idx].qty>=dish.maxQty)))return;
+    if(!dish||soldOutIds.has(id)||(idx>=0&&(dish.tags.includes("tea_fee")||order[idx].qty>=dish.maxQty)))return;
     const newlyChecked=idx<0,animateDetails=newlyChecked&&!detailChoices.get(id);
     if(newlyChecked){order.push({dish,qty:orderLineQuantity(scene,{dish,qty:1})});detailChoices.delete(id)}
     else order[idx].qty++;
