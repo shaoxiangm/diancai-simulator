@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#9b352a">
-<meta name="application-version" content="3.4.2">
+<meta name="application-version" content="3.5.0">
 <title>点菜模拟器 · 中国式饭局人情世故在线小游戏</title>
 <meta name="description" content="《点菜模拟器》是一款免费的复古复写纸风格中国式饭局网页小游戏。涵盖八大菜系与门店档次隔离、33枚奇葩成就、后厨排单与经理毒舌批注，考验你的预算把控与酒桌人情世故。">
 <meta name="keywords" content="点菜模拟器,中国式饭局模拟器,点菜小游戏,网页小游戏,人情世故模拟器,HTML5小游戏,饭局点菜">
@@ -232,8 +232,8 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 .seal small::before,.seal small::after{content:"·";margin:0 3px}
 .seal b{display:block;max-width:100%;padding:0 5px;margin:4px 0 0;font:900 clamp(16px,4.6vw,19px)/1.1 var(--serif);white-space:normal;text-align:center;text-wrap:balance}
 .seal::after{content:"";position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;background:repeating-linear-gradient(112deg,transparent 0 13px,#f9ebe89c 13.5px,transparent 14.3px 24px)}
-.grade-title :is(.seal,.award-seal){transform:scale(1) rotate(-6deg)}
-.awaiting-imprint .grade-title :is(.seal,.award-seal){opacity:0}
+.grade-title .seal{transform:scale(1) rotate(-6deg)}
+.awaiting-imprint :is(.grade-title .seal,.meta-stamp-zone .award-seal){opacity:0}
 dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;background:var(--paper);border:2px solid var(--red);border-radius:4px;box-shadow:0 12px 40px #16181266}dialog::backdrop{background:#171813a8}dialog h2{font-size:23px}dialog p{margin:10px 0;font-size:15px}dialog .primary{margin-top:14px}
 #achModal{width:min(430px,94vw);padding:0;overflow:hidden}
 #achModal[open]{display:flex;flex-direction:column}
@@ -304,6 +304,14 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 #shareModal[open]{display:flex;flex-direction:column}
 .share-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 16px;padding:8px 0;border-bottom:3px double var(--red)}
 .share-head h2{color:var(--red);font:900 clamp(17px,5vw,22px)/1.23 var(--serif)}.share-head .smallbtn{flex:none;min-height:38px}
+#shareModal .share-head .smallbtn{border-color:var(--red)}
+@keyframes close-btn-pulse{
+  0%,100%{color:var(--red);border-color:var(--red);box-shadow:0 0 0 transparent;transform:scale(1)}
+  50%{color:var(--pen);border-color:var(--pen);box-shadow:0 0 7px color-mix(in srgb,var(--pen) 32%,transparent);transform:scale(1.04)}
+}
+@media(prefers-reduced-motion:no-preference){
+  #shareModal[open] .share-head .smallbtn{animation:close-btn-pulse 1.8s ease-in-out infinite}
+}
 .share-body{min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:12px 16px 16px}
 .share-result{display:grid;grid-template-columns:minmax(0,1fr) minmax(112px,38%);align-items:center;gap:8px}
 .share-result p{margin:0}.share-level{color:var(--green);font:700 16px/1.35 var(--serif)}.share-scene{margin-top:4px!important;color:var(--muted);font-size:13px}
@@ -323,6 +331,14 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 @media(max-width:350px){.body{padding-inline:14px}.brand{margin-inline:14px}.foot{padding-inline:14px}.meta b{margin-left:4px}.tab{font-size:12px}}
 @media(prefers-reduced-motion:reduce){*,*::after{animation-duration:.001ms!important;transition:none!important}}
 .sheet-face{--face:var(--paper);position:relative;display:flex;flex:1;min-height:0;flex-direction:column;background-color:var(--face);background-image:inherit;transform-origin:8px 0}
+.kitchen-pass-overlay{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:16px;background:color-mix(in srgb,var(--paper) 80%,transparent)}
+.kitchen-pass-card{width:min(100%,290px);padding:16px;background:var(--paper);border:4px double var(--red);box-shadow:0 4px 13px color-mix(in srgb,var(--ink) 16%,transparent)}
+.kitchen-pass-card h3{color:var(--red);font-size:19px}
+.kitchen-pass-steps{list-style:none;margin:10px 0 0;padding:0}
+.kitchen-pass-steps li{padding:6px 0;border-top:1px dotted var(--line);color:var(--muted);font:700 15px/1.45 var(--hand);opacity:.56}
+.kitchen-pass-steps li.on{color:var(--blue);opacity:1}
+@keyframes kitchen-pass-ink{from{opacity:.56;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:no-preference){.kitchen-pass-steps li.on{animation:kitchen-pass-ink .19s ease-out}}
 .back .sheet-face{--face:var(--pink)}
 .pad.flipping-slip{background-color:#d5c4ad}
 .flipping-slip .sheet-face{transform-origin:center center;backface-visibility:hidden;box-shadow:0 2px 12px #59463435}
@@ -336,20 +352,28 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 .brand-level,.archive-link{color:var(--blue);font:700 12px/1.4 var(--hand)}
 .archive-link{display:flex;align-items:center;justify-self:end;gap:6px;min-height:28px;padding:2px 6px;border:0;border-bottom:1px solid #23438e44;background:none}
 .archive-link::after{content:"";width:5px;height:5px;border:solid currentColor;border-width:1px 1px 0 0;transform:rotate(45deg)}
-.grade-title.has-award{grid-template-columns:minmax(0,1fr) auto}
 .grade-title h2 span{display:inline-block}
-.stamp-pair{display:flex;align-items:center;justify-content:flex-end;gap:9px}
-.stamp-pair .seal{width:clamp(99px,27vw,116px)}
 .award-seal{position:relative;flex:none;width:74px;height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:3px;border:4px double currentColor;border-radius:3px;color:var(--blue);font:900 17px/1.1 var(--serif);text-align:center;transform:rotate(5deg)}
 .award-seal::after{content:"";position:absolute;inset:-3px;pointer-events:none;background:repeating-linear-gradient(112deg,transparent 0 16px,#f9ebe887 16.6px,transparent 17.2px 29px)}
 .award-seal small{font:700 10px/1 var(--hand);letter-spacing:.12em}.award-seal b{text-wrap:balance;word-break:break-all}.award-seal.wordy b{font-size:12px;line-height:1.1}
 .award-impressions{display:flex;flex-wrap:wrap;gap:14px;list-style:none;margin:18px 2px;padding:0}
-.stagehead .more-awards{margin:7px 0 0;color:var(--blue);font:700 13px/1.4 var(--hand)}
+.meta-stamp-zone{position:relative;isolation:isolate;--stamp-size:clamp(44px,14vw,54px)}
+.meta-stamp-zone .award-seal{
+  position:absolute;
+  top:calc(50% - var(--stamp-size)/2 + var(--stamp-nudge));
+  right:calc(5px + var(--stamp-index)*min(var(--stamp-size) - 4px,(100% - var(--stamp-size) - 10px)/var(--stamp-spaces)));
+  width:var(--stamp-size);height:var(--stamp-size);padding:1px;gap:1px;
+  border-width:3px;font-size:12px;color:color-mix(in srgb,var(--blue) 68%,transparent);transform:rotate(var(--stamp-angle));
+  mix-blend-mode:multiply;opacity:.88;pointer-events:none
+}
+.meta-stamp-zone .award-seal small{font-size:8px;letter-spacing:.05em}
+.meta-stamp-zone .award-seal.wordy b{font-size:9px}
+.meta-stamp-zone .award-seal.wordy small{display:none}
 .exam-line{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
 .percentile{margin:0 0 9px;padding:4px 6px;color:var(--blue);border-block:1px dotted #23438e55;font:700 16px/1.3 var(--hand);background:#23438e07}
 .exam-line span{font:12px var(--serif);color:var(--muted)}.exam-line{margin-bottom:5px;color:var(--red);font:700 16px var(--hand)}
-@media(max-width:390px){.brand-actions .smallbtn{padding-inline:6px}.brand-actions .mute-btn{min-width:29px;padding-inline:4px}.grade-title.has-award{gap:6px}}
-@media(max-width:350px){.brand strong i{width:20px;height:20px;margin-right:5px}.stamp-pair{gap:7px}.stamp-pair .seal b{font-size:16px}}
+@media(max-width:390px){.brand-actions .smallbtn{padding-inline:6px}.brand-actions .mute-btn{min-width:29px;padding-inline:4px}}
+@media(max-width:350px){.brand strong i{width:20px;height:20px;margin-right:5px}}
 @media(prefers-reduced-motion:no-preference){
   .tearing::before{content:"";position:absolute;inset:16px 0 0;background:repeating-linear-gradient(0deg,transparent 0 26px,#b9877740 26px 27px),linear-gradient(#d2b4a8,#f0dcd3 24%);pointer-events:none}
   .tearing .sheet-face{animation:tear-away .29s ease-in both;box-shadow:0 -4px 12px #3b2c2760}
@@ -667,7 +691,20 @@ const SP_MENUS=[
     tags:tag?[tag]:[],menuDesc
   }))
 }));
-const MENU_CATEGORIES=["海鲜水产","招牌硬菜","热炒小菜","砂锅炖煲","时令素菜","汤羹主食","凉菜卤味","酒水饮品","餐位杂项",
+// 早茶点心单独开水牌，既不进通用菜库，也不参与其他饭局抽菜。
+const TEA_DIMSUM=[
+  ["tea_01","豉汁蒸凤爪",28,"一笼三只",0.9,64,87,50,"poultry","steamed",["elder_friendly","local_signature"],"凤爪先炸后蒸，豉汁煨到软糯脱骨。"],
+  ["tea_02","蟹籽干蒸烧卖",32,"一笼四粒",1,68,92,40,"pork","steamed",["boneless_easy","local_signature","seafood"],"鲜虾和猪肉做馅，薄皮干蒸，顶上点一撮蟹籽。"],
+  ["tea_03","蜜汁叉烧包",26,"一笼三只",1.1,57,94,42,"staple","steamed",["elder_friendly","down_rice"],"开口的松软包皮裹蜜汁叉烧，趁热咬开爆汁。"],
+  ["tea_04","鲜虾红米肠",38,"例牌六件",1.1,70,94,40,"shrimp_crab","steamed",["boneless_easy","local_signature","seafood"],"红米肠粉包鲜虾和脆衣，外软里脆，配豉油。"],
+  ["tea_05","荔湾艇仔粥",28,"大碗一窝",1.3,55,92,24,"staple","soup",["elder_friendly","low_fat","seafood"],"绵滑粥底煮进鱼片和浮皮，趁热撒葱花。"],
+  ["tea_06","陈皮牛肉球",30,"一笼三粒",1,63,90,41,"beef","steamed",["elder_friendly","boneless_easy"],"牛肉手打起胶拌陈皮末，笼底垫腐竹蒸透。"],
+  ["tea_07","奶黄流沙包",26,"一笼三只",1,57,91,44,"staple","steamed",["elder_friendly"],"松软面皮包咸蛋黄奶黄馅，出笼时馅心流沙。"]
+].map(([id,name,price,spec,portion,prestige,edibility,heaviness,ingredientType,cookMethod,tags,menuDesc])=>({
+  id,name,price,spec,portion,prestige,edibility,heaviness,ingredientType,cookMethod,tags,menuDesc,
+  category:"广式茶点",regions:["guangfu"],minTier:"mid_high",spicy:0
+}));
+const MENU_CATEGORIES=["广式茶点","海鲜水产","招牌硬菜","热炒小菜","砂锅炖煲","时令素菜","汤羹主食","凉菜卤味","酒水饮品","餐位杂项",
   ...new Set(SP_MENUS.flatMap(menu=>menu.dishes.map(d=>d.category)))
 ];
 
@@ -900,6 +937,7 @@ const FRUGAL_FREEBIES=[
   portion:0.2,prestige:30,edibility:90,heaviness:6,spicy:0,regions:["shanghai"],tags:[]
 }));
 
+const TEA_HOUSE_DISH_IDS=new Set(["dish_19","dish_26","dish_37","dish_39","dish_44","dish_89","dish_94","dish_95"]);
 function buildStoreMenu(scenario,allDishes=DISHES){
   if(scenario.isSideQuest){
     const menu=SP_MENUS.find(m=>m.id===scenario.id);
@@ -914,6 +952,10 @@ function buildStoreMenu(scenario,allDishes=DISHES){
   }
   const tierOrder={street:1,mid_high:2,luxury:3};
   const deck=allDishes.filter(d=>d.regions.includes(region)&&tierOrder[d.minTier]<=tierOrder[tier]);
+  if(mode==="tea"){
+    const houseMenu=deck.filter(d=>TEA_HOUSE_DISH_IDS.has(d.id)&&!d.tags.includes("alcohol"));
+    return TEA_DIMSUM.concat(houseMenu.map(dish=>priceStoreDish(dish,tier)));
+  }
   for(let i=deck.length-1;i>0;i--){
     const j=Math.floor(random()*(i+1));
     [deck[i],deck[j]]=[deck[j],deck[i]];
@@ -1973,20 +2015,26 @@ async function playPaperMotion(element,frames,options){
 function pressReportStamps(){
   setTimeout(()=>SoundFX.stamp(),220);
   sheetFace.classList.remove("awaiting-imprint");
-  const stamps=sheetFace.querySelectorAll(".grade-title .seal,.grade-title .award-seal");
-  const press=[
-    {opacity:0,transform:"scale(1.65) rotate(-14deg)"},
-    {opacity:1,transform:"scale(.94) rotate(-5deg)",offset:.46},
-    {opacity:1,transform:"scale(1.025) rotate(-6.4deg)",offset:.72},
-    {opacity:1,transform:"scale(1) rotate(-6deg)"}
-  ];
-  const motions=Array.from(stamps,stamp=>playPaperMotion(stamp,press,
-    {duration:280,delay:120,fill:"backwards",easing:"ease-out"}));
-  motions.push(playPaperMotion(sheetFace,[
+  function press(stamp,angle,opacity,delay){
+    return playPaperMotion(stamp,[
+      {opacity:0,transform:"scale(1.65) rotate("+(angle-8)+"deg)"},
+      {opacity,transform:"scale(.94) rotate("+(angle+1)+"deg)",offset:.46},
+      {opacity,transform:"scale(1.025) rotate("+(angle-.4)+"deg)",offset:.72},
+      {opacity,transform:"scale(1) rotate("+angle+"deg)"}
+    ],{duration:280,delay,fill:"backwards",easing:"ease-out"});
+  }
+  const rank=sheetFace.querySelector(".grade-title .seal");
+  const rankMotion=press(rank,-6,1,120);
+  // Let late impressions land without holding the report controls or its dialogs.
+  sheetFace.querySelectorAll(".meta-stamp-zone .award-seal").forEach((stamp,index)=>{
+    const angle=parseFloat(stamp.style.getPropertyValue("--stamp-angle"));
+    press(stamp,angle,.88,210+90*index);
+  });
+  const shake=playPaperMotion(sheetFace,[
     {transform:"translateY(0)"},{transform:"translateY(2px)"},
     {transform:"translateY(-1px)"},{transform:"translateY(0)"}
-  ],{duration:110,delay:210,easing:"ease-out"}));
-  return Promise.all(motions);
+  ],{duration:110,delay:210,easing:"ease-out"});
+  return Promise.all([rankMotion,shake]);
 }
 function revealReportScore(scoreValue,target,motion){
   if(motion.matches){scoreValue.textContent=target;return}
@@ -2023,7 +2071,38 @@ async function settle(zeroOrder=false){
   }
   nextReportDialog();
 }
+async function runKitchenPass(scene,order){
+  if(typeof window.onBeforeKitchenServe==="function"){
+    try{
+      await window.onBeforeKitchenServe({scene,order,roundLevel});
+      return;
+    }catch{
+      // 第三方插屏失败时，仍继续完成出单。
+    }
+  }
+  const motion=matchMedia("(prefers-reduced-motion: reduce)");
+  if(motion.matches)return;
+
+  const overlay=document.createElement("div");
+  overlay.className="kitchen-pass-overlay";
+  overlay.innerHTML='<div class="kitchen-pass-card"><h3>后厨出单传菜</h3><ol class="kitchen-pass-steps">'+
+    '<li>① 粉联传后厨 · 灶台点火</li><li>② 猛火现烹中 · 装盘走菜</li><li>③ 整席上齐 · 经理验单</li></ol></div>';
+  sheetFace.append(overlay);
+  const steps=overlay.querySelectorAll("li"),beatTimes=[0,420,850,1300];
+  const started=performance.now();
+  try{
+    for(let i=0;i<steps.length&&!motion.matches;i++){
+      steps[i].classList.add("on");
+      SoundFX.tick();
+      const wait=Math.max(0,beatTimes[i+1]-(performance.now()-started));
+      await new Promise(done=>setTimeout(done,wait));
+    }
+  }finally{
+    overlay.remove();
+  }
+}
 async function turnInOrder(){
+  await runKitchenPass(scene,order);
   readProgress();
   const freePlay=!dailyExam&&!activeSideQuest&&roundLevel>lastLevel;
   const run=freePlay?readFreeRun():null;
@@ -2081,14 +2160,15 @@ async function turnInOrder(){
   pad.classList.remove("flipping-slip");
   revealReportScore(scoreValue,report.score,motion);
   awardNoticePending=report.newAchievements.length>0;
-  const passed=report.passed;
-  if(passed||(!motion.matches&&awardNoticePending)){
-    // 失败时先让分数定格，避免解锁弹窗遮住收笔动效。
+  const milestone=report.passed&&(report.level===3||report.campaignWon||report.score>=95);
+  const awardDelay=report.passed?750:motion.matches?0:850;
+  const noticeDelay=milestone?900:awardNoticePending?awardDelay:0;
+  if(noticeDelay){
     reportDialogTimer=setTimeout(()=>{
       reportDialogTimer=0;
-      shareDue=passed;
+      shareDue=milestone;
       nextReportDialog();
-    },passed?650:850);
+    },noticeDelay);
   }
   await pressReportStamps();
 }
@@ -2390,7 +2470,7 @@ function budgetPct(sum,limit){
 function dishRow(d){
   const item=order.find(({dish})=>dish.id===d.id);
   const soldOut=soldOutIds.has(d.id),unchecking=removing.has(d.id);
-  const open=detailChoices.get(d.id)??Boolean(item);
+  const open=detailChoices.get(d.id)??(!reviewingOrder&&Boolean(item));
   const attrs='data-id="'+d.id+'" ';
   const detailsId="desc-"+d.id;
   const name='<span class="name'+(soldOut||unchecking?' cross':'')+'">'+d.name+'</span>';
@@ -2466,13 +2546,13 @@ function courseLabel(dish,i){
 }
 const SEATING_PLANS={
   business:{
-    places:[["north","正对门 · 主陪位","我方招商主管"],["east","主陪右手 · 主宾位","客户负责人"],
-      ["west","主陪左手 · 副宾位","采购总监"],["south","靠门口 · 末席买单位","你（经手人）"]]
+    places:[["north","正对门 · 主陪位","我方招商主管"],["west","主陪右手 · 主宾位","客户负责人"],
+      ["east","主陪左手 · 副宾位","采购总监"],["south","靠门口 · 末席买单位","你（经手人）"]]
   },
   finale:{
-    places:[["north","正对门 · 主陪位","主任"],["northeast","主陪右手 · 主宾位","核心来宾"],
-      ["northwest","主陪左手 · 尊长位","老专家"],["southeast","右侧陪席","项目同事"],
-      ["southwest","左侧陪席","控油女同事"],["south","靠门口 · 末席买单位","你（经手人）"]]
+    places:[["north","正对门 · 主陪位","主任"],["northwest","主陪右手 · 主宾位","核心来宾"],
+      ["northeast","主陪左手 · 尊长位","老专家"],["southwest","主陪右翼 · 陪席","项目同事"],
+      ["southeast","主陪左翼 · 陪席","控油女同事"],["south","靠门口 · 末席买单位","你（经手人）"]]
   }
 };
 const PAY_OPPONENTS={reunion:"老同学",business:"客户负责人"};
@@ -3008,9 +3088,20 @@ function showShareContent(model){
   preview.hidden=true;
   modal.querySelector(".share-body").scrollTop=0;
 }
-function awardStamp(award,id=""){
-  return '<div'+(id?' id="'+id+'"':'')+' class="award-seal'+(award.name.length>7?' wordy':'')+
-    '" role="img" aria-label="成就印章：'+award.name+'"><small>成就印</small><b>'+award.name+'</b></div>';
+function awardStamp(award,style=""){
+  const compactName=award.name.length>(style?6:7);
+  return '<div class="award-seal'+(compactName?' wordy':'')+'"'+(style?' style="'+style+'"':'')+
+    ' role="img" aria-label="成就印章：'+award.name+'"><small>成就印</small><b>'+award.name+'</b></div>';
+}
+function stampReportMeta(awards){
+  const details=meta();
+  if(!awards.length)return details;
+  const angles=[-11,7,-4,13],nudges=[-4,4,-5,3];
+  const stamps=awards.map((award,index)=>{
+    const position=index%angles.length;
+    return awardStamp(award,'--stamp-index:'+index+';--stamp-nudge:'+nudges[position]+'px;--stamp-angle:'+angles[position]+'deg');
+  });
+  return '<div class="meta-stamp-zone" style="--stamp-spaces:'+Math.max(1,awards.length-1)+'">'+details+stamps.join("")+'</div>';
 }
 function diagnosticText(){
   const {seating,payment,tableEvent,cartGameResult}=report;
@@ -3064,16 +3155,9 @@ function grade(){
   const stamp='<div id="grade-rank" class="seal" role="img" aria-label="职级核定：'+report.rank+'，'+report.stampNote+'">'+
     '<small>'+report.stampNote+'</small><b>'+report.rank+'</b></div>';
   const awards=ACHIEVEMENTS.filter(a=>report.achievements.includes(a.id));
-  const fresh=awards.filter(a=>(report.newAchievements||[]).includes(a.id));
-  const candidates=fresh.length?fresh:awards;
-  const featured=awards.find(a=>a.id==="ach_shameless")||candidates.find(a=>a.id==="ach_beggar")||candidates[0];
-  const otherAwards=awards.filter(a=>a!==featured).map(a=>a.name);
-  const blue=featured?awardStamp(featured,"grade-award"):'';
   const header='<header class="stagehead">'+ticket("联单背面　／　经理批阅")+
-    '<div class="grade-title'+(blue?' has-award':'')+'"><div><h2 tabindex="-1" aria-describedby="grade-rank'+
-    (blue?' grade-award':'')+'"><span>接待考评</span><wbr><span>定级单</span></h2><p>'+scene.title+'</p></div>'+
-    (blue?'<div class="stamp-pair">'+stamp+blue+'</div>':stamp)+'</div>'+
-    (otherAwards.length?'<p class="more-awards">同单另记：'+otherAwards.join('、')+'</p>':'')+'</header>';
+    '<div class="grade-title"><div><h2 tabindex="-1" aria-describedby="grade-rank"><span>接待考评</span><wbr><span>定级单</span></h2>'+
+    '<p>'+scene.title+'</p></div>'+stamp+'</div></header>';
   const result=report.campaignWon?'八关通关 · 首席司长荣誉':report.passed?'闯关成功':'差 '+(report.passScore-report.score)+' 分过关';
   const nextLevel=Math.max(progress.level,report.level+(report.passed?1:0));
   const next=dailyExam?"返回封面":activeSideQuest?continueMainLabel():nextLevel>lastLevel?'自由接单 · 再来一桌':nextLevel>report.level?'撕开第 '+nextLevel+' 关派单':'重考第 '+report.level+' 关';
@@ -3084,7 +3168,7 @@ function grade(){
   const scoreBlock='<div class="report"><div class="sliptop"><b>综合得分</b><span class="score" role="img" aria-label="'+report.score+' / 100"><span class="score-value" aria-hidden="true">'+report.score+'</span><small aria-hidden="true"> / 100</small></span></div>'+banner+summary()+cap+bars+'</div>';
   const notes='<ol class="notes">'+report.notes.map(n=>'<li><strong>'+n.dish+'</strong>　<u>'+n.reason+'</u>。'+n.text+'</li>').join('')+'</ol>';
   const actions='<div class="report-actions">'+action("share","晒出战绩","smallbtn share-btn",'aria-haspopup="dialog"')+action("bill","查原单")+action("copy-diag","复制内测码","smallbtn",'aria-live="polite"')+'</div>';
-  return [header+meta()+scoreBlock+'<div class="subtitle"><h3>经理逐条批注</h3>'+actions+'</div>'+notes+guestCheck(),foot+action("draw",next,"primary")+imprint()];
+  return [header+stampReportMeta(awards)+scoreBlock+'<div class="subtitle"><h3>经理逐条批注</h3>'+actions+'</div>'+notes+guestCheck(),foot+action("draw",next,"primary")+imprint()];
 }
 function render(fresh=false){
   receiptObserver?.disconnect();
@@ -3446,7 +3530,9 @@ async function draw(exam=null){
     resetTableRituals();
     soldOutIds.clear();
     menuEdits=0;menuElapsed=0;menuStarted=null;
-    order=initialOrderFor(scene,storeMenu);cat=scene.mode==="frugal"?"汤羹主食":cats.find(c=>storeMenu.some(d=>menuCategoryLabel(d)===c));reviewingOrder=false;categoryScroll=0;
+    order=initialOrderFor(scene,storeMenu);
+    cat={tea:"广式茶点",frugal:"汤羹主食"}[scene.mode]??cats.find(c=>storeMenu.some(d=>menuCategoryLabel(d)===c));
+    reviewingOrder=false;categoryScroll=0;
     lastBudgetSum=total();
     lastBudgetPct=budgetPct(lastBudgetSum,scene.budgetMax);
     dishWhispers.clear();
