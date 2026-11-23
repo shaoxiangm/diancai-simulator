@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#9b352a">
-<meta name="application-version" content="3.5.0">
+<meta name="application-version" content="4.0.0-beta">
 <title>点菜模拟器 · 中国式饭局人情世故在线小游戏</title>
 <meta name="description" content="《点菜模拟器》是一款免费的复古复写纸风格中国式饭局网页小游戏。涵盖八大菜系与门店档次隔离、33枚奇葩成就、后厨排单与经理毒舌批注，考验你的预算把控与酒桌人情世故。">
 <meta name="keywords" content="点菜模拟器,中国式饭局模拟器,点菜小游戏,网页小游戏,人情世故模拟器,HTML5小游戏,饭局点菜">
@@ -447,6 +447,7 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
   }
 }
 </script>
+<link rel="stylesheet" href="ticket.css">
 <noscript>
 <style>
 #pad{display:none}
@@ -464,7 +465,10 @@ body{height:auto;min-height:100dvh;overflow:auto}
       </div>
       <div class="cover-titleblock">
         <h1 class="cover-title" id="cover-title" tabindex="-1" aria-label="中国式饭局 · 点菜模拟器"><span>中国式饭局</span><strong>点菜模拟器</strong></h1>
-        <b class="cover-chop" aria-label="请客之道"><span>请</span><span>客</span><span>之</span><span>道</span></b>
+        <div class="cover-plate">
+          <img src="img/dish_25.webp" width="216" height="146" alt="手绘麻婆豆腐">
+          <b class="cover-chop" aria-label="请客之道"><span>请</span><span>客</span><span>之</span><span>道</span></b>
+        </div>
       </div>
       <div class="cover-bottom">
         <div class="ledger-counter" aria-live="polite">
@@ -473,6 +477,7 @@ body{height:auto;min-height:100dvh;overflow:auto}
         <p class="tiny" id="resumeNote" hidden>旧版成就已留档。新版八桌饭局从第一关开席。</p>
         <button class="primary cover-open" type="button" data-act="draw">翻开菜单 · 接第 1 关派单</button>
         <button class="smallbtn" type="button" data-act="daily-exam">今日全网统考</button>
+        <small class="cover-edition">4.0.0 beta</small>
       </div>
     </div>
   </section>
@@ -2302,9 +2307,9 @@ function scenarioInfo(){
 }
 function briefPanel(first){
   const open=first?firstBriefOpen:menuBriefOpen;
-  const context=first?"":'<span class="brief-context">'+scene.headcount+' 位 · 预算 '+(Number.isFinite(scene.budgetMax)?'¥'+scene.budgetMax:'¥ 无上限')+'</span>';
+  const context=first?"":'<span class="brief-context">'+scene.headcount+' 位 · '+(Number.isFinite(scene.budgetMax)?'¥'+scene.budgetMax+' 以内':'预算无上限')+'</span>';
   return '<section class="brief-panel">'+
-    action("brief","派单简报"+context,"brief-toggle",'aria-expanded="'+open+'" aria-controls="dispatch-details"')+
+    action("brief",'<span class="brief-label">派单简报</span>'+context,"brief-toggle",'aria-expanded="'+open+'" aria-controls="dispatch-details"')+
     '<div id="dispatch-details"'+(open?'':' hidden')+'>'+(first?'':meta())+scenarioInfo()+'</div></section>';
 }
 const tutorialSkipKey="tutorial.first-order.skip";
@@ -2399,12 +2404,13 @@ function sketchType(dish){
   return foodSketches[type]||"stir_fry_meat";
 }
 const sketchPhotos=new Map();
+const frugalRiceArt={dish_49:"frugal_fried_rice",dish_50:"frugal_rice"};
 function mountSketchPhoto(id){
   const photo=sketchPhotos.get(id);
   if(photo?.naturalWidth)page.querySelector('[data-sketch-for="'+id+'"]')?.append(photo);
 }
 function dishSketch(dish){
-  const id=dish.id;
+  const id=scene?.mode==="frugal"?(frugalRiceArt[dish.id]??dish.id):dish.id;
   if(!sketchPhotos.has(id)){
     const photo=new Image();
     sketchPhotos.set(id,photo);
@@ -2487,7 +2493,7 @@ function dishRow(d){
   const notes=whisper?.notes.map(({text,combo,duration},index)=>elapsed<duration
     ?'<span class="pen-whisper'+(combo?' combo':'')+'" data-whisper="'+index+'" style="--whisper-time:'+duration+'ms;animation-delay:-'+elapsed+'ms">'+text+'</span>':'').join("")||"";
   const note=notes?'<div class="dish-whispers" aria-hidden="true">'+notes+'</div>':"";
-  return '<article class="dish'+(open?' open-detail':'')+(unchecking?' unchecking':'')+'" data-dish="'+d.id+'">'+detail+
+  return '<article class="dish'+(open?' open-detail':'')+(open&&detailChoices.get(d.id)?' view-art':'')+(unchecking?' unchecking':'')+'" data-dish="'+d.id+'">'+detail+
     '<div class="dish-sale"><span class="price">¥'+d.price+'</span>'+check+'</div>'+
     '<div class="dish-desc" id="'+detailsId+'" aria-hidden="'+!open+'"><span>'+d.menuDesc+'</span></div>'+quantity+note+'</article>';
 }
@@ -2503,9 +2509,10 @@ function menu(){
   }
   const available=cats.filter(c=>storeMenu.some(d=>menuCategoryLabel(d)===c));
   const tabs=reviewingOrder?'':'<nav class="tabs" aria-label="菜品分类">'+available.map(c=>action("cat",c,"tab"+(cat===c?" active":""),'data-cat="'+c+'" aria-pressed="'+(cat===c)+'"')).join("")+'</nav>';
-  const title=reviewingOrder?"已点菜单":"联单勾菜";
+  const title=reviewingOrder?"已点菜单":"点菜单";
   const count=reviewingOrder?'共 '+order.length+' 项':'本店共 '+storeMenu.length+' 项';
-  const head='<div class="stagehead menu-head">'+ticket("第二联　／　勾菜")+'<div class="menu-title"><h2 tabindex="-1">'+title+'</h2><span>'+count+'</span></div></div>';
+  const head='<div class="stagehead menu-head">'+ticket("第二联　／　勾菜")+'<div class="menu-title"><h2 tabindex="-1">'+title+'</h2><span>'+count+'</span></div>'+briefPanel(false)+'</div>';
+  const columns='<div class="ticket-columns" aria-hidden="true"><span>序</span><span>菜品</span><span>单价</span><span>点选</span></div>';
   const sum=total(),over=sum>scene.budgetMax,changedOver=over&&sum!==lastBudgetSum;
   const withinBudget=Number.isFinite(scene.budgetMax)&&scene.budgetMin>0&&sum>=scene.budgetMin&&sum<=scene.budgetMax;
   let meter="";
@@ -2524,13 +2531,14 @@ function menu(){
   const issue=orderSubmissionIssue(scene,order);
   const hint=frugal&&order.length&&sum===0?'这张水单上只有免费福利。':'';
   const claimed=frugal?order.filter(item=>item.dish.price===0).length:0;
-  const benefits=freeItems.length?'<section aria-label="进店福利"><div class="subtitle"><h3>进店福利</h3><span class="tiny">每桌任选一样 · 已勾 '+claimed+' 样</span></div>'+freeItems.map(dishRow).join("")+'</section>':'';
+  const benefits=freeItems.length?'<section class="ticket-benefits" aria-label="进店福利"><div class="subtitle"><h3>进店福利</h3><span class="tiny">每桌任选一样 · 已勾 '+claimed+' 样</span></div>'+columns+freeItems.map(dishRow).join("")+'</section>':'';
   const cost='<div class="order-cost'+(changedOver?' over bump':over?' over':'')+'">'+(over?'超预算':'预计')+' <b>¥'+sum+'</b> / '+limit+'<small>'+note+'</small></div>';
   const pickGuide=!reviewingOrder&&order.length<2?tutorialNote("点菜名右侧的方框勾菜，再点一次就取消。"):"";
   const queueGuide=order.length>=2?tutorialNote("菜点齐了？点下方按钮进后厨排上菜顺序。"):"";
-  return [head+briefPanel(false)+benefits+tabs+pickGuide+'<section class="order-list" aria-label="'+(reviewingOrder?'本桌已点菜品':cat)+'">'+list.map(dishRow).join("")+
+  return [head+benefits+tabs+pickGuide+'<section class="order-list" aria-label="'+(reviewingOrder?'本桌已点菜品':cat)+'">'+columns+list.map(dishRow).join("")+
     (list.length?'':'<p class="empty">联单还是空的。点「继续点菜」，挑一道开单。</p>')+'</section>',
-    (hint?'<p class="tiny">'+hint+'</p>':'')+'<div class="order-strip">'+orderLink+cost+meter+'</div>'+queueGuide+action("kitchen","确认菜单并排上菜顺序",isZeroOrder()?"primary zero-order":"primary",!issue&&!removing.size?"":"disabled")];
+    (hint?'<p class="tiny">'+hint+'</p>':'')+queueGuide+'<div class="ticket-handoff"><div class="order-strip">'+orderLink+cost+meter+'</div>'+
+    action("kitchen",'<strong>交后厨</strong><small>排上菜顺序</small>',isZeroOrder()?"primary zero-order":"primary",'aria-label="确认菜单并排上菜顺序" '+(!issue&&!removing.size?"":"disabled"))+'</div>'];
 }
 function courseLabel(dish,i){
   if(dish.tags.includes("tea_fee"))return "全桌 · 按位计费";
@@ -3662,6 +3670,7 @@ document.addEventListener("click",e=>{
     const row=b.closest(".dish");
     row.classList.remove("just-checked");
     row.classList.toggle("open-detail",open);
+    row.classList.toggle("view-art",open);
     b.setAttribute("aria-expanded",String(open));
     document.getElementById(b.getAttribute("aria-controls")).setAttribute("aria-hidden",String(!open));
     return;
