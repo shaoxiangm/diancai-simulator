@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#9b352a">
-<meta name="application-version" content="3.1.1">
+<meta name="application-version" content="3.4.2">
 <title>点菜模拟器 · 中国式饭局人情世故在线小游戏</title>
-<meta name="description" content="《点菜模拟器》是一款免费的复古复写纸风格中国式饭局网页小游戏。涵盖八大菜系与门店档次隔离、22枚奇葩成就、后厨排单与经理毒舌批注，考验你的预算把控与酒桌人情世故。">
+<meta name="description" content="《点菜模拟器》是一款免费的复古复写纸风格中国式饭局网页小游戏。涵盖八大菜系与门店档次隔离、33枚奇葩成就、后厨排单与经理毒舌批注，考验你的预算把控与酒桌人情世故。">
 <meta name="keywords" content="点菜模拟器,中国式饭局模拟器,点菜小游戏,网页小游戏,人情世故模拟器,HTML5小游戏,饭局点菜">
 <meta name="author" content="shaoxiangm">
 <link rel="canonical" href="https://shaoxiangm.github.io/diancai-simulator/">
@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="点菜模拟器 · 中国式饭局在线小游戏">
-<meta name="twitter:description" content="八大菜系动态水单、22枚成就与经理红笔毒舌批注，来测测你的饭局情商。">
+<meta name="twitter:description" content="八大菜系动态水单、33枚成就与经理红笔毒舌批注，来测测你的饭局情商。">
 <style>
 :root{--paper:#f5ede0;--pink:#f3ddd6;--red:#9b352a;--line:#b88676;--green:#2b2520;--ink:#2b2520;--blue:#253c66;--pen:#b52b27;--muted:#6b5f52;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
 *{box-sizing:border-box}
@@ -27,6 +27,7 @@ body::before{content:"";position:fixed;left:11%;bottom:12%;width:125px;aspect-ra
 body::after{content:"";position:fixed;z-index:-0;pointer-events:none;right:6%;top:-135px;width:7px;height:370px;border-radius:50% 50% 30% 30%;background:linear-gradient(90deg,#221911,#7e6242 42%,#35271b);transform:rotate(-34deg);box-shadow:15px 0 0 #4a3827,18px 6px 9px #181814,3px 5px 8px #151610}
 button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 button:disabled{opacity:.42;cursor:default}
+button.zero-order{opacity:.42}
 button:focus-visible,[tabindex="-1"]:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .pad{position:relative;z-index:1;width:min(414px,100vw);height:min(860px,calc(100dvh - 24px));border-radius:9px 9px 6px 6px;overflow:hidden;display:flex;flex-direction:column;background-color:var(--paper);background-image:repeating-linear-gradient(7deg,#66513506 0 1px,transparent 1px 4px),radial-gradient(ellipse at 15% 12%,#fff8,transparent 65%);box-shadow:0 2px #dcc5b6,0 4px #b59080,0 6px #dbc5a8,0 8px #79695b,0 21px 52px #080b08a6}
 .pad.back{background-color:var(--pink)}
@@ -125,10 +126,12 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 .order-link .order-count{font:700 13px/1.3 var(--hand);white-space:nowrap}.order-link::after{content:"";width:6px;height:6px;border:solid currentColor;border-width:1.5px 1.5px 0 0;transform:rotate(45deg)}
 .order-link.return::after{order:-1;transform:rotate(-135deg)}
 .order-cost{margin-left:auto;text-align:right;font-size:13px;line-height:1.35}.order-cost b{color:var(--blue);font:700 17px var(--hand)}.order-cost.over b{color:inherit}.order-cost small{display:block;color:var(--muted);font-size:12px}
+.order-cost .budget-good{color:var(--blue);font-weight:700;white-space:nowrap}
 .queue{padding:10px 0;border-bottom:1px dotted #b39682;display:flex;align-items:center;gap:7px}.detail{flex:1;min-width:0}.name{font:700 17px var(--serif)}.desc{font-size:13px;color:var(--muted)}.price{font:700 15px var(--mono)}.ctrl{border-color:#637797;color:var(--blue);min-width:32px;height:33px;padding:0 6px}
 .dish{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(150,60,49,.2)}
+.dish-whispers{position:absolute;right:42px;top:4px;z-index:3;pointer-events:none;display:grid;justify-items:end;gap:3px;max-width:calc(100% - 42px)}
 .pen-whisper{
-  position:absolute;right:42px;top:4px;z-index:3;pointer-events:none;white-space:nowrap;
+  max-width:100%;
   font:700 13px/1.2 var(--hand);color:var(--pen);background:var(--paper);
   border:1px dashed var(--pen);padding:2px 6px;border-radius:2px;
   box-shadow:1px 2px 4px color-mix(in srgb,var(--ink) 13%,transparent);
@@ -138,8 +141,29 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
   12%,62%{opacity:1;transform:translateY(-2px) rotate(-2deg)}
   100%{opacity:0;transform:translateY(-12px) rotate(-1deg)}
 }
+.pen-whisper.combo{
+  color:var(--blue);border:3px double var(--blue);
+  box-shadow:1px 2px 4px color-mix(in srgb,var(--ink) 13%,transparent),inset 0 0 9px color-mix(in srgb,#c86d1f 20%,transparent);
+}
+@keyframes check-pop{
+  0%{transform:rotate(-4deg) scale(.88)}
+  55%{transform:rotate(-4deg) scale(1.16)}
+  100%{transform:rotate(-4deg) scale(1)}
+}
+@keyframes check-scratch{
+  25%{transform:translateX(-2px)}
+  55%{transform:translateX(2px)}
+  80%{transform:translateX(-1px)}
+}
+@keyframes budget-bump{
+  0%,100%{transform:scale(1)}
+  45%{transform:scale(1.16)}
+}
 @media(prefers-reduced-motion:no-preference){
-  .pen-whisper{animation:whisper-float 1.55s ease-out both}
+  .pen-whisper{animation:whisper-float var(--whisper-time,1550ms) ease-out both}
+  .dish.just-marked .dish-check[aria-pressed="true"] span{animation:check-pop .2s ease-out}
+  .dish.unchecking .cross{animation:check-scratch .18s ease-out}
+  .order-cost.over.bump b{display:inline-block;animation:budget-bump .24s ease-out}
 }
 .dish-info{min-width:0;display:flex;align-items:center;gap:10px;padding:0;border:0;background:none;text-align:left}
 .dish-info .name,.dish-info .spec{display:block}.dish-info .name{line-height:1.35}.dish-info .spec{margin-top:3px;color:#7a6b5d;font:11px/1.45 var(--serif)}
@@ -167,6 +191,17 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
 .cross{position:relative}.cross::after{content:"";position:absolute;left:0;top:37%;width:100%;height:3px;border-block:1px solid var(--blue);transform:rotate(-2deg);transform-origin:left;animation:stroke .19s ease-out}.empty{color:var(--muted);font-size:14px;padding:24px 0}
 .sliptop{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.sliptop b{color:var(--red);font-family:var(--serif)}
 .report{border-top:3px double var(--red);margin-top:13px;padding-top:10px}.score{color:var(--pen);font:italic 700 51px/1 var(--hand)}.score small{font-size:18px}.bars{margin:12px 0}.bar{display:grid;grid-template-columns:72px 1fr 26px;align-items:center;gap:8px;font-size:13px;margin:6px 0}.track{background:#b985712a;height:7px}.track i{display:block;height:100%;background:var(--blue)}.bar b{color:var(--blue);text-align:right}
+.score{display:inline-block;font-variant-numeric:tabular-nums}
+@keyframes reveal-report-ink{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes score-celebrate{0%,100%{transform:scale(1)}32%{transform:scale(1.14);text-shadow:0 0 9px #c9915377}68%{transform:scale(.98)}}
+@keyframes score-wobble{0%,100%{transform:rotate(0)}33%{transform:rotate(-4deg)}68%{transform:rotate(2deg)}}
+@media(prefers-reduced-motion:no-preference){
+  .bars .track i{transform-origin:left center}
+  .flipping-slip .bars .track i{transform:scaleX(0)}
+  .bars.revealing .track i{animation:reveal-report-ink .36s ease-out calc(var(--i)*70ms) both}
+  .score.score-high{animation:score-celebrate .34s ease-out}
+  .score.score-low{animation:score-wobble .29s ease-out}
+}
 .notes{padding-left:23px;color:var(--pen);font:600 16px/1.65 var(--hand)}.notes li{padding:6px 0;border-bottom:1px dotted #bc998b}.notes strong{border:1px solid;border-radius:49%;padding:1px 4px}.notes u{text-underline-offset:3px}
 .guest-check{
   width:85%;margin:20px auto 8px;padding:12px clamp(8px,3vw,15px);
@@ -215,6 +250,52 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 .earned .archive-stamp{border:3px double currentColor;color:var(--blue);transform:rotate(-2deg);font-size:15px}
 .archive-row.earned p{color:var(--red);font:600 14px/1.55 var(--hand)}
 .share-btn{border:1px solid #23438e88;border-radius:2px;background:#23438e08;color:var(--blue);font:700 15px/1.35 var(--hand);padding:5px 9px}
+.kitchen-switch{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:9px}
+.kitchen-switch .tab-badge{border-color:var(--pen);color:var(--pen);box-shadow:inset 0 0 0 1px var(--pen)}
+.kitchen-switch .tab-badge.active{color:var(--paper)}
+.seating-notice{margin:0 0 6px;color:var(--blue);font:700 13px/1.4 var(--hand)}
+#dialog:has(.seating-reminder)>[data-act="close"]{display:none}
+#dialog .seating-reminder .primary{margin-top:0}
+.seat-map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(55px,auto)) auto;gap:6px;align-items:center;margin:12px 0 0}
+.seat-map--six{grid-template-rows:repeat(4,minmax(55px,auto)) auto}
+.seat-slot{min-width:0;min-height:54px;align-self:stretch;padding:4px;overflow-wrap:anywhere;border:1.5px dashed var(--blue);background:#23438e05}
+.seat-slot>span,.seat-slot>b{display:block}.seat-slot>span{color:var(--muted);font:600 11px/1.25 var(--serif)}
+.seat-slot>b{margin-top:3px;color:var(--muted);font:700 14px/1.3 var(--hand)}
+.seat-slot.filled{border:1px solid var(--blue);background:var(--paper)}.seat-slot.filled>b{color:var(--blue)}
+.seat-chip,.seat-slot.filled{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.seat-grip{display:inline-block;margin-right:3px;color:var(--blue);font-size:.9em;letter-spacing:-.12em}
+.seat-bank{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:10px;padding:8px;border:1px dashed var(--line);border-radius:3px;background:#efe4ce66}
+.seat-bank--six{grid-template-columns:repeat(3,minmax(0,1fr))}
+.seat-chip,.seat-chip-slot{min-width:0;min-height:46px;padding:4px;overflow-wrap:anywhere;font:700 14px/1.2 var(--hand)}
+.seat-chip{border-color:var(--blue);background:var(--paper);color:var(--blue)}
+.seat-chip-slot{border-style:dashed;color:var(--muted)}
+.seat-slot.swap-target{box-shadow:inset 0 0 0 1px #23438e36}
+.seat-slot[aria-pressed="true"],.seat-chip[aria-pressed="true"]{outline:2px solid var(--blue);outline-offset:-3px;background:#23438e10}
+.seat-slot:focus-visible,.seat-chip:focus-visible,.seat-chip-slot:focus-visible{outline-offset:2px}
+.seat-chip.dragging,.seat-slot.dragging{opacity:.4;cursor:grabbing}
+.seat-slot.drag-over,.seat-bank.drag-over{outline:2px solid var(--pen);background:color-mix(in srgb,var(--pen) 10%,var(--paper))}
+.seat-ghost{position:fixed;z-index:50;pointer-events:none;user-select:none;white-space:nowrap;transform:rotate(-3deg) scale(1.06);box-shadow:0 6px 16px #2b252044;background:var(--paper);border:1.5px solid var(--blue);color:var(--blue);font:700 15px var(--hand);padding:6px 12px}
+@keyframes seat-landing{0%,100%{transform:scale(1)}45%{transform:scale(1.055)}72%{transform:scale(.99)}}
+@media(prefers-reduced-motion:no-preference){
+  .seat-slot.drag-over{transform:scale(1.03)}
+  .seat-slot.landing{animation:seat-landing .21s ease-out}
+}
+@media(prefers-reduced-motion:reduce){.seat-ghost{transform:none}}
+.seat-map .north{grid-area:1/2}.seat-map .west{grid-area:2/1}.seat-map .east{grid-area:2/3}.seat-map .south{grid-area:3/2}
+.seat-map--six .northwest{grid-area:2/1}.seat-map--six .northeast{grid-area:2/3}.seat-map--six .southwest{grid-area:3/1}.seat-map--six .southeast{grid-area:3/3}.seat-map--six .south{grid-area:4/2}
+.seat-circle{grid-area:2/2;align-self:center;justify-self:center;width:94%;aspect-ratio:1;border:3px double var(--red);border-radius:50%;display:grid;place-items:center;color:var(--blue);text-align:center;font:700 15px/1.25 var(--hand)}
+.seat-map--six .seat-circle{grid-area:2/2/4/3}.seat-door{grid-area:4/2;text-align:center;color:var(--red);font:700 13px/1.4 var(--serif);border-top:1px dashed var(--line)}.seat-map--six .seat-door{grid-area:5/2}
+.payment-choices{display:grid;gap:7px}.payment-choices button{text-align:left;min-height:40px}.payment-meters{margin:13px 0}
+#dialog.payment-dialog>[data-act="close"]{display:none}
+#dialog .payment-reaction{padding:5px 8px;border-left:2px solid var(--blue);background:var(--paper);color:var(--blue);font:700 14px/1.4 var(--hand)}
+.payment-value{position:relative}.payment-delta{position:absolute;right:calc(100% + 2px);top:0;padding:0 2px;background:var(--paper);color:var(--blue);font:700 11px/1.3 var(--mono);pointer-events:none}
+.payment-delta.negative{color:var(--pen)}
+@media(prefers-reduced-motion:no-preference){
+  .payment-reaction{animation:payment-reaction-in .24s ease-out both}
+  .payment-delta{animation:payment-delta-float 1s ease-out both}
+  @keyframes payment-reaction-in{from{transform:translateY(5px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes payment-delta-float{0%{transform:translateY(2px);opacity:0}18%,56%{opacity:1}100%{transform:translateY(-8px);opacity:0}}
+}
 .report-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px}
 .subtitle:has(.report-actions){flex-wrap:wrap;gap:4px 6px}
 .copy-field{position:fixed;inset:0 auto auto 0;width:1px;height:1px;opacity:0;font-size:16px}
@@ -282,6 +363,29 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 .tutorial-note p{margin:0}
 .tutorial-skip{position:absolute;top:2px;right:3px;min-height:26px;padding:2px 6px;border:0;background:transparent;color:#625025;font:600 12px/1.4 var(--serif);text-decoration:underline;text-underline-offset:2px;white-space:nowrap;pointer-events:auto}
 .foot>.tutorial-note{margin:0 0 7px}
+#dialog.table-event-active>[data-act="close"]{display:none}
+.table-event-choices{display:grid;gap:7px}
+.table-event-choices .smallbtn{display:grid;gap:2px;justify-items:start;min-height:42px;padding:8px 10px;text-align:left}
+.table-event-choices .smallbtn span{color:var(--ink);font-weight:400}
+#dialog.cart-game-active>[data-act="close"]{display:none}
+#dialog .cart-clock{color:var(--pen);font:700 18px/1.4 var(--hand);font-variant-numeric:tabular-nums}
+#dialog .cart-list{display:grid;align-content:start;gap:0;height:clamp(92px,30dvh,196px);margin:0 0 7px;padding:0;overflow-y:auto;list-style:none;overscroll-behavior:contain}
+#dialog .cart-list li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:7px;padding:5px 0;border-bottom:1px dotted var(--line);overflow-wrap:anywhere}
+#dialog .cart-kick{min-height:36px;padding:4px 7px;background:var(--pen);color:var(--paper);border-color:var(--pen);white-space:nowrap}
+#dialog .cart-finish{min-height:32px}
+#dialog .cart-tray{position:relative}
+#dialog .cart-list{overflow-x:hidden;overflow-anchor:none}
+#cart-countdown.urgent{display:inline-block;color:var(--pen);text-shadow:0 0 1px var(--pen)}
+#dialog .cart-list .kicking span{text-decoration:line-through;text-decoration-color:var(--pen)}
+#dialog .cart-saved{position:absolute;z-index:1;right:5px;pointer-events:none;padding:1px 4px;background:var(--paper);color:var(--blue);font:700 14px/1.2 var(--hand)}
+@media(prefers-reduced-motion:no-preference){
+  #dialog .cart-list .cart-spawned{animation:cart-flash .35s ease-out}
+  #dialog .cart-list .kicking{animation:cart-kick-out .17s ease-in both}
+  #dialog .cart-saved{animation:cart-saved-rise .58s ease-out both}
+  @keyframes cart-flash{from{transform:translateY(-8px);background:color-mix(in srgb,var(--pen) 18%,transparent)}to{transform:translateY(0);background:transparent}}
+  @keyframes cart-kick-out{to{transform:translateX(16px);opacity:0}}
+  @keyframes cart-saved-rise{0%{transform:translateY(0);opacity:1}55%{opacity:1}100%{transform:translateY(-12px);opacity:0}}
+}
 #shareImagePreview{margin-top:15px;border-top:1px dashed var(--line)}
 #shareImagePreview p{margin:9px 0;font-size:13px;color:var(--muted)}
 #shareImagePreview img{display:block;width:100%;height:auto;-webkit-touch-callout:default;user-select:auto}
@@ -297,7 +401,7 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
     "中国式饭局点菜模拟器"
   ],
   "url": "https://shaoxiangm.github.io/diancai-simulator/",
-  "description": "一款基于复古复写纸点菜单体验的中国式饭局模拟网页小游戏，包含主线八大菜系接待关卡、快餐彩蛋、随机突发事件与22枚成就图鉴。",
+  "description": "一款基于复古复写纸点菜单体验的中国式饭局模拟网页小游戏，包含主线八大菜系接待关卡、快餐彩蛋、随机突发事件与33枚成就图鉴。",
   "genre": [
     "Simulation",
     "Casual",
@@ -357,7 +461,7 @@ body{height:auto;min-height:100dvh;overflow:auto}
       <button class="smallbtn" data-act="help" aria-haspopup="dialog" aria-controls="dialog">玩法说明</button>
     </div>
     <span class="brand-level" id="tag-level">第 1 关 · 须达 60 分</span>
-    <button id="progress-tag" class="archive-link" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-count">成就 0/22</span></button>
+    <button id="progress-tag" class="archive-link" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-count">成就 0/33</span></button>
   </header>
   <div id="page"></div>
   </div>
@@ -577,13 +681,6 @@ const SCENARIOS=[
     purpose:"三个人凑了二百六十元。点一道店里的拿手菜，再照顾米饭和时蔬，吃舒服就行。",
     hiddenTips:"先看一眼总价；一道能下饭的川菜配一盘清爽素菜，就有了家常饭的样子。"
   },{
-    mode:"family",title:"老丈人寿宴·鲁菜馆",restaurantName:"泉城鲁菜馆",region:"luyu",regionLabel:"济南·鲁菜",
-    tableNames:["明湖小间","泉水雅座"],tier:"mid_high",headcount:4,budgetMin:280,budgetMax:400,noAlcohol:true,
-    guestTraits:{hasElderOrLeader:true},
-    guestsSummary:"你、伴侣、岳父和岳母四人。寿星牙口弱，硬骨和带筋的肉咬不动。长辈交代这桌家宴以茶代酒。",
-    purpose:"一家人给岳父做寿，四百元以内。老爷子爱先吃热炒和硬菜，末了喝碗汤溜缝，前头别急着端汤。",
-    hiddenTips:"点好夹、软嫩的菜；留一盆汤在热菜后头，以茶饮代酒。"
-  },{
     mode:"tea",title:"老广早茶·西关茶楼",restaurantName:"西关茶楼",region:"guangfu",regionLabel:"广州·广府",
     tableNames:["趟栊窗边","二楼圆桌"],tier:"mid_high",headcount:5,budgetMin:200,budgetMax:300,noAlcohol:true,
     guestTraits:{hasElderOrLeader:true},
@@ -597,6 +694,19 @@ const SCENARIOS=[
     purpose:"单碗白米饭六元，先让四个人吃上主食。老板发话了，紫菜例汤、酸豆角、大麦茶这三样 ¥0 的免费福利，每桌【只能任选一样】。",
     hiddenTips:"数清四人份的主食，再和同桌商量想领哪一种赠品。"
   },{
+    mode:"reunion",title:"大排档·老同学撸串",restaurantName:"北市·老同学串摊",region:"dongbei",regionLabel:"沈阳·东北",
+    tableNames:["街边三台","雨棚下桌"],tier:"street",headcount:3,budgetMin:60,budgetMax:150,
+    guestsSummary:"你和两名老同学重聚，三个人都坐地铁来的。伙计问先开冰啤还是先等炉上的串。",
+    purpose:"一百五十元的小聚。有人忙着续酒，拿几碟凉菜也能从毕业聊到现在；想吃热菜就等炉火，别把两桌人的量都点上。",
+    hiddenTips:"酒按瓶点，凉菜按桌分，三个人的饭量心里要有数。"
+  },{
+    mode:"family",title:"老丈人寿宴·鲁菜馆",restaurantName:"泉城鲁菜馆",region:"luyu",regionLabel:"济南·鲁菜",
+    tableNames:["明湖小间","泉水雅座"],tier:"mid_high",headcount:4,budgetMin:280,budgetMax:400,noAlcohol:true,
+    guestTraits:{hasElderOrLeader:true},
+    guestsSummary:"你、伴侣、岳父和岳母四人。寿星牙口弱，硬骨和带筋的肉咬不动。长辈交代这桌家宴以茶代酒。",
+    purpose:"一家人给岳父做寿，四百元以内。老爷子爱先吃热炒和硬菜，末了喝碗汤溜缝，前头别急着端汤。",
+    hiddenTips:"点好夹、软嫩的菜；留一盆汤在热菜后头，以茶饮代酒。"
+  },{
     mode:"spicy",title:"无辣不欢·湘菜变态辣局",restaurantName:"湘江边·岳麓麓山会馆",region:"xiang",regionLabel:"长沙·湘菜",
     tableNames:["岳麓厅","湘江六台"],tier:"street",headcount:6,budgetMin:320,budgetMax:520,noAlcohol:true,requiresHeat:true,
     guestsSummary:"你和五位车友来吃辣，六个人都要自己开车回家，一口酒也不能点。",
@@ -609,12 +719,6 @@ const SCENARIOS=[
     guestsSummary:"你、招商主管、采购总监及客户负责人，四人谈明年的合作。主宾说上回那瓶飞天酱香酒，今天还想同大家再碰一杯。",
     purpose:"公司批了两千元。茶位依到席人数照开；领班问，老客惯喝的那瓶要不要先醒着？剩下的钱要能配出一桌合宜的菜。",
     hiddenTips:"客人记得上次喝过什么。闽南席先上汤，酒和茶位也记在这张账上。"
-  },{
-    mode:"reunion",title:"大排档·老同学撸串",restaurantName:"北市·老同学串摊",region:"dongbei",regionLabel:"沈阳·东北",
-    tableNames:["街边三台","雨棚下桌"],tier:"street",headcount:3,budgetMin:60,budgetMax:150,
-    guestsSummary:"你和两名老同学重聚，三个人都坐地铁来的。伙计问先开冰啤还是先等炉上的串。",
-    purpose:"一百五十元的小聚。有人忙着续酒，拿几碟凉菜也能从毕业聊到现在；想吃热菜就等炉火，别把两桌人的量都点上。",
-    hiddenTips:"酒按瓶点，凉菜按桌分，三个人的饭量心里要有数。"
   },{
     mode:"finale",title:"驻京办·年度终极接待",restaurantName:"榕城驻京办·闽江宴",region:"mindong",regionLabel:"北京·驻京闽东席",
     tableNames:["闽江厅","接待一厅"],tier:"luxury",headcount:10,budgetMin:2400,budgetMax:3000,mustHighEndAlcohol:true,
@@ -645,12 +749,12 @@ const SIDE_QUESTS=[
 ].map(s=>({...s,isSideQuest:true,mode:s.id,region:"fast_food",guestTraits:{},purpose:s.brief}));
 
 function selectSideQuest(completedLevel,seenIds,random=Math.random){
-  if(!Number.isInteger(completedLevel)||completedLevel<2||completedLevel===8)return null;
+  if(!Number.isInteger(completedLevel)||completedLevel<3||completedLevel===7||completedLevel===8)return null;
   const freePlay=completedLevel>8;
   const seen=new Set(seenIds);
-  if(completedLevel===2&&seen.size)return null;
+  if(completedLevel===3&&seen.size)return null;
   const remaining=SIDE_QUESTS.filter(quest=>!seen.has(quest.id));
-  const chance=freePlay?0.35:completedLevel===2||completedLevel===5?1:0.4;
+  const chance=freePlay?0.35:completedLevel===3||completedLevel===6?1:0.3;
   if(!remaining.length||(chance<1&&random()>=chance))return null;
   return remaining[Math.floor(random()*remaining.length)];
 }
@@ -695,6 +799,26 @@ function createSeededRng(seedNum){
   };
 }
 
+const TEA_SEAT_RATES={
+  street:{price:4,words:"四"},
+  mid_high:{price:8,words:"八"},
+  luxury:{price:18,words:"十八"}
+};
+const STORE_PRICE_RATES={
+  mid_high:{street:1.2},
+  luxury:{street:1.5,mid_high:1.2}
+};
+
+function priceStoreDish(dish,tier){
+  if(dish.id==="dish_89"){
+    const {price,words}=TEA_SEAT_RATES[tier];
+    return {...dish,price,spec:"每位 ¥"+price,menuDesc:"按实际到席人数开茶摆位，每位"+words+"元。"};
+  }
+  const rate=STORE_PRICE_RATES[tier]?.[dish.minTier];
+  if(!rate||dish.price<=0)return dish;
+  return {...dish,price:Math.round(dish.price*rate/2)*2};
+}
+
 function generateRoguelikeScenario(rng=Math.random,{daily=false}={}){
   const regions=Object.keys(CUISINE_LABELS);
   const pick=items=>items[Math.floor(rng()*items.length)];
@@ -732,7 +856,7 @@ function generateRoguelikeScenario(rng=Math.random,{daily=false}={}){
     :affix.hint);
   if(hiddenClue)guidance.push(hiddenClue);
 
-  const teaCost=isTeaRegion(region)?8*headcount:0;
+  const teaCost=isTeaRegion(region)?TEA_SEAT_RATES[tier.id].price*headcount:0;
   const budgetMax=tier.perGuest*headcount+teaCost+2*Math.floor(rng()*10);
   const budgetMin=tightBudget?budgetMax-15:Math.round(budgetMax*0.7);
   const menuSeed=Math.floor(rng()*4294967296);
@@ -829,7 +953,7 @@ function buildStoreMenu(scenario,allDishes=DISHES){
     selected.add(d);
   }
   const menu=deck.filter(d=>selected.has(d));
-  if(!frugal)return menu;
+  if(!frugal)return menu.map(dish=>priceStoreDish(dish,tier));
   const paid=menu.map(d=>{
     if(d.id==="dish_50")return {...d,price:6,spec:"一人一碗",portion:1,stapleServings:1,menuDesc:"六块钱盛一大碗，每人一份。"};
     if(d.id==="dish_49")return {...d,price:8,spec:"一人一盘",portion:1,stapleServings:1,menuDesc:"老街小份现炒，一盘管饱一个人。"};
@@ -849,9 +973,9 @@ const ACHIEVEMENTS=[
     clue:'上菜讲究冷热先后，厚味后面接一道清爽的。',comment:'前菜垫底、硬菜压轴、汤水收尾，后厨传菜员都夸你这张单子排得顺手。'},
   {id:'ach_streak',type:'regular',name:'三连胜经手人',description:'连续三次接单均一次通过，中途无重考或弃单。',
     clue:'接连三张单子，别让后厨退回来一张。',comment:'连着三场硬仗滴水不漏，单位里往后但凡有重要接待，第一个就得喊你张罗。'},
-  {id:'ach_frugal',type:'regular',name:'极限刮油大师',description:'完成第 4 关发薪前夜凑份子。',
+  {id:'ach_frugal',type:'regular',name:'极限刮油大师',description:'完成第 3 关发薪前夜凑份子。',
     clue:'月底手头紧，先数够四人份主食，再看柜台的赠品。',comment:'四个人的主食都安排齐了，二十四块钱也没超。财务科要是桌桌都碰上你这样的经手人，月底能早下班。'},
-  {id:'ach_tycoon',type:'regular',name:'不差钱操盘手',description:'完成第 6 关商务接待，酒和席面都安排妥当。',
+  {id:'ach_tycoon',type:'regular',name:'不差钱操盘手',description:'完成第 7 关商务接待，酒和席面都安排妥当。',
     clue:'两千元的大客户饭局，先给酒单留好那一笔。',comment:'两千块的预算，大头给了该备的酒，剩下的钱还能端出一桌像样的菜。这次接待，财务和主陪都肯签字。'},
   {id:'ach_chief',type:'regular',name:'驻京办首席司长',description:'单局拿到 99～100 分和最高职级印章。',
     clue:'五栏评分，一栏也马虎不得。',comment:'天时地利人和全占齐了，往主陪侧席一坐就是定海神针，这桌饭局可以直接写进教科书。'},
@@ -882,7 +1006,29 @@ const ACHIEVEMENTS=[
   {id:'ach_grass_crowd',type:'secret',priority:104,name:'真·吃草群众',description:'炸鸡支线只点两份沙拉，花光五十元。',
     clue:'同事说别带草料。试试两盒刚好够不够。',comment:'别人都在啃炸鸡，你拿五十块换了两盒草。肠胃清了，灵魂也升华了。我破例给你盖个章。'},
   {id:'ach_mcd_rebel',type:'secret',priority:104,name:'麦门叛逆者',description:'在随心配支线把两套的四份餐全点成同一个区。',
-    clue:'不想红白相配？两套该拿的份数可别少。',comment:'一红配一白是银拱门的规矩，四份全挑同一个区是你的脾气。既然你吃得这么理直气壮，我破例放行。'}
+    clue:'不想红白相配？两套该拿的份数可别少。',comment:'一红配一白是银拱门的规矩，四份全挑同一个区是你的脾气。既然你吃得这么理直气壮，我破例放行。'},
+  {id:'ach_usurp',type:'secret',priority:105,name:'喧宾夺主',description:'在第 7 或第 8 关把经手人安排在正对门的主陪位。',
+    clue:'菜还没上，猜猜谁先坐了包厢里最显眼的位置？',comment:'你是来经手这桌饭的，一抬腿倒坐进了主陪正位。领导推门一看，差点转身问自己是不是走错了包厢。'},
+  {id:'ach_drafty_seat',type:'secret',priority:105,name:'门口吹风专座',description:'在第 7 或第 8 关把核心主宾排到靠门末席。',
+    clue:'包厢门口凉快，谁坐那里最出人意料？',comment:'把主宾放在门缝边吹风，传菜员每进门还得请他让一让。你倒是给贵客留了个最忙的座。'},
+  {id:'ach_protocol_pro',type:'regular',priority:102,name:'礼宾司老油条',description:'第 7 或第 8 关的圆桌座次完全正确，并成功过关。',
+    clue:'主陪正对门，主宾在右手，经手人靠近门。',comment:'哪位喝汤，哪位先动筷，都有条理。宾客进门便能各归其位，这张座次单倒像礼宾司老手写的。'},
+  {id:'ach_freeloader',type:'secret',priority:105,name:'饭局白嫖王',description:'对方主动买了单，你实付 0 元并顺利过关。',
+    clue:'抢单也讲火候，给对方留够面子和台阶。',comment:'你一口一个该我来，说得对方把账全结了。钱包一分没动，人情倒是记得清清楚楚。'},
+  {id:'ach_treat_all',type:'regular',priority:102,name:'全场消费我买单',description:'抢到买单权、账单未超预算，并成功过关。',
+    clue:'先算清账，再抢话筒。',comment:'结账抢得干脆，钱包掏得利落，报销红线也没碰。全场消费你买单，这回没人跟你客气。'},
+  {id:'ach_qr_wrestle',type:'secret',priority:105,name:'收银台摔跤冠军',description:'抢单推搡过猛，面子值降到 20 或以下。',
+    clue:'一直抢，直抢到收银员把二维码收起来。',comment:'结个账结出了摔跤决赛。排队的人全绕着你们走，收银员只好把付款码收回抽屉。'},
+  {id:'ach_pr_master',type:'regular',priority:101,name:'危机公关大师',description:'妥善处理一场突发事件，并以至少 85 分过关。',
+    clue:'出岔子时给客人留台阶，也把水单补圆。',comment:'临时改单、改规矩，桌上愣是没人觉得受了怠慢。手忙脚乱的是后厨，拿得稳当的是你。'},
+  {id:'ach_beta_taster',type:'secret',priority:104,name:'首席试吃官',description:'打通新版第 8 关「驻京办·年度终极接待」。',
+    clue:'把这轮内测的新联单，一张张签到收官。',comment:'八张改版水单都送到了后厨，最后这桌也过了。首席试吃官的纪念章，值班经理亲自给你盖。'},
+  {id:'ach_zero_dish',type:'secret',priority:105,name:'极致的AA制',description:'在主线关卡中一道菜都不点，直接交白卷。',
+    clue:'谁也别想占便宜，今天把饭局直接 A 没。',comment:'生怕别人占你一分钱便宜，干脆一道菜都不点。这已经不是 AA 制了，这是把饭局直接 A 没了。'},
+  {id:'ach_cart_guard',type:'regular',priority:102,name:'护盘侠',description:'在「共享点餐保卫战」中删掉全部偷塞进来的刺客菜并过关。',
+    clue:'队友扫码疯狂加贵菜时，手速要够快。',comment:'手速快得出了残影，愣是没让一只大龙虾混进结账单。队友直呼扫兴，你的钱包长舒一口气。'},
+  {id:'ach_cart_sucker',type:'secret',priority:105,name:'冤大头提款机',description:'在「共享点餐保卫战」中漏掉至少 3 道刺客菜被塞进账单。',
+    clue:'共享购物车开启时，放任队友自由发挥。',comment:'眼睁睁看着兄弟们往购物车里塞龙虾和茅台，你在一旁微笑点头。自动提款机成精了也就你这样。'}
 ];
 const RANK_TIERS=[
   {max:39,rank:'试用期端茶小弟',stampNote:'考核未过'},
@@ -894,7 +1040,8 @@ const RANK_TIERS=[
   {max:98,rank:'礼宾统筹正处长',stampNote:'滴水不漏'},
   {max:100,rank:'驻京办首席司长',stampNote:'炉火纯青'}
 ];
-function passScore(level){return level===8?80:Math.min(92,60+(level-1)*5)}
+const CAMPAIGN_PASS_SCORES=[60,65,70,75,80,85,85,80];
+function passScore(level){return level>CAMPAIGN_PASS_SCORES.length?82:CAMPAIGN_PASS_SCORES[level-1]??60}
 const percentileBands=[[0,39,1,17],[40,59,18,41],[60,69,42,61],[70,79,62,77],
   [80,89,78,90],[90,95,91,95],[96,99,96,98]];
 function estimatePercentile(score){
@@ -916,7 +1063,6 @@ function orderLineTotal(scenario,entry){
 }
 function orderSubmissionIssue(scenario,order){
   const entries=order.filter(r=>r.qty>0);
-  if(!entries.length)return '请先点一道菜。';
   if(scenario.mode!=='frugal')return '';
   const claimed=new Set();
   for(const {dish,qty} of entries){
@@ -974,17 +1120,52 @@ function judgeSideQuest(scenario,order,level){
   const passed=Boolean(award);
   const {rank,stampNote}=RANK_TIERS.find(t=>score<=t.max);
   const notes=[{priority:100,dish:award?award.name:'本桌水单',reason,text:award?award.comment:text,good:passed}];
-  return {sideQuestId:scenario.id,level,passScore:98,passed,score,rank,stampNote,percentile:estimatePercentile(score),
+  return {sideQuestId:scenario.id,level,passScore:98,passed,score,rank,stampNote,bill,paid:bill,percentile:estimatePercentile(score),
     dimensions:checks.map(([label,value])=>({label,value})),fatal:'',notes,achievements:award?[award.id]:[]};
 }
+function teaWaiverRemark({region,tier}){
+  return (region==='guangfu'?'来广东':'来福建')+'下馆子，你跟前台吵了半个小时，硬是把每位'+TEA_SEAT_RATES[tier].price+'元的茶位费给退了，全大厅都停下筷子看你，服了。';
+}
 function judge(scenario, order, options={}) {
-  if(scenario.isSideQuest)return judgeSideQuest(scenario,order,options.level??1);
-  const {headcount:h,budgetMin:lo,budgetMax:hi,region,tier,guestTraits:t}=scenario;
   const items=order.filter(r=>r.qty>0);
   const tagged=(d,k)=>d.tags.includes(k);
   const fee=items.find(r=>tagged(r.dish,'tea_fee'));
   const purchases=items.filter(r=>!tagged(r.dish,'tea_fee'));
+  const level=options.level??(scenario.isSideQuest?1:scenario.level??1);
+  const mainMode=!scenario.isSideQuest&&SCENARIOS[level-1]?.id===scenario.id?scenario.mode:null;
+  const labels=['预算把控','面子排场','食客体感','识菜避坑','上菜节奏'];
+  const cartGameResult=options.cartGameResult;
+  const cartSucker=cartGameResult?.leaked>=3;
   const bill=purchases.reduce((sum,row)=>sum+orderLineTotal(scenario,row),fee?orderLineTotal(scenario,fee):0);
+  // 茶位参与对账，仍可在没有菜品与饮品时交白卷。
+  if(!purchases.length){
+    const blank=ACHIEVEMENTS.find(a=>a.id==='ach_zero_dish');
+    const notes=[{priority:blank.priority,dish:mainMode?blank.name:'本桌水单',reason:'交白卷',text:blank.comment,good:false}];
+    const achievements=mainMode?[blank.id]:[];
+    if(mainMode==='tea'&&!fee){
+      const shameless=ACHIEVEMENTS.find(a=>a.id==='ach_shameless');
+      achievements.push(shameless.id);
+      notes.push({priority:shameless.priority,dish:shameless.name,reason:'当众退茶位',text:teaWaiverRemark(scenario),good:false});
+    }
+    if(!scenario.isSideQuest&&cartSucker){
+      const sucker=ACHIEVEMENTS.find(a=>a.id==='ach_cart_sucker');
+      achievements.push(sucker.id);
+      notes.push({priority:sucker.priority,dish:sucker.name,reason:'经理批示',text:sucker.comment,good:false});
+    }
+    return {...(scenario.isSideQuest?{sideQuestId:scenario.id}:{}),level,
+      passScore:scenario.isSideQuest?98:passScore(level),passed:false,score:15,bill,paid:bill,
+      rank:RANK_TIERS[0].rank,stampNote:RANK_TIERS[0].stampNote,percentile:estimatePercentile(15),
+      dimensions:labels.map(label=>({label,value:15})),fatal:'没有给客人点一道菜。这张单子，我最多给 15 分。',notes,achievements};
+  }
+  if(scenario.isSideQuest)return judgeSideQuest(scenario,order,level);
+  const {headcount:h,budgetMin:lo,budgetMax:hi,region,tier,guestTraits:t}=scenario;
+  const seating=(mainMode==='business'||mainMode==='finale')&&Array.isArray(options.seating?.mistakes)?options.seating:null;
+  const paymentOutcome=['reunion','business'].includes(mainMode)?options.payment?.outcome:null;
+  const paymentWaived=paymentOutcome==='free';
+  const paid=paymentWaived?0:bill;
+  // 客人代付只豁免超支，预算下限仍按水单的实际消费核对。
+  const budgetBill=paymentWaived?Math.min(bill,hi):bill;
+  const tableEvent=options.tableEvent;
   const drinks=purchases.filter(r=>r.dish.category==='drinks');
   const alcohol=drinks.filter(r=>tagged(r.dish,'alcohol'));
   const hasPremium=alcohol.some(r=>tagged(r.dish,'premium_alcohol'));
@@ -993,7 +1174,6 @@ function judge(scenario, order, options={}) {
   // 酒水、赠茶与茶位参与对账，不算菜量、菜序或复夹率。
   order=purchases.filter(r=>r.dish.category!=='drinks'&&r.dish.ingredientType!=='drink');
   const n=order.length;
-  const labels=['预算把控','面子排场','食客体感','识菜避坑','上菜节奏'];
   const clamp=v=>Math.max(0,Math.min(100,Math.round(v)));
   const ds=order.map(r=>r.dish),notes=[];
   const money=k=>order.reduce((a,r)=>a+r.dish[k]*r.qty,0);
@@ -1015,7 +1195,7 @@ function judge(scenario, order, options={}) {
   const coldTable=alcohol.length>0&&n>0&&ds.every(isCold);
   const heatMissing=scenario.requiresHeat&&!ds.some(d=>d.spicy>=3);
   const sweetMissing=scenario.requiresHeat&&!hasSweet;
-  const teaRemark=(region==='guangfu'?'来广东':'来福建')+'下馆子，你跟前台吵了半个小时，硬是把8块钱的茶位费给退了，全大厅都停下筷子看你，服了。';
+  const teaRemark=teaWaiverRemark(scenario);
   const giftRemark='明文写着免费福利只能挑一样，你倒好，紫菜汤、酸豆角、大麦茶全给包圆了。这脸皮厚度，后厨的切菜板都自叹不如。敬你是条汉子。';
   const heavy=d=>d.heaviness>=70;
   const seafood=d=>d.category==='海鲜水产'||['fish','shrimp_crab'].includes(d.ingredientType)||tagged(d,'seafood');
@@ -1052,7 +1232,6 @@ function judge(scenario, order, options={}) {
   const conflict=wrong.length?{priority:99,dish:wrong.length===1?wrong[0].name:'本桌水单',reason:'地方招牌串桌',
     text:'在'+CUISINE_LABELS[region]+'的酒楼里硬点'+wrongMenu+'，后厨师傅都得现翻菜谱，客人还以为走错了馆子。',good:false}:null;
   const regionPenalty=13*wrong.length;
-  const level=options.level??scenario.level??1;
   const target=passScore(level);
   const tutorial=level===1&&scenario.id===SCENARIOS[0].id;
   const violatesDriving=scenario.noAlcohol&&alcohol.length>0;
@@ -1092,7 +1271,17 @@ function judge(scenario, order, options={}) {
       ach_coconut:coconuts>=3,
       ach_undercover:sweetMissing,
       ach_participant:passed&&tutorialFish,
-      ach_boring:passed&&earnsBoringAward(result)
+      ach_boring:passed&&earnsBoringAward(result),
+      ach_usurp:seating?.usurped===true,
+      ach_drafty_seat:seating?.drafty===true,
+      ach_protocol_pro:passed&&seating?.mistakes.length===0,
+      ach_freeloader:passed&&paymentWaived,
+      ach_treat_all:passed&&paymentOutcome==='host'&&bill<=hi,
+      ach_qr_wrestle:paymentOutcome==='wrestle',
+      ach_pr_master:passed&&result.score>=85&&tableEvent?.resolved===true,
+      ach_beta_taster:passed&&mainMode==='finale',
+      ach_cart_guard:passed&&cartGameResult?.spawned>0&&cartGameResult.leaked===0,
+      ach_cart_sucker:cartSucker
     };
     const awards=ACHIEVEMENTS.filter(a=>earned[a.id]).sort((a,b)=>(b.priority??100)-(a.priority??100));
     const pinned=awards.filter(a=>a.type==='secret'||!existing.has(a.id))
@@ -1103,11 +1292,11 @@ function judge(scenario, order, options={}) {
     const chosen=rest.filter((note,i)=>note.priority>=97||i<Math.max(3,6-pinned.length));
     const praise=result.notes.find(c=>c.good);
     if(praise&&!pinned.some(c=>c.good)&&!chosen.includes(praise))chosen.push(praise);
-    return {...result,level,passScore:target,passed,notes:pinned.concat(chosen),
+    return {...result,level,passScore:target,passed,bill,paid,notes:pinned.concat(chosen),
       achievements:awards.map(a=>a.id),
       percentile:estimatePercentile(result.score)};
   }
-  const scores=[budgetPoints(bill,lo,hi),96,98,94,95];
+  const scores=[budgetPoints(budgetBill,lo,hi),96,98,94,95];
   const names=list=>list.slice(0,2).map(d=>d.name).join('、');
   const first=ds[0], biggest=purchases.slice().sort((a,b)=>orderLineTotal(scenario,b)-orderLineTotal(scenario,a))[0];
   const anchor=biggest?biggest.dish.name:'';
@@ -1121,7 +1310,14 @@ function judge(scenario, order, options={}) {
   }
   function scoreReport(special){
     if(teaWaived){
-      scores[1]-=40; scores[3]-=35; limit(49,'整桌茶位没有结清');
+      if(mainMode==='tea'){
+        scores[1]-=20;
+        scores[3]-=15;
+      }else{
+        scores[1]-=40;
+        scores[3]-=35;
+        limit(49,'整桌茶位没有结清');
+      }
       note(101,'茗茶与餐位费','当众退茶位',teaRemark);
     }
     if(scenario.noAlcohol&&alcohol.length){
@@ -1169,6 +1365,38 @@ function judge(scenario, order, options={}) {
       scores[3]-=18;
       note(97,names(duplicateMeats),'荤菜撞重样','主宾讲究一山不容二虎，同类肉菜点重样了');
     }
+    const originalSocialPoints=special?.includeSocialScore?clamp(scores[0])+clamp(scores[1]):null;
+    if(seating){
+      if(seating.mistakes.length){
+        scores[1]-=6*seating.mistakes.length;
+        for(const {hint,actual,expected} of seating.mistakes){
+          const remark=actual==="空席未入座"
+            ?'「'+hint+'」还空着没请'+expected+'入座，宾客还站着呢。'
+            :'「'+hint+'」请留给'+expected+'，这席安排错了。';
+          note(97,actual,'座次扣分',remark);
+        }
+      }else{
+        scores[1]+=6;
+        note(97,'包厢座次','宾主入座得体','主陪端坐，主宾有位，经手人也知道替全桌留出一条上菜道。',true);
+      }
+    }
+    if(paymentOutcome==='wrestle'){
+      scores[1]-=10;
+      note(100,'收银台','推拉过了头','客人掏钱，你堵付款码，两个人闹成一团，后面的客人也没法结账。');
+    }else if(paymentWaived){
+      scores[1]+=3;
+      note(100,'对方买单','得体免单','桌上账照开，这顿对方主动请客。你实付零元，有来有往，下回也给人留份情。',true);
+    }else if(paymentOutcome==='host'){
+      scores[1]+=5;
+      note(100,'经手人买单','豪爽抢单','该付的账掏得明白，客人的面子也照顾到了。',true);
+    }
+    if(tableEvent?.type==='soldout'){
+      if(tableEvent.choice==='A')scores[1]+=4;
+      if(tableEvent.choice==='B')scores[0]+=3;
+    }
+    if(tableEvent?.resolved===true){
+      note(96,'临场应对','公关妥当','后厨出了点变数，你把桌面的分寸和客人的交代都顾住了。',true);
+    }
     const dimensions=labels.map((label,i)=>({label,value:clamp(scores[i])}));
     const average=clamp(dimensions.reduce((sum,d)=>sum+d.value,0)/dimensions.length);
     if(tutorial&&bill>hi){
@@ -1176,10 +1404,12 @@ function judge(scenario, order, options={}) {
       note(100,anchor,'新手账单超支','起步这一桌也得守住预算。请撤掉几道菜再交单。');
     }
     if(tutorial&&chili.length)limit(target-1,'第一关的辣味忌口未落实');
-    const nominal=Math.min(cap,special?.score??average);
+    // 同学下酒席沿用原来的基础得分，买单与沽清选项的分差仍进入总分。
+    const socialDelta=originalSocialPoints===null?0:(dimensions[0].value+dimensions[1].value-originalSocialPoints)/dimensions.length;
+    const nominal=Math.min(cap,special?clamp(special.score+socialDelta):average);
     // 新手免掉分量和次序的硬门槛，仍展示按原公式计算的五项分数。
     const score=tutorialFish?target:tutorialPass?Math.max(target,nominal):nominal;
-    const {rank,stampNote}=special??RANK_TIERS.find(tier=>score<=tier.max);
+    const {rank,stampNote}=special?.rank&&socialDelta===0?special:RANK_TIERS.find(tier=>score<=tier.max);
     notes.sort((a,b)=>b.priority-a.priority);
     return finish({score,rank,stampNote,dimensions,fatal,notes});
   }
@@ -1195,9 +1425,9 @@ function judge(scenario, order, options={}) {
     const fed=staples.reduce((sum,r)=>sum+(r.dish.stapleServings??1)*r.qty,0);
     const giftsTaken=gifts.length;
     const extraGifts=Math.max(0,giftsTaken-1);
-    scores[1]=giftsTaken===0?80:100-20*extraGifts;
+    scores[1]=giftsTaken===0?80:freeSweep?92:100-10*extraGifts;
     scores[2]=100-28*Math.max(0,h-fed)-12*Math.max(0,fed-h);
-    scores[3]=giftsTaken===0?85:100-25*extraGifts;
+    scores[3]=giftsTaken===0?85:freeSweep?90:100-12*extraGifts;
     scores[4]=giftsTaken===1?100:85;
     if(issue){limit(39,issue);note(99,'后厨核单','水单须重开',issue)}
     if(bill>hi){limit(54,'四人凑的份子钱只有二十四元');note(98,anchor,'份子钱不够','这桌一共只凑了'+hi+'元，多出来的'+(bill-hi)+'元得由谁垫上？')}
@@ -1206,21 +1436,20 @@ function judge(scenario, order, options={}) {
       note(92,names(staples.map(r=>r.dish))||'主食','主食没备足',h+'人围桌，只备了'+fed+'人份主食。先叫每人都能吃饱，再算别的账。');
     }else if(fed===h)note(80,names(staples.map(r=>r.dish)),'主食管饱','四位刚发完工牌的同事各有一份正经主食，谁也不用看着别人碗里的饭。',true);
     if(extraGifts>0){
-      limit(target-1,'每桌赠品只能任选一样');
-      note(98,'本桌福利','赠品多领','水牌上写着三选一，这张单却勾了'+giftsTaken+'样。留一样，余下的给隔壁桌。');
+      note(98,'本桌福利','赠品多领','水牌上写着三选一，这张单却勾了'+giftsTaken+'样。面子和识菜避坑这两栏，我都得扣一点。');
     }else if(giftsTaken===1){
       note(85,gifts[0].name,'福利选得妥当','三样里依规选了一样，四个人分着吃喝，老板也乐意再招呼你们。',true);
     }else note(80,'本桌福利','赠品未取','柜台上三样都能挑，一桌正好领一样，下回记得问一声。');
     if(bill<=hi)note(65,anchor,'份子钱对账','本桌付费菜共'+bill+'元，都在四位同事凑的份子钱里。',true);
     return scoreReport();
   }
-  if(scenario.mode==='reunion'&&coldTable&&bill<=hi){
+  if(scenario.mode==='reunion'&&coldTable&&budgetBill<=hi){
     const score=Math.max(target,94);
-    scores.splice(0,5,budgetPoints(bill,lo,hi),94,96,94,96);
-    note(94,alcohol[0].dish.name,'老同学的下酒席','三个老同学慢慢喝，凉菜拿筷子就能夹，账也收在一百五里头。老板，这桌可以划过。',true);
-    return scoreReport({score,...RANK_TIERS.find(tier=>score<=tier.max)});
+    scores.splice(0,5,budgetPoints(budgetBill,lo,hi),94,96,94,96);
+    note(94,alcohol[0].dish.name,'老同学的下酒席',bill>hi?'老同学慢慢喝，凉菜拿筷子就能夹。酒和下酒菜都齐了。':'三个老同学慢慢喝，凉菜拿筷子就能夹，账也收在一百五里头。老板，这桌可以划过。',true);
+    return scoreReport({score,includeSocialScore:true,...RANK_TIERS.find(tier=>score<=tier.max)});
   }
-  if(scenario.mode==='reunion'&&bill>hi){
+  if(scenario.mode==='reunion'&&budgetBill>hi){
     limit(target-1,'同学们只凑了一百五十元');
   }
   if(!n){
@@ -1232,7 +1461,7 @@ function judge(scenario, order, options={}) {
     const {dish,qty}=order[0];
     const coverage=Math.min(1,dish.portion*qty/h)*dish.edibility/100;
     const score=beggar?15:15+Math.round(3*coverage);
-    scores.splice(0,5,budgetPoints(bill,lo,hi),dish.prestige/4,coverage*40,dish.edibility/2-regionPenalty,0);
+    scores.splice(0,5,budgetPoints(budgetBill,lo,hi),dish.prestige/4,coverage*40,dish.edibility/2-regionPenalty,0);
     let verdict='满桌人盯着这一盘菜转转盘，筷子都不好意思伸第二次——这哪是请客吃饭，这是大型服从性测试。';
     if(dish.ingredientType==='staple')verdict='一桌人就点一盘主食，怎么，今天包厢里搞饥荒演习、一人分三粒米？建议直接去楼下沙县一人一碗拌面。';
     else if(dish.ingredientType==='veg')verdict='请客只上一盘青菜，你是打算带领导和客户集体辟谷修仙，还是明天一早已经准备好递辞职信了？';
@@ -1243,14 +1472,14 @@ function judge(scenario, order, options={}) {
   }
   if(hi===Infinity){
     note(48,anchor,'黑卡签单','全桌'+bill+'元由老板签单。恰到好处，才值得这一桌身价。',true);
-  }else if(bill>hi){
+  }else if(budgetBill>hi){
     const over=(bill-hi)/hi;
     note(over>=0.2?98:72,anchor,'超出红线'+(bill-hi)+'元','排面撑起来了，报销单谁签？光这一项就花了'+biggest.dish.price*biggest.qty+'元。');
     if(over>=0.4)limit(39,'总额超预算四成，财务退单');
     else if(over>=0.2)limit(64,'总额超预算两成，接待降级');
   }else if(bill<lo){
     note(43,anchor,'低于预算下限'+(lo-bill)+'元','账上还留着钱，先看看桌上有没有少照顾一双筷子。');
-  }else note(48,anchor,'账目合规','全桌'+bill+'元，离红线还剩'+(hi-bill)+'元。签字的人不用陪你做算术。',true);
+  }else if(bill<=hi)note(48,anchor,'账目合规','全桌'+bill+'元，离红线还剩'+(hi-bill)+'元。签字的人不用陪你做算术。',true);
   const minimumCourses=hasIronPotStew?h-1:h+1;
   const short=Math.max(0,minimumCourses-effectiveDishCount);
   const extra=Math.max(0,n-h-2);
@@ -1365,7 +1594,7 @@ const sharedRanks=new Set([...RANK_TIERS.map(t=>t.rank),"职场自爆卡车","�
   "编外打杂实习生","局促见习办事员","中规中矩接待科员","精打细算副科长","稳妥得体接待科长",
   "老练圆滑副处长","滴水不漏正处长","定海神针·资深办公室主任"]);
 const challenge=readChallenge(location.search);
-let activeShare=null,shareTimer=0,shareDue=false,awardNoticePending=false;
+let activeShare=null,reportDialogTimer=0,shareDue=false,awardNoticePending=false;
 const cats = MENU_CATEGORIES;
 const pick = list => list[Math.floor(Math.random()*list.length)];
 const serial = () => String(Math.floor(100000+Math.random()*900000));
@@ -1380,10 +1609,20 @@ function resetMenuView(){
 }
 let storeMenu=[],menuEdits=0,menuElapsed=0,menuStarted=null;
 let lastBudgetPct=0,lastBudgetSum=0;
-const dishWhispers=new Map();
-const whisperDuration=1550;
+const dishWhispers=new Map(),seenDishCombos=new Set();
+const dishCombos=[
+  {id:"fish-mutton",left:d=>d.ingredientType==="fish",right:d=>d.ingredientType==="mutton",text:"行家！鱼羊凑鲜，排面稳了"},
+  {id:"heat-sweet",left:d=>d.spicy>=3,right:d=>d.tags.includes("coconut")||d.tags.includes("spice_relief"),text:"行家！辣配甜饮，懂吃"},
+  {id:"wine-banquet",left:d=>d.id==="dish_84",right:d=>d.ingredientType!=="drink"&&d.prestige>=85,text:"行家！好酒配硬菜，面子拉满"}
+];
 let receiptPrintPending=false,receiptObserver=null;
-let eventTriggered=false;
+let eventTriggered=false,tableEvent=null,pendingTableEvent=null;
+function resetTableEvent(){
+  eventTriggered=false;
+  tableEvent=null;
+  pendingTableEvent=null;
+  dialog.classList.remove("table-event-active");
+}
 const soldOutIds=new Set();
 let dailyExam=null;
 
@@ -1570,12 +1809,12 @@ const SoundFX=(()=>{
 })();
 
 const achievementKey="ronggang_achievements";
-const campaignKey="campaign140.";
+const campaignKey="campaign320.";
 const lastLevel=8;
 const progress={level:1,achievements:new Set()};
 const memoryMarks=new Set();
 let activeSideQuest=null;
-const sideSessionKey=savePrefix+"sideQuests200";
+const sideSessionKey=savePrefix+campaignKey+"sideQuests";
 const sideSession=readSideSession();
 
 function readSideSession(){
@@ -1586,7 +1825,7 @@ function readSideSession(){
       for(const quest of SIDE_QUESTS)if(saved.seen.includes(quest.id))state.seen.add(quest.id);
     }
     const next=saved?.pending;
-    if(next&&state.seen.has(next.id)&&Number.isInteger(next.mainStageIdx)&&next.mainStageIdx>=3&&next.mainStageIdx<=lastLevel+1)
+    if(next&&state.seen.has(next.id)&&Number.isInteger(next.mainStageIdx)&&next.mainStageIdx>=4&&next.mainStageIdx<=lastLevel+1)
       state.pending={id:next.id,mainStageIdx:next.mainStageIdx};
   }catch{}
   return state;
@@ -1749,8 +1988,28 @@ function pressReportStamps(){
   ],{duration:110,delay:210,easing:"ease-out"}));
   return Promise.all(motions);
 }
-async function settle(){
-  if(turningPage||stage!=="kitchen")return;
+function revealReportScore(scoreValue,target,motion){
+  if(motion.matches){scoreValue.textContent=target;return}
+  page.querySelector(".bars")?.classList.add("revealing");
+  const started=performance.now();
+  function roll(now){
+    if(!scoreValue.isConnected)return;
+    if(motion.matches||now-started>=520){
+      scoreValue.textContent=target;
+      if(motion.matches)return;
+      if(target>=85)scoreValue.parentElement.classList.add("score-high");
+      if(target<=39)scoreValue.parentElement.classList.add("score-low");
+      return;
+    }
+    const time=Math.max(0,(now-started)/520);
+    const value=String(Math.floor(target*(1-(1-time)**3)));
+    if(scoreValue.textContent!==value)scoreValue.textContent=value;
+    requestAnimationFrame(roll);
+  }
+  requestAnimationFrame(roll);
+}
+async function settle(zeroOrder=false){
+  if(turningPage||(zeroOrder?(stage!=="menu"||!isZeroOrder()||removing.size):stage!=="kitchen"))return;
   const issue=orderSubmissionIssue(scene,order);
   if(issue)return modal("后厨核单","<p>"+issue+"</p>");
   turningPage=true;
@@ -1771,8 +2030,14 @@ async function turnInOrder(){
   const clean=!dailyExam&&(freePlay?run.ticket===freeTicket:
     !activeSideQuest&&progress.level===roundLevel&&firstAttempt&&!hasMark(campaignKey+"retry."+roundLevel));
   const streakBefore=dailyExam||activeSideQuest?0:freePlay?run.streak:precedingWins();
+  const seating=seatingReport();
   report=judge(scene,order,{level:roundLevel,storeMenu,freePlay,streakBefore,firstAttempt:clean,
-    earnedAchievements:progress.achievements,menuSeconds:menuElapsed/1000,edits:menuEdits});
+    earnedAchievements:progress.achievements,menuSeconds:menuElapsed/1000,edits:menuEdits,
+    seating,payment:paymentResult,tableEvent,cartGameResult});
+  report.seating=seating;
+  report.payment=paymentResult;
+  report.tableEvent=tableEvent;
+  report.cartGameResult=cartGameResult;
   report.freePlay=freePlay;
   report.campaignWon=!dailyExam&&!activeSideQuest&&roundLevel===lastLevel&&report.passed;
   report.newAchievements=report.achievements.filter(id=>!progress.achievements.has(id));
@@ -1792,7 +2057,7 @@ async function turnInOrder(){
       saveMark(campaignKey+"pass."+roundLevel);
       progress.level=Math.max(progress.level,roundLevel+1);
       // 过关时先留好保底支线，结算页刷新后仍能取到这张单。
-      if(progress.level===roundLevel+1&&(roundLevel===2||roundLevel===5)){
+      if(progress.level===roundLevel+1&&(roundLevel===3||roundLevel===6)){
         const quest=selectSideQuest(roundLevel,sideSession.seen);
         if(quest)reserveSideQuest(quest);
       }
@@ -1808,16 +2073,22 @@ async function turnInOrder(){
   stage="report";
   receiptPrintPending=true;
   render(true);
+  const scoreValue=page.querySelector(".score-value");
+  const motion=matchMedia("(prefers-reduced-motion: reduce)");
+  if(!motion.matches)scoreValue.textContent="0";
   await playPaperMotion(sheetFace,[{transform:"rotateY(-90deg)"},{transform:"rotateY(0deg)"}],
     {duration:280,easing:"ease-out"});
   pad.classList.remove("flipping-slip");
+  revealReportScore(scoreValue,report.score,motion);
   awardNoticePending=report.newAchievements.length>0;
-  if(report.passed){
-    shareTimer=setTimeout(()=>{
-      shareTimer=0;
-      shareDue=true;
+  const passed=report.passed;
+  if(passed||(!motion.matches&&awardNoticePending)){
+    // 失败时先让分数定格，避免解锁弹窗遮住收笔动效。
+    reportDialogTimer=setTimeout(()=>{
+      reportDialogTimer=0;
+      shareDue=passed;
       nextReportDialog();
-    },650);
+    },passed?650:850);
   }
   await pressReportStamps();
 }
@@ -1851,7 +2122,7 @@ function startReceiptPrint(){
   receiptObserver.observe(receipt);
 }
 function nextReportDialog(){
-  if(turningPage||stage!=="report"||shareTimer||document.querySelector("dialog[open]"))return;
+  if(turningPage||stage!=="report"||reportDialogTimer||document.querySelector("dialog[open]"))return;
   if(shareDue)return openShare();
   if(awardNoticePending){
     awardNoticePending=false;
@@ -1893,7 +2164,7 @@ function shareDetails(){
 }
 function openShare(){
   if(stage!=="report"||shareModal.open)return;
-  clearTimeout(shareTimer);shareTimer=0;shareDue=false;
+  clearTimeout(reportDialogTimer);reportDialogTimer=0;shareDue=false;
   activeShare=shareDetails();
   awardNoticePending=false;
   shareModal.querySelector("#shareManual")?.remove();
@@ -1961,7 +2232,7 @@ function showFirstOrderTutorial(){
   if(roundLevel!==1||scene?.mode!=="home"||dailyExam||activeSideQuest||progress.level>1||hasMark(tutorialSkipKey))return false;
   if(["ach_first","ach_friday","ach_silver","ach_grass_crowd","ach_mcd_rebel"].some(id=>progress.achievements.has(id)))return false;
   for(let n=1;n<=lastLevel;n++){
-    if(hasMark(campaignKey+"pass."+n)||hasMark("campaign8.pass."+n)||hasMark("pass."+n))return false;
+    if(hasMark(campaignKey+"pass."+n)||hasMark("campaign140.pass."+n)||hasMark("campaign8.pass."+n)||hasMark("pass."+n))return false;
   }
   return true;
 }
@@ -2091,26 +2362,38 @@ function getDishWhisper(scene,dish){
 }
 function pinDishWhisper(dish){
   const text=getDishWhisper(scene,dish);
-  if(!text)return;
-  // 点菜会重绘整张水单，按最初出现的时间接着播放浮签。
-  const whisper={text,startedAt:performance.now()};
+  const notes=text?[{text,duration:1550}]:[];
+  const companions=order.filter(row=>row.dish.id!==dish.id&&row.qty>0&&!removing.has(row.dish.id)).map(row=>row.dish);
+  for(const combo of dishCombos){
+    if(seenDishCombos.has(combo.id))continue;
+    const hasLeft=companions.some(combo.left),hasRight=companions.some(combo.right);
+    if((hasLeft&&hasRight)||!((combo.left(dish)&&hasRight)||(combo.right(dish)&&hasLeft)))continue;
+    seenDishCombos.add(combo.id);
+    notes.push({text:combo.text,duration:2100,combo:true});
+  }
+  if(!notes.length)return;
+  // 水单重绘时沿用原始起点，让批注和搭配浮签各自按时收笔。
+  const whisper={notes,startedAt:performance.now()};
   dishWhispers.set(dish.id,whisper);
-  setTimeout(()=>{
+  notes.forEach(({duration},index)=>setTimeout(()=>{
     if(dishWhispers.get(dish.id)!==whisper)return;
-    dishWhispers.delete(dish.id);
-    page.querySelector('[data-dish="'+dish.id+'"] .pen-whisper')?.remove();
-  },whisperDuration);
+    const group=page.querySelector('[data-dish="'+dish.id+'"] .dish-whispers');
+    if(index===notes.length-1){
+      dishWhispers.delete(dish.id);
+      group?.remove();
+    }else group?.querySelector('[data-whisper="'+index+'"]')?.remove();
+  },duration));
 }
 function budgetPct(sum,limit){
   return Number.isFinite(limit)&&limit>0?Math.min(100,Math.round(sum/limit*100)):0;
 }
 function dishRow(d){
   const item=order.find(({dish})=>dish.id===d.id);
-  const soldOut=soldOutIds.has(d.id);
+  const soldOut=soldOutIds.has(d.id),unchecking=removing.has(d.id);
   const open=detailChoices.get(d.id)??Boolean(item);
   const attrs='data-id="'+d.id+'" ';
   const detailsId="desc-"+d.id;
-  const name='<span class="name'+(soldOut||removing.has(d.id)?' cross':'')+'">'+d.name+'</span>';
+  const name='<span class="name'+(soldOut||unchecking?' cross':'')+'">'+d.name+'</span>';
   const detail=action("dish-detail",dishSketch(d)+'<span class="detail">'+name+'<span class="spec">'+d.spec+(d.maxQty===1?' · 进店免费':'')+'</span></span>',"dish-info",
     attrs+'aria-label="'+d.name+'，'+d.spec+'，菜品详情" aria-expanded="'+open+'" aria-controls="'+detailsId+'"');
   const check=soldOut?action("add","已沽清","smallbtn sold-out",attrs+'disabled aria-label="'+d.name+'已沽清"'):action(item?"uncheck":"add",'<span aria-hidden="true">'+(item?'✓':'')+'</span>',"dish-check",
@@ -2121,11 +2404,15 @@ function dishRow(d){
     action("add","＋","ctrl",attrs+'aria-label="增加'+d.name+'一份"')+'</div>':'';
   const whisper=dishWhispers.get(d.id);
   const elapsed=whisper?Math.floor(performance.now()-whisper.startedAt):0;
-  const note=whisper&&elapsed<whisperDuration
-    ?'<span class="pen-whisper" aria-hidden="true" style="animation-delay:-'+elapsed+'ms">'+whisper.text+'</span>':'';
-  return '<article class="dish'+(open?' open-detail':'')+'" data-dish="'+d.id+'">'+detail+
+  const notes=whisper?.notes.map(({text,combo,duration},index)=>elapsed<duration
+    ?'<span class="pen-whisper'+(combo?' combo':'')+'" data-whisper="'+index+'" style="--whisper-time:'+duration+'ms;animation-delay:-'+elapsed+'ms">'+text+'</span>':'').join("")||"";
+  const note=notes?'<div class="dish-whispers" aria-hidden="true">'+notes+'</div>':"";
+  return '<article class="dish'+(open?' open-detail':'')+(unchecking?' unchecking':'')+'" data-dish="'+d.id+'">'+detail+
     '<div class="dish-sale"><span class="price">¥'+d.price+'</span>'+check+'</div>'+
     '<div class="dish-desc" id="'+detailsId+'" aria-hidden="'+!open+'"><span>'+d.menuDesc+'</span></div>'+quantity+note+'</article>';
+}
+function isZeroOrder(){
+  return !order.some(({dish,qty})=>qty>0&&!dish.tags.includes("tea_fee"));
 }
 function menu(){
   const frugal=scene.mode==="frugal";
@@ -2139,30 +2426,31 @@ function menu(){
   const title=reviewingOrder?"已点菜单":"联单勾菜";
   const count=reviewingOrder?'共 '+order.length+' 项':'本店共 '+storeMenu.length+' 项';
   const head='<div class="stagehead menu-head">'+ticket("第二联　／　勾菜")+'<div class="menu-title"><h2 tabindex="-1">'+title+'</h2><span>'+count+'</span></div></div>';
-  const sum=total(),over=sum>scene.budgetMax;
+  const sum=total(),over=sum>scene.budgetMax,changedOver=over&&sum!==lastBudgetSum;
+  const withinBudget=Number.isFinite(scene.budgetMax)&&scene.budgetMin>0&&sum>=scene.budgetMin&&sum<=scene.budgetMax;
   let meter="";
   if(Number.isFinite(scene.budgetMax)&&scene.budgetMax>0){
     const ratio=sum/scene.budgetMax;
     const currPct=budgetPct(sum,scene.budgetMax);
-    const state=over?(sum!==lastBudgetSum?" over shake":" over"):ratio>=0.85?" warn":"";
+    const state=over?(changedOver?" over shake":" over"):ratio>=0.85?" warn":"";
     meter='<div class="budget-meter'+state+'" aria-hidden="true">'+
       '<i style="--from:'+lastBudgetPct+'%;--to:'+currPct+'%"></i></div>';
     lastBudgetPct=currPct;
-    lastBudgetSum=sum;
   }
+  lastBudgetSum=sum;
   const orderLink=reviewingOrder?action("review-order","继续点菜","order-link return"):action("review-order",'已点菜单 <span class="order-count">'+order.length+' 项</span>',"order-link");
-  const note='人均 ¥'+(sum/scene.headcount).toFixed(0);
+  const note='人均 ¥'+(sum/scene.headcount).toFixed(0)+(withinBudget?'<span class="budget-good"> · ✓ 账目合宜</span>':'');
   const limit=Number.isFinite(scene.budgetMax)?scene.budgetMax:'无上限';
   const issue=orderSubmissionIssue(scene,order);
   const hint=frugal&&order.length&&sum===0?'这张水单上只有免费福利。':'';
   const claimed=frugal?order.filter(item=>item.dish.price===0).length:0;
   const benefits=freeItems.length?'<section aria-label="进店福利"><div class="subtitle"><h3>进店福利</h3><span class="tiny">每桌任选一样 · 已勾 '+claimed+' 样</span></div>'+freeItems.map(dishRow).join("")+'</section>':'';
-  const cost='<div class="order-cost'+(over?' over':'')+'">'+(over?'超预算':'预计')+' <b>¥'+sum+'</b> / '+limit+'<small>'+note+'</small></div>';
+  const cost='<div class="order-cost'+(changedOver?' over bump':over?' over':'')+'">'+(over?'超预算':'预计')+' <b>¥'+sum+'</b> / '+limit+'<small>'+note+'</small></div>';
   const pickGuide=!reviewingOrder&&order.length<2?tutorialNote("点菜名右侧的方框勾菜，再点一次就取消。"):"";
   const queueGuide=order.length>=2?tutorialNote("菜点齐了？点下方按钮进后厨排上菜顺序。"):"";
   return [head+briefPanel(false)+benefits+tabs+pickGuide+'<section class="order-list" aria-label="'+(reviewingOrder?'本桌已点菜品':cat)+'">'+list.map(dishRow).join("")+
     (list.length?'':'<p class="empty">联单还是空的。点「继续点菜」，挑一道开单。</p>')+'</section>',
-    (hint?'<p class="tiny">'+hint+'</p>':'')+'<div class="order-strip">'+orderLink+cost+meter+'</div>'+queueGuide+action("kitchen","确认菜单并排上菜顺序","primary",!issue&&!removing.size?"":"disabled")];
+    (hint?'<p class="tiny">'+hint+'</p>':'')+'<div class="order-strip">'+orderLink+cost+meter+'</div>'+queueGuide+action("kitchen","确认菜单并排上菜顺序",isZeroOrder()?"primary zero-order":"primary",!issue&&!removing.size?"":"disabled")];
 }
 function courseLabel(dish,i){
   if(dish.tags.includes("tea_fee"))return "全桌 · 按位计费";
@@ -2176,12 +2464,327 @@ function courseLabel(dish,i){
   else if(dish.ingredientType==="veg"||dish.ingredientType==="tofu")course=i<2?"前菜":"配菜";
   return position+" · "+course;
 }
+const SEATING_PLANS={
+  business:{
+    places:[["north","正对门 · 主陪位","我方招商主管"],["east","主陪右手 · 主宾位","客户负责人"],
+      ["west","主陪左手 · 副宾位","采购总监"],["south","靠门口 · 末席买单位","你（经手人）"]]
+  },
+  finale:{
+    places:[["north","正对门 · 主陪位","主任"],["northeast","主陪右手 · 主宾位","核心来宾"],
+      ["northwest","主陪左手 · 尊长位","老专家"],["southeast","右侧陪席","项目同事"],
+      ["southwest","左侧陪席","控油女同事"],["south","靠门口 · 末席买单位","你（经手人）"]]
+  }
+};
+const PAY_OPPONENTS={reunion:"老同学",business:"客户负责人"};
+const PAY_MOVES=[
+  [["借口去洗手间提前扫码",8,15],["按住对方掏手机的手",-14,-22],["大声喊服务员过来",-10,-16]],
+  [["搬出长辈或领导压场",-6,12],["承诺下次一定你回请",24,4],["假装手机信号差加载不出",-15,-15]],
+  [["趁对方接电话偷偷结账",1,11],["顺水推舟让对方买单并记人情",20,7],["死死挡住收银台付款码",-22,-27]]
+];
+let kitchenView="serving",seatAssignments=[],seatPoolOrder=[],selectedSeatToken=null;
+let seatingReminderShown=false,paymentGame=null,paymentResult=null;
+function tableSeatingPlan(){
+  if(!scene||activeSideQuest||dailyExam)return null;
+  if(roundLevel===7&&scene.mode==="business")return SEATING_PLANS.business;
+  if(roundLevel===8&&scene.mode==="finale")return SEATING_PLANS.finale;
+  return null;
+}
+function resetTableRituals(){
+  kitchenView="serving";
+  const plan=tableSeatingPlan();
+  const count=plan?.places.length??0;
+  seatAssignments=Array(count).fill(null);
+  seatPoolOrder=Array.from({length:count},(_,person)=>person);
+  for(let i=count-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [seatPoolOrder[i],seatPoolOrder[j]]=[seatPoolOrder[j],seatPoolOrder[i]];
+  }
+  if(plan===SEATING_PLANS.business&&seatPoolOrder[0]===count-1){
+    const j=1+Math.floor(Math.random()*(count-1));
+    [seatPoolOrder[0],seatPoolOrder[j]]=[seatPoolOrder[j],seatPoolOrder[0]];
+  }
+  selectedSeatToken=null;
+  seatingReminderShown=false;
+  paymentGame=null;
+  paymentResult=null;
+}
+function unseatedCount(){
+  return seatAssignments.filter(person=>person===null).length;
+}
+function seatingReport(){
+  const plan=tableSeatingPlan();
+  if(!plan)return undefined;
+  const mistakes=plan.places.flatMap(([,hint,expected],seat)=>{
+    const person=seatAssignments[seat];
+    return person===seat?[]:[{hint,actual:person===null?"空席未入座":plan.places[person][2],expected}];
+  });
+  return {mistakes,usurped:seatAssignments[0]===plan.places.length-1,drafty:seatAssignments.at(-1)===1};
+}
+function kitchenTabs(){
+  const tab=(id,label,badge="")=>action("kitchen-view",label,"tab"+(kitchenView===id?" active":"")+badge,
+    'type="button" data-id="'+id+'" aria-pressed="'+(kitchenView===id)+'"');
+  const remaining=unseatedCount();
+  const seatTab=remaining>0?tab("seating","2. 包厢座次（剩 "+remaining+" 空位）"," tab-badge"):
+    tab("seating","2. 包厢座次（已排满）");
+  return '<nav class="tabs kitchen-switch" aria-label="后厨排单项目">'+tab("serving","1. 上菜顺序")+seatTab+'</nav>';
+}
+function seatMap(plan){
+  const six=plan.places.length===6;
+  const grip='<span class="seat-grip" aria-hidden="true">⋮⋮</span>';
+  const selected=selectedSeatToken;
+  const returning=selected?.from==="seat";
+  const cards=plan.places.map(([direction,hint],seat)=>{
+    const person=seatAssignments[seat],filled=person!==null;
+    const selectedHere=returning&&selected.seat===seat;
+    const name=filled?plan.places[person][2]:"虚位以待";
+    return action("seat-slot",'<span>'+hint+'</span><b>'+(filled?grip:"")+name+'</b>',
+      "smallbtn seat-slot "+direction+(filled?" filled":"")+(selected&&!selectedHere?" swap-target":""),
+      'type="button" data-seat="'+seat+'" data-id="'+seat+'" aria-label="'+hint+'：'+name+'"'+(filled?' aria-pressed="'+selectedHere+'"':''));
+  }).join("");
+  const pool=seatPoolOrder.map(person=>{
+    const name=plan.places[person][2];
+    const attrs='type="button" data-person="'+person+'" data-id="'+person+'"';
+    if(seatAssignments.includes(person))return action("seat-bank-return","已入座","smallbtn seat-chip-slot",
+      attrs+' aria-label="'+name+'已入座，点击可将选中的铭牌撤回托盘"'+(returning?'':' tabindex="-1"'));
+    return action("seat-chip",grip+name,"smallbtn seat-chip",
+      attrs+' aria-pressed="'+Boolean(selected?.from==="bank"&&selected.person===person)+'"');
+  }).join("");
+  let hint="按住下方铭牌拖入圆桌空位（或点选铭牌再点座位入座）；拖回下方托盘可撤回。";
+  if(returning)hint="已选「"+plan.places[seatAssignments[selected.seat]][2]+"」，点另一座位互换，点原位或托盘撤回。";
+  else if(selected)hint="已选「"+plan.places[selected.person][2]+"」，点一个座位安排入座。";
+  return '<p class="pen seat-instructions" role="status">'+hint+'</p>'+
+    '<div class="seat-map'+(six?" seat-map--six":"")+'" role="group" aria-label="包厢圆桌座位图">'+cards+
+      '<div class="seat-circle">'+plan.places.length+' 个关键席位</div><div class="seat-door">[ 包厢门 ]</div></div>'+
+    '<div class="seat-bank'+(six?" seat-bank--six":"")+'" role="group" aria-label="待入座铭牌托盘">'+pool+'</div>';
+}
+function paymentOutcomeName(outcome){
+  return {wrestle:"收银台摔跤 · 双双社死",free:"完美推拉 · 成功免单",host:"豪爽抢单 · 买单成功"}[outcome];
+}
+function showPaymentRound(){
+  const {round,politeness,face,opponent,lastDelta}=paymentGame;
+  const meter=(label,value,change)=>{
+    const delta=change?'<span class="payment-delta'+(change<0?" negative":"")+'">'+(change>0?"+":"")+change+'</span>':"";
+    return '<div class="bar"><span>'+label+'</span><div class="track"><i style="width:'+value+'%"></i></div>'+
+      '<b class="payment-value">'+value+delta+'</b></div>';
+  };
+  const reaction=lastDelta?'<p class="payment-reaction">'+opponent+"："+lastDelta.reaction+'</p>':"";
+  const choices=PAY_MOVES[round].map(([label],i)=>action("pay-move",label,"smallbtn",
+    'type="button" data-id="'+i+'" data-round="'+round+'"')).join("");
+  const html='<p class="pen" tabindex="-1" id="payment-round">第 '+(round+1)+' / 3 回合</p>'+
+    reaction+'<div class="payment-meters">'+meter("客气值",politeness,lastDelta?.politeChange)+
+      meter("面子值",face,lastDelta?.faceChange)+'</div>'+
+    '<div class="payment-choices">'+choices+'</div>';
+  if(dialog.open)dialog.querySelector("#dialogText").innerHTML=html;
+  else modal("抢买单 · "+opponent,html);
+  dialog.querySelector("#payment-round").focus({preventScroll:true});
+}
+function submitKitchenOrder(){
+  if(dialog.open)return;
+  if(orderSubmissionIssue(scene,order))return settle();
+  const remaining=tableSeatingPlan()?unseatedCount():0;
+  if(remaining>0&&!seatingReminderShown){
+    seatingReminderShown=true;
+    return modal("座次还没安排",
+      '<p>包厢里还有 '+remaining+' 位宾客站着没落座呢！直接出菜空席将按礼数不周扣分，确定不先安排完座次吗？</p>'+
+      '<div class="payment-choices seating-reminder">'+
+      action("goto-seating","去安排座次","primary",'type="button"')+
+      action("force-serve-seating","不管了，直接出菜","smallbtn",'type="button"')+'</div>');
+  }
+  const opponent=PAY_OPPONENTS[scene.mode];
+  if(paymentResult||activeSideQuest||dailyExam||roundLevel>lastLevel||!opponent)return settle();
+  paymentGame={round:0,politeness:50,face:50,opponent,lastDelta:null};
+  dialog.classList.add("payment-dialog");
+  showPaymentRound();
+}
+function playPaymentMove(button){
+  if(!dialog.open||!paymentGame||Number(button.dataset.round)!==paymentGame.round)return;
+  const move=PAY_MOVES[paymentGame.round][Number(button.dataset.id)];
+  if(!move)return;
+  SoundFX.tap();
+  const [,politeChange,faceChange]=move;
+  const clamp=value=>Math.max(0,Math.min(100,value));
+  paymentGame.politeness=clamp(paymentGame.politeness+politeChange);
+  paymentGame.face=clamp(paymentGame.face+faceChange);
+  let reaction;
+  if(faceChange<=-20)reaction="别拽我胳膊，收银员看咱们呢！";
+  else if(faceChange<0)reaction="这单我来吧，别让收银员等着。";
+  else if(paymentGame.opponent===PAY_OPPONENTS.reunion)reaction="少来这套，我手机早扫完了！";
+  else reaction="小伙子太客气，这顿怎么好意思！";
+  paymentGame.lastDelta={politeChange,faceChange,reaction};
+  paymentGame.round++;
+  if(paymentGame.round<PAY_MOVES.length)return showPaymentRound();
+  const {politeness,face}=paymentGame;
+  const outcome=face<=20?"wrestle":politeness>=75?"free":"host";
+  paymentResult={outcome,politeness,face};
+  paymentGame=null;
+  dialog.classList.remove("payment-dialog");
+  dialog.close();
+  return settle();
+}
 function kitchen(){
-  return [heading("第二联　／　排菜","后厨排单","按住右侧 ≡ 拖动，或点 ↑ ↓ 微调。排在前面的先上桌。")+'<div class="sliptop"><b>'+table+' · '+order.length+' 项</b>'+action("edit","返回勾菜")+'</div><div class="order-list queue-list">'+order.map(({dish,qty},i)=>{
+  const plan=tableSeatingPlan();
+  const seating=plan&&kitchenView==="seating";
+  const head=heading("第二联　／　排菜","后厨排单",seating?"":"按住右侧 ≡ 拖动，或点 ↑ ↓ 微调。排在前面的先上桌。")+(plan?kitchenTabs():"")+
+    '<div class="sliptop"><b>'+table+' · '+order.length+' 项</b>'+action("edit","返回勾菜")+'</div>';
+  const remaining=plan?unseatedCount():0;
+  const seatingNotice=remaining>0&&!seating?'<p class="seating-notice">还有 '+remaining+' 位宾客未入座，请切至上方「2. 包厢座次」安排入座。</p>':"";
+  const foot=summary()+(order.length>=2?tutorialNote("拖住菜名右侧 ≡ 排序，凉菜 → 热菜 → 汤品。"):"")+
+    seatingNotice+action("serve","交后厨出菜","primary");
+  if(seating)return [head+seatMap(plan),foot];
+  return [head+'<div class="order-list queue-list">'+order.map(({dish,qty},i)=>{
     const attr='data-id="'+dish.id+'" aria-label="';
     return '<div class="queue" data-id="'+dish.id+'"><i class="seq">'+(i+1)+'</i><div class="detail"><span class="name">'+dish.name+'</span><div class="desc">'+qty+' 份　¥'+qty*dish.price+'</div><span class="course">'+courseLabel(dish,i)+'</span></div>'+action("up","↑","ctrl",attr+'上移'+dish.name+'" '+(i===0?'disabled':''))+action("down","↓","ctrl",attr+'下移'+dish.name+'" '+(i===order.length-1?'disabled':''))+'<button type="button" class="queue-grip" aria-label="调整'+dish.name+'顺序，拖动或使用上下方向键" '+(order.length===1?'disabled':'')+'>≡</button></div>';
-  }).join("")+'</div>',summary()+(order.length>=2?tutorialNote("拖住菜名右侧 ≡ 排序，凉菜 → 热菜 → 汤品。"):"")+action("serve","交后厨出菜","primary")];
+  }).join("")+'</div>',foot];
 }
+let seatDrag=null,skipSeatDragClick=false;
+function isArrangingSeats(){
+  return stage==="kitchen"&&kitchenView==="seating"&&Boolean(tableSeatingPlan());
+}
+function placeSeatToken(token,targetSeat){
+  const fromSeat=token.from==="seat"?token.seat:null;
+  const person=fromSeat===null?token.person:seatAssignments[fromSeat];
+  if(person===null||fromSeat===targetSeat)return;
+
+  if(targetSeat===null){
+    seatAssignments[fromSeat]=null;
+    SoundFX.uncheck();
+  }else if(fromSeat===null){
+    if(seatAssignments.includes(person))return;
+    seatAssignments[targetSeat]=person;
+    SoundFX.check();
+  }else{
+    [seatAssignments[fromSeat],seatAssignments[targetSeat]]=[seatAssignments[targetSeat],seatAssignments[fromSeat]];
+    SoundFX.tap();
+  }
+
+  selectedSeatToken=null;
+  render();
+  if(targetSeat===null){
+    page.querySelector('.seat-chip[data-person="'+person+'"]')?.focus({preventScroll:true});
+    return;
+  }
+  const destination=page.querySelector('.seat-slot[data-seat="'+targetSeat+'"]');
+  destination?.classList.add("landing");
+  destination?.focus({preventScroll:true});
+}
+function clickSeatToken(button){
+  if(!isArrangingSeats())return;
+  const {act,person,seat}=button.dataset;
+  if(act==="seat-bank-return"){
+    if(selectedSeatToken?.from==="seat")placeSeatToken(selectedSeatToken,null);
+    return;
+  }
+  if(act==="seat-chip"){
+    const id=Number(person);
+    selectedSeatToken=selectedSeatToken?.from==="bank"&&selectedSeatToken.person===id?null:{from:"bank",person:id};
+  }else{
+    const index=Number(seat);
+    if(selectedSeatToken){
+      const sameSeat=selectedSeatToken.from==="seat"&&selectedSeatToken.seat===index;
+      return placeSeatToken(selectedSeatToken,sameSeat?null:index);
+    }
+    if(seatAssignments[index]===null)return;
+    selectedSeatToken={from:"seat",seat:index};
+  }
+  SoundFX.tap();
+  render();
+}
+function seatDropTarget(drag){
+  const under=document.elementFromPoint(drag.x,drag.y);
+  const slot=under?.closest(".seat-slot");
+  if(slot&&page.contains(slot))return slot;
+  const bank=drag.token.from==="seat"?under?.closest(".seat-bank"):null;
+  return bank&&page.contains(bank)?bank:null;
+}
+function updateSeatDropHighlight(drag){
+  const next=seatDropTarget(drag);
+  if(drag.target===next)return;
+  drag.target?.classList.remove("drag-over");
+  drag.target=next;
+  drag.target?.classList.add("drag-over");
+}
+function seatDragFrame(){
+  const drag=seatDrag;
+  if(!drag)return;
+  drag.frame=0;
+  const bounds=drag.body.getBoundingClientRect();
+  const edge=Math.min(42,bounds.height/4);
+  if(edge>0&&drag.x>=bounds.left&&drag.x<bounds.right&&drag.y>=bounds.top&&drag.y<bounds.bottom){
+    const depth=drag.y<bounds.top+edge?drag.y-bounds.top-edge:Math.max(0,drag.y-bounds.bottom+edge);
+    const before=drag.body.scrollTop;
+    drag.body.scrollTop+=Math.round(depth/edge*10);
+    if(drag.body.scrollTop!==before)drag.frame=requestAnimationFrame(seatDragFrame);
+  }
+  updateSeatDropHighlight(drag);
+}
+function finishSeatDrag(drop){
+  const drag=seatDrag;
+  if(!drag)return;
+  const moved=drag.ghost||Math.hypot(drag.x-drag.startX,drag.y-drag.startY)>4;
+  const target=drop&&moved?seatDropTarget(drag):null;
+  if(moved)skipSeatDragClick=true;
+  seatDrag=null;
+  cancelAnimationFrame(drag.frame);
+  drag.target?.classList.remove("drag-over");
+  drag.source.classList.remove("dragging");
+  drag.ghost?.remove();
+  if(drag.source.hasPointerCapture(drag.pointer))drag.source.releasePointerCapture(drag.pointer);
+  if(target)placeSeatToken(drag.token,target.matches(".seat-slot")?Number(target.dataset.seat):null);
+}
+page.addEventListener("pointerdown",e=>{
+  if(!e.isPrimary||e.button!==0||seatDrag)return;
+  skipSeatDragClick=false;
+  if(turningPage||queueDrag||!isArrangingSeats())return;
+  const source=e.target.closest(".seat-chip,.seat-slot.filled");
+  if(!source)return;
+  const token=source.matches(".seat-chip")?{from:"bank",person:Number(source.dataset.person)}:
+    {from:"seat",seat:Number(source.dataset.seat)};
+  source.setPointerCapture(e.pointerId);
+  seatDrag={source,token,body:source.closest(".body"),pointer:e.pointerId,
+    startX:e.clientX,startY:e.clientY,x:e.clientX,y:e.clientY,ghost:null,target:null,frame:0};
+});
+page.addEventListener("pointermove",e=>{
+  const drag=seatDrag;
+  if(!drag||drag.pointer!==e.pointerId)return;
+  drag.x=e.clientX;drag.y=e.clientY;
+  if(!drag.ghost){
+    if(Math.hypot(drag.x-drag.startX,drag.y-drag.startY)<=4)return;
+    const person=drag.token.from==="bank"?drag.token.person:seatAssignments[drag.token.seat];
+    drag.ghost=document.createElement("div");
+    drag.ghost.className="seat-ghost";
+    drag.ghost.textContent=tableSeatingPlan().places[person][2];
+    drag.ghost.setAttribute("aria-hidden","true");
+    document.body.append(drag.ghost);
+    drag.source.classList.add("dragging");
+    skipSeatDragClick=true;
+  }
+  drag.ghost.style.left=Math.max(4,Math.min(drag.x+12,innerWidth-drag.ghost.offsetWidth-8))+"px";
+  drag.ghost.style.top=Math.max(4,Math.min(drag.y+12,innerHeight-drag.ghost.offsetHeight-8))+"px";
+  updateSeatDropHighlight(drag);
+  if(!drag.frame)drag.frame=requestAnimationFrame(seatDragFrame);
+});
+page.addEventListener("pointerup",e=>{
+  const drag=seatDrag;
+  if(!drag||drag.pointer!==e.pointerId)return;
+  drag.x=e.clientX;drag.y=e.clientY;
+  finishSeatDrag(true);
+});
+page.addEventListener("pointercancel",e=>{if(seatDrag?.pointer===e.pointerId)finishSeatDrag(false)});
+page.addEventListener("lostpointercapture",e=>{
+  if(seatDrag?.pointer===e.pointerId&&seatDrag.source===e.target)finishSeatDrag(false);
+});
+window.addEventListener("blur",()=>finishSeatDrag(false));
+// Some touch browsers dispatch a click after releasing a captured pointer.
+page.addEventListener("click",e=>{
+  if(!skipSeatDragClick||e.detail===0)return;
+  skipSeatDragClick=false;
+  e.preventDefault();
+  e.stopPropagation();
+},true);
+page.addEventListener("click",e=>{
+  if(turningPage||queueDrag||seatDrag||!isArrangingSeats()||selectedSeatToken?.from!=="seat")return;
+  if(e.target.closest(".seat-bank")&&!e.target.closest("button"))placeSeatToken(selectedSeatToken,null);
+});
 // 只移动被越过的相邻行，抓手及其父行一直连在原节点上，持续捕获同一指针。
 let queueDrag=null;
 function moveQueueRow(row,to){
@@ -2409,15 +3012,53 @@ function awardStamp(award,id=""){
   return '<div'+(id?' id="'+id+'"':'')+' class="award-seal'+(award.name.length>7?' wordy':'')+
     '" role="img" aria-label="成就印章：'+award.name+'"><small>成就印</small><b>'+award.name+'</b></div>';
 }
+function diagnosticText(){
+  const {seating,payment,tableEvent,cartGameResult}=report;
+  const limit=Number.isFinite(scene.budgetMax)?scene.budgetMax:"无上限";
+  const paid=report.paid??total();
+  const names=ACHIEVEMENTS.filter(a=>report.achievements.includes(a.id)).map(a=>a.name);
+  const dishes=order.map(({dish,qty})=>dish.name+"×"+qty);
+  return "【点菜模拟器 v"+gameVersion+" 内测战报】"+[
+    "关卡："+deskRoundLabel(report.level)+"·"+scene.title,
+    "得分："+report.score+"/"+report.passScore+"("+(report.passed?"过关":"未过关")+")",
+    "五维：["+report.dimensions.map(d=>d.value).join(",")+"]",
+    "账单：¥"+(report.bill??total())+"/"+limit,
+    "菜品："+(dishes.join(", ")||"无"),
+    "突发事件："+(tableEvent?tableEvent.title+"->选"+tableEvent.choice+" "+tableEvent.choiceLabel:"无"),
+    "座次："+(seating?seating.mistakes.length?"排错 "+seating.mistakes.length+" 席":"全对":"本桌不排座"),
+    "抢买单："+(payment?paymentOutcomeName(payment.outcome)+"(¥"+paid+")":"无"),
+    "共享点餐："+(cartGameResult?(cartGameResult.leaked===0?"全部拦截":"漏掉"+cartGameResult.leaked+"道"):"未触发"),
+    "成就："+(names.join(", ")||"无")
+  ].join(" | ");
+}
+async function copyDiagnostic(button){
+  if(stage!=="report"||!report)return;
+  const current=report,text=diagnosticText();
+  try{
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(text);
+      button.textContent="已复制";
+      return;
+    }
+  }catch{}
+  if(stage!=="report"||report!==current||document.querySelector("dialog[open]"))return;
+  modal("内测诊断码",'<p>诊断码已全选，可直接复制。</p><textarea class="copy-field manual" id="diagnostic-copy" aria-label="内测诊断码" readonly></textarea>');
+  const field=document.getElementById("diagnostic-copy");
+  field.value=text;
+  field.focus();
+  field.select();
+  field.setSelectionRange(0,field.value.length);
+}
 function guestCheck(){
   const rows=order.map(({dish,qty})=>
     '<tr><th scope="row">'+dish.name+'</th><td>×'+qty+'</td><td>¥'+dish.price+'</td></tr>'
   ).join('');
+  const personal=report.payment?'<tr><th scope="row" colspan="2">个人实付</th><td>¥'+(report.paid??total())+'</td></tr>':'';
   return '<section class="guest-check" aria-labelledby="check-title">'+
     '<h3 id="check-title">*** 结账单 / GUEST CHECK ***</h3><p>'+scene.restaurantName+(dailyExam?' · 今日统考 '+dailyExam.label:'')+'</p>'+
     '<table aria-label="按上菜顺序列出的结账明细"><colgroup><col><col class="count-col"><col class="price-col"></colgroup>'+
     '<thead><tr><th scope="col">菜名</th><th scope="col">数量</th><th scope="col">单价</th></tr></thead>'+
-    '<tbody>'+rows+'</tbody><tfoot><tr><th scope="row" colspan="2">合计(TOTAL):</th><td>¥'+total()+'</td></tr></tfoot></table></section>';
+    '<tbody>'+(rows||'<tr><th scope="row">（未点菜品 · 空气一份）</th><td>×1</td><td>¥0</td></tr>')+'</tbody><tfoot><tr><th scope="row" colspan="2">合计(TOTAL):</th><td>¥'+total()+'</td></tr>'+personal+'</tfoot></table></section>';
 }
 function grade(){
   const stamp='<div id="grade-rank" class="seal" role="img" aria-label="职级核定：'+report.rank+'，'+report.stampNote+'">'+
@@ -2438,16 +3079,17 @@ function grade(){
   const next=dailyExam?"返回封面":activeSideQuest?continueMainLabel():nextLevel>lastLevel?'自由接单 · 再来一桌':nextLevel>report.level?'撕开第 '+nextLevel+' 关派单':'重考第 '+report.level+' 关';
   const foot='<div class="exam-line"><b>'+result+'</b><span>'+deskRoundLabel(report.level)+' · 过关线 '+report.passScore+' 分</span></div>';
   const banner='<div class="percentile">击败全国 '+report.percentile+'% 经手人</div>';
-  const bars='<div class="bars">'+report.dimensions.map(x=>'<div class="bar"><span>'+x.label+'</span><div class="track"><i style="width:'+x.value+'%"></i></div><b>'+x.value+'</b></div>').join('')+'</div>';
+  const bars='<div class="bars">'+report.dimensions.map((x,index)=>'<div class="bar" style="--i:'+index+'"><span>'+x.label+'</span><div class="track"><i style="width:'+x.value+'%"></i></div><b>'+x.value+'</b></div>').join('')+'</div>';
   const cap=report.fatal?'<p class="over">'+report.fatal+'</p>':'';
-  const scoreBlock='<div class="report"><div class="sliptop"><b>综合得分</b><span class="score">'+report.score+'<small> / 100</small></span></div>'+banner+summary()+cap+bars+'</div>';
+  const scoreBlock='<div class="report"><div class="sliptop"><b>综合得分</b><span class="score" role="img" aria-label="'+report.score+' / 100"><span class="score-value" aria-hidden="true">'+report.score+'</span><small aria-hidden="true"> / 100</small></span></div>'+banner+summary()+cap+bars+'</div>';
   const notes='<ol class="notes">'+report.notes.map(n=>'<li><strong>'+n.dish+'</strong>　<u>'+n.reason+'</u>。'+n.text+'</li>').join('')+'</ol>';
-  const actions='<div class="report-actions">'+action("share","晒出战绩","smallbtn share-btn",'aria-haspopup="dialog"')+action("bill","查原单")+'</div>';
+  const actions='<div class="report-actions">'+action("share","晒出战绩","smallbtn share-btn",'aria-haspopup="dialog"')+action("bill","查原单")+action("copy-diag","复制内测码","smallbtn",'aria-live="polite"')+'</div>';
   return [header+meta()+scoreBlock+'<div class="subtitle"><h3>经理逐条批注</h3>'+actions+'</div>'+notes+guestCheck(),foot+action("draw",next,"primary")+imprint()];
 }
 function render(fresh=false){
   receiptObserver?.disconnect();
   receiptObserver=null;
+  finishSeatDrag(false);
   finishQueueDrag(true);
   syncMenuClock();
   if(stage==="cover"){
@@ -2479,68 +3121,281 @@ function finishPageTurn(){
   }
   page.querySelector("h2,h1")?.focus({preventScroll:true});
 }
-function modal(title,html){
-  document.querySelector("#dialogTitle").textContent=title;document.querySelector("#dialogText").innerHTML=html;dialog.showModal();syncMenuClock();
+function modal(title,html,closeLabel="收好联单"){
+  document.querySelector("#dialogTitle").textContent=title;
+  dialog.querySelector(':scope > [data-act="close"]').textContent=closeLabel;
+  document.querySelector("#dialogText").innerHTML=html;
+  if(pendingTableEvent||paymentGame||cartGame)dialog.setAttribute("closedby","none");
+  else dialog.removeAttribute("closedby");
+  dialog.showModal();
+  syncMenuClock();
 }
 function returnToCover(){
-  clearTimeout(shareTimer);
-  shareTimer=0;shareDue=false;awardNoticePending=false;
+  clearTimeout(reportDialogTimer);
+  reportDialogTimer=0;shareDue=false;awardNoticePending=false;
   dailyExam=null;
   receiptPrintPending=false;
   activeSideQuest=null;
   stage="cover";
+  resetCartGame();
   pad.classList.remove("back");
   render(true);
   bookCover.querySelector(".cover-open").focus({preventScroll:true});
 }
+function eventSafeDish(dish){
+  const {avoidSeafood,avoidSpicy}=scene.guestTraits;
+  const sea=dish.category==="海鲜水产"||["fish","shrimp_crab"].includes(dish.ingredientType)||dish.tags.includes("seafood");
+  return !(avoidSeafood&&sea)&&!(avoidSpicy&&dish.spicy>0)&&!(scene.noAlcohol&&dish.tags.includes("alcohol"));
+}
+function addEventDish(dish){
+  const row=order.find(item=>item.dish.id===dish.id);
+  if(row)row.qty++;
+  else order.push({dish,qty:1});
+}
 function triggerTableEvent(rng){
   const events=new Map();
   const byId=(a,b)=>a.id.localeCompare(b.id);
-  const isPaidDish=d=>d.price>0&&!d.tags.includes("tea_fee");
+  const byPrice=(a,b)=>a.price-b.price||byId(a,b);
+  const isPaid=d=>d.price>0&&!d.tags.includes("tea_fee");
+  const isFood=d=>isPaid(d)&&d.ingredientType!=="drink";
+  const isMildVeg=d=>d.ingredientType==="veg"&&d.heaviness<40;
+  const isAlcohol=d=>d.tags.includes("alcohol");
+  const isRelief=d=>d.tags.includes("spice_relief");
   const pickedIds=new Set(order.map(row=>row.dish.id));
-  const soldOut=order.map(row=>row.dish).filter(d=>isPaidDish(d)&&
-    !(scene.mustHighEndAlcohol&&d.tags.includes("premium_alcohol"))).sort(byId);
-  if(soldOut.length)events.set("soldout",()=>{
-    const target=soldOut[Math.floor(rng()*soldOut.length)];
-    soldOutIds.add(target.id);
-    dishWhispers.delete(target.id);
-    order=order.filter(row=>row.dish.id!==target.id);
-    if(reviewingOrder){
-      reviewingOrder=false;
-      cat=menuCategoryLabel(target);
+  const ready=storeMenu.filter(d=>!soldOutIds.has(d.id)).sort(byId);
+  const extraFood=ready.filter(d=>isFood(d)&&eventSafeDish(d)&&!pickedIds.has(d.id));
+  const hardDish=d=>["招牌硬菜","海鲜水产","砂锅炖煲"].includes(d.category);
+
+  const substitutions=[];
+  for(const row of order.slice().sort((a,b)=>byId(a.dish,b.dish))){
+    const target=row.dish;
+    if(!isPaid(target)||scene.mustHighEndAlcohol&&target.tags.includes("premium_alcohol"))continue;
+    const others=order.filter(item=>item!==row);
+    if(scene.requiresHeat&&((target.spicy>=3&&!others.some(({dish})=>dish.spicy>=3))||
+      (isRelief(target)&&!others.some(({dish})=>isRelief(dish)))))continue;
+    const sameCategory=extraFood.filter(d=>d.category===target.category);
+    const morePrestige=extraFood.filter(d=>hardDish(d)&&d.prestige>target.prestige);
+    const premium=[...new Set([...sameCategory,...morePrestige])].sort((a,b)=>b.prestige-a.prestige||byPrice(a,b))[0];
+    const outgoing=orderLineTotal(scene,row);
+    const affordable=extraFood.filter(d=>d.price<=outgoing&&d.prestige<=70).sort(byPrice);
+    const lowCost=scene.mode==="reunion"&&others.some(({dish})=>isAlcohol(dish))?
+      affordable.find(d=>d.cookMethod==="cold"||d.tags.includes("cold_dish"))??affordable[0]:affordable[0];
+    if(premium&&(lowCost||others.some(({dish})=>isFood(dish))))substitutions.push({target,premium,lowCost});
+  }
+  if(substitutions.length)events.set("soldout",()=>{
+    const {target,premium,lowCost}=substitutions[Math.floor(rng()*substitutions.length)];
+    function replaceSoldOut(dish){
+      soldOutIds.add(target.id);
+      dishWhispers.delete(target.id);
+      if(dish)order=order.map(item=>item.dish.id===target.id?{dish,qty:1}:item);
+      else order=order.filter(item=>item.dish.id!==target.id);
+      if(reviewingOrder){
+        reviewingOrder=false;
+        cat=menuCategoryLabel(target);
+      }
+      return true;
     }
-    return ["后厨临时沽清","传菜员小跑过来擦汗：「不好意思，刚最后一份【"+target.name+"】被隔壁桌抢走了！您看换道别的？」"];
+    return {title:"后厨临时沽清",message:"传菜员小跑过来擦汗：「不好意思，刚最后一份【"+target.name+"】被隔壁桌抢走了！」",options:{
+      A:{label:"加钱保排面",detail:"换上"+premium.name+"（¥"+premium.price+"）",apply:()=>replaceSoldOut(premium)},
+      B:{label:"省钱保实惠",detail:lowCost?"换上"+lowCost.name+"（¥"+lowCost.price+"）":"先撤菜，留出预算",apply:()=>replaceSoldOut(lowCost)}
+    }};
   });
-  if(scene.headcount<10&&!scene.guestTraits.hasFemaleWatchingDiet)events.set("guest",()=>{
-    scene.headcount++;
-    for(const row of order)if(row.dish.tags.includes("tea_fee"))row.qty=scene.headcount;
-    scene.guestTraits.hasFemaleWatchingDiet=true;
-    scene.guestsSummary+="　临时多了一位控油轻食的女同事。";
-    menuBriefOpen=true;
-    return ["微信临时来客","主宾低头看了眼手机：「刚到楼下，临时多带一位女同事过来，她最近控油轻食，大家多担待。」（全桌人数 +1，须备清爽素菜）"];
+
+  const byVegFit=(a,b)=>Number(b.tags.includes("low_fat"))-Number(a.tags.includes("low_fat"))||
+    Number(a.cookMethod==="cold")-Number(b.cookMethod==="cold")||byPrice(a,b);
+  const mildVeg=extraFood.filter(isMildVeg).sort(byVegFit)[0]||ready.filter(d=>isMildVeg(d)&&eventSafeDish(d)&&
+    order.some(row=>row.dish.id===d.id&&row.qty<(d.maxQty??Infinity))).sort(byVegFit)[0];
+  if(scene.headcount<10&&!scene.guestTraits.hasFemaleWatchingDiet&&mildVeg)events.set("guest",()=>{
+    function seatGuest(){
+      scene.headcount++;
+      for(const row of order)if(row.dish.tags.includes("tea_fee"))row.qty=scene.headcount;
+      scene.guestTraits.hasFemaleWatchingDiet=true;
+      scene.guestsSummary+="　临时多了一位控油轻食的女同事。";
+      menuBriefOpen=true;
+    }
+    return {title:"微信临时来客",message:"主宾低头看了眼手机：「刚到楼下，临时多带一位女同事过来，她最近控油轻食，大家多担待。」（全桌人数 +1）",options:{
+      A:{label:"周到加菜",detail:"添一份"+mildVeg.name+"（¥"+mildVeg.price+"）",apply:()=>{seatGuest();addEventDish(mildVeg);return true}},
+      B:{label:"原菜匀着吃",detail:"维持菜单，按新人数考核",apply:()=>{seatGuest();return order.some(({dish})=>dish.tags.includes("low_fat")&&eventSafeDish(dish))}}
+    }};
   });
+
   if(!scene.noAlcohol&&!scene.mustHighEndAlcohol)events.set("driving",()=>{
-    scene.noAlcohol=true;
-    scene.drivingAnnounced=true;
-    scene.guestsSummary+="　下午全员开车去工地巡检，今席以茶饮代酒。";
-    menuBriefOpen=true;
-    return ["下午临时开车","主宾刚挂断电话：「下午临时通知全员开车去工地巡检，今天谁也别碰酒，以茶水饮料代酒！」"];
+    // 柜台常备椰汁，即使开局水牌只抽到了酒水，也能顺手换饮料。
+    const drink=ready.filter(d=>d.ingredientType==="drink"&&!isAlcohol(d)&&isRelief(d)).sort(byPrice)[0]||
+      priceStoreDish(DISHES.find(d=>d.id==="dish_88"),scene.tier);
+    function announceDriving(){
+      scene.noAlcohol=true;
+      scene.drivingAnnounced=true;
+      scene.guestsSummary+="　下午全员开车去工地巡检，今席以茶饮代酒。";
+      menuBriefOpen=true;
+    }
+    return {title:"下午临时开车",message:"主宾刚挂断电话：「下午临时通知全员开车去工地巡检，今天谁也别碰酒，以茶水饮料代酒！」",options:{
+      A:{label:"当机立断换茶饮",detail:"撤掉所有酒，换一份"+drink.name+"（¥"+drink.price+"）",apply:()=>{
+        announceDriving();
+        order=order.filter(({dish})=>!isAlcohol(dish));
+        if(!storeMenu.some(d=>d.id===drink.id))storeMenu.push(drink);
+        addEventDish(drink);
+        return true;
+      }},
+      B:{label:"先留着再说",detail:"酒单照旧",apply:()=>{announceDriving();return !order.some(({dish})=>isAlcohol(dish))}}
+    }};
   });
-  const specials=storeMenu.filter(d=>isPaidDish(d)&&d.ingredientType!=="drink"&&
-    !pickedIds.has(d.id)&&!soldOutIds.has(d.id)).sort(byId);
-  if(specials.length)events.set("special",()=>{
-    const bonusDish=specials[Math.floor(rng()*specials.length)];
+
+  if(extraFood.length)events.set("special",()=>{
+    const bonusDish=extraFood[Math.floor(rng()*extraFood.length)];
     const featured={...bonusDish,name:bonusDish.name+"（今日主厨力荐）",prestige:Math.min(99,bonusDish.prestige+15)};
-    storeMenu=storeMenu.map(d=>d.id===featured.id?featured:d);
-    return ["经理塞来一张纸条","经理凑到你耳边低声说：「后厨刚到一批尖货，今天点【"+bonusDish.name+"】算我给您留的压轴面子菜！」"];
+    return {title:"经理塞来一张纸条",message:"经理凑到你耳边低声说：「后厨刚到一批尖货，今天点【"+bonusDish.name+"】算我给您留的压轴面子菜！」",options:{
+      A:{label:"顺水推舟加一道",detail:"添上"+bonusDish.name+"（¥"+bonusDish.price+"）",apply:()=>{
+        storeMenu=storeMenu.map(d=>d.id===featured.id?featured:d);
+        addEventDish(featured);
+        return true;
+      }},
+      B:{label:"礼貌谢绝守预算",detail:"维持原菜单",apply:()=>true}
+    }};
   });
+
   if(!events.size)return false;
   const slots=dailyExam?["soldout","guest","driving","special"]:[...events.keys()];
   const start=Math.floor(rng()*slots.length);
-  const next=slots.slice(start).concat(slots.slice(0,start)).find(key=>events.has(key));
-  const [title,message]=events.get(next)();
-  render();
-  modal(title,"<p>"+message+"</p>");
+  const type=slots.slice(start).concat(slots.slice(0,start)).find(key=>events.has(key));
+  const event=events.get(type)();
+  pendingTableEvent={type,...event};
+  const choices=Object.entries(event.options).map(([key,option])=>action("table-event-choice",
+    '<b>'+key+' · '+option.label+'</b><span>'+option.detail+'</span>',"smallbtn",'type="button" data-id="'+key+'"')).join("");
+  dialog.classList.add("table-event-active");
+  modal(event.title,'<p>'+event.message+'</p><div class="table-event-choices">'+choices+'</div>');
+  return true;
+}
+function resolveTableEvent(choice){
+  const event=pendingTableEvent;
+  if(!event||!dialog.open||stage!=="menu"||!["A","B"].includes(choice))return;
+  const option=event.options[choice];
+  SoundFX.tap();
+  const resolved=option.apply()&&total()<=scene.budgetMax;
+  tableEvent={type:event.type,choice,resolved,title:event.title,choiceLabel:option.label};
+  pendingTableEvent=null;
+  dialog.classList.remove("table-event-active");
+  dialog.close();
+  if(!orderSubmissionIssue(scene,order))stage="kitchen";
+  render(true);
+}
+const CART_DISHES=DISHES.filter(dish=>["dish_07","dish_10","dish_16","dish_61","dish_84"].includes(dish.id));
+const CART_PLAYER_NAMES=["老王","李哥","大壮","阿杰"];
+let cartGame=null,cartGameResult=null,cartGamePlayed=false;
+
+function clearCartTimers(game){
+  clearInterval(game.clock);
+  clearTimeout(game.nextSpawn);
+}
+function resetCartGame(){
+  if(cartGame){
+    clearCartTimers(cartGame);
+    cartGame=null;
+    dialog.classList.remove("cart-game-active");
+    if(dialog.open)dialog.close();
+  }
+  cartGameResult=null;
+  cartGamePlayed=false;
+}
+function spawnCartItem(game){
+  if(cartGame!==game||cartGameResult)return;
+  if(stage!=="menu"){resetCartGame();return}
+  if(performance.now()>=game.deadline){finishCartGame();return}
+  const choice=CART_DISHES[Math.floor(Math.random()*CART_DISHES.length)];
+  const dish=storeMenu.find(d=>d.id===choice.id)||priceStoreDish(choice,scene.tier);
+  const player=CART_PLAYER_NAMES[Math.floor(Math.random()*CART_PLAYER_NAMES.length)];
+  const id=String(++game.spawned);
+  const line=document.createElement("li");
+  const label=document.createElement("span");
+  label.textContent="["+player+"] 加入了 "+dish.name+" ¥"+dish.price;
+  const button=document.createElement("button");
+  button.type="button";
+  button.className="smallbtn cart-kick";
+  button.dataset.act="cart-kick";
+  button.dataset.id=id;
+  button.textContent="删掉";
+  button.setAttribute("aria-label","删掉"+player+"加入的"+dish.name);
+  line.append(label,button);
+  game.items.set(id,{dish,line});
+  line.classList.add("cart-spawned");
+  game.list.prepend(line);
+  game.list.scrollTop=0;
+  SoundFX.check();
+  game.nextSpawn=setTimeout(()=>spawnCartItem(game),1100+Math.random()*400);
+}
+function maybeStartCartGame(){
+  if(stage!=="menu"||scene.isSideQuest||dailyExam||cartGamePlayed||dialog.open||!CART_DISHES.length)return false;
+  if(scene.mode!=="reunion"&&(roundLevel<=lastLevel||Math.random()>=0.45))return false;
+  const game={items:new Map(),spawned:0,deadline:performance.now()+15000};
+  cartGame=game;
+  cartGamePlayed=true;
+  dialog.classList.add("cart-game-active");
+  modal("手机扫码 · 共享点餐保卫战",'<p>老同学扫了桌角二维码开启共享点餐，正偷偷往购物车里塞贵菜！快赶在下单前删掉！</p>'+
+    '<p class="cart-clock">剩余 <span id="cart-countdown" role="timer" aria-live="off">15</span> 秒</p>'+
+    '<div class="cart-tray"><ul class="cart-list" aria-label="共享购物车"></ul></div>'+
+    action("cart-finish-now","直接结束拦截","smallbtn cart-finish",'type="button"'));
+  game.list=dialog.querySelector(".cart-list");
+  const countdown=dialog.querySelector("#cart-countdown");
+  game.clock=setInterval(()=>{
+    if(cartGame!==game||cartGameResult)return;
+    if(stage!=="menu"){resetCartGame();return}
+    const remaining=Math.ceil((game.deadline-performance.now())/1000);
+    if(remaining<=0){finishCartGame();return}
+    if(countdown.textContent===String(remaining))return;
+    countdown.textContent=String(remaining);
+    if(remaining<=5){
+      countdown.classList.add("urgent");
+      playPaperMotion(countdown,[{transform:"scale(1)"},{transform:"scale(1.25)",offset:.3},{transform:"scale(1)"}],
+        {duration:360,easing:"ease-out"});
+    }
+  },100);
+  spawnCartItem(game);
+  return true;
+}
+function kickCartItem(id){
+  if(!cartGame||cartGameResult||!dialog.open||stage!=="menu")return;
+  if(performance.now()>=cartGame.deadline){finishCartGame();return}
+  const item=cartGame.items.get(id);
+  if(!item)return;
+  const {items,list}=cartGame;
+  const {line,dish}=item;
+  const moveFocus=line.contains(document.activeElement);
+  items.delete(id);
+  const tray=list.parentElement;
+  const bounds=list.getBoundingClientRect();
+  const saved=document.createElement("span");
+  saved.className="cart-saved";
+  saved.textContent="已拦截 -¥"+dish.price;
+  saved.setAttribute("aria-hidden","true");
+  saved.style.top=Math.max(0,Math.min(bounds.height-20,line.getBoundingClientRect().top-bounds.top+5))+"px";
+  tray.append(saved);
+  setTimeout(()=>saved.remove(),580);
+  line.inert=true;
+  if(moveFocus)(list.querySelector("li:not([inert]) .cart-kick")||dialog.querySelector('[data-act="cart-finish-now"]'))?.focus({preventScroll:true});
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)line.remove();
+  else{
+    line.classList.add("kicking");
+    setTimeout(()=>line.remove(),170);
+  }
+  SoundFX.uncheck();
+}
+function finishCartGame(){
+  const game=cartGame;
+  if(!game||cartGameResult||stage!=="menu")return;
+  clearCartTimers(game);
+  const leaked=game.items.size;
+  for(const {dish} of game.items.values())addEventDish(dish);
+  cartGameResult={spawned:game.spawned,leaked};
+  const status=leaked?"手慢一步，被队友硬塞了 "+leaked+" 道贵菜进账单！":"成功拦截全部刺客菜，钱包守住了！";
+  dialog.querySelector("#dialogText").innerHTML='<p class="pen" role="status">'+status+'</p>'+
+    action("cart-proceed","继续排上菜顺序","primary",'type="button"');
+  dialog.querySelector('[data-act="cart-proceed"]').focus();
+}
+function continueAfterCart(){
+  if(!cartGame||!cartGameResult||!dialog.open||stage!=="menu")return false;
+  cartGame=null;
+  dialog.classList.remove("cart-game-active");
+  dialog.close();
   return true;
 }
 function maybeTableEvent(){
@@ -2550,12 +3405,19 @@ function maybeTableEvent(){
   const rng=dailyExam?createSeededRng(dailyExam.seed^0x65766e74):Math.random;
   return rng()<0.55&&triggerTableEvent(rng);
 }
+function advanceToKitchen(){
+  if(stage!=="menu"||removing.size||orderSubmissionIssue(scene,order))return;
+  if(maybeTableEvent())return;
+  stage="kitchen";
+  render(true);
+}
 async function draw(exam=null){
   if(turningPage)return;
   turningPage=true;
+  resetCartGame();
   sheetFace.inert=true;
   const openingCover=stage==="cover";
-  clearTimeout(shareTimer);shareTimer=0;shareDue=false;awardNoticePending=false;
+  clearTimeout(reportDialogTimer);reportDialogTimer=0;shareDue=false;awardNoticePending=false;
   const tear=!openingCover&&!matchMedia("(prefers-reduced-motion: reduce)").matches;
   try{
     if(openingCover||tear)SoundFX.paper();
@@ -2580,13 +3442,15 @@ async function draw(exam=null){
     }
     scene={...scene,guestTraits:{...scene.guestTraits}};
     storeMenu=buildStoreMenu({...scene,menuSeed:scene.menuSeed??Math.floor(Math.random()*4294967296)},DISHES);
-    eventTriggered=false;
+    resetTableEvent();
+    resetTableRituals();
     soldOutIds.clear();
     menuEdits=0;menuElapsed=0;menuStarted=null;
     order=initialOrderFor(scene,storeMenu);cat=scene.mode==="frugal"?"汤羹主食":cats.find(c=>storeMenu.some(d=>menuCategoryLabel(d)===c));reviewingOrder=false;categoryScroll=0;
     lastBudgetSum=total();
     lastBudgetPct=budgetPct(lastBudgetSum,scene.budgetMax);
     dishWhispers.clear();
+    seenDishCombos.clear();
     receiptPrintPending=false;
     report=null;removing.clear();resetMenuView();
     stage="brief";render(true);
@@ -2606,9 +3470,32 @@ document.addEventListener("click",e=>{
   const b=e.target.closest("button[data-act]");if(!b||b.disabled)return;
   if(b.dataset.act==="mute"){SoundFX.toggle();return}
   SoundFX.unlock();
-  if(turningPage||queueDrag)return;
+  if(turningPage||queueDrag||seatDrag)return;
   const a=b.dataset.act,id=b.dataset.id,idx=order.findIndex(x=>x.dish.id===id);
-  if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。交单后可在经理批注下方对照结账小票。</p><p>主线共八关，依次接待家常川菜、长辈寿宴、西关早茶、发薪前夜、重辣湘宴、商务请托、同学撸串和驻京办终宴。留意谁喝酒、汤何时上；粤闽的茶位按人数入账。主线第 2 关过后会插一张快餐水单，第 5 关过后若还有没遇到的支线，再保底插一张。第 3、4、6、7 关过关后有四成机会遇到剩余支线。第 8 关达标后可以自由接单，自由局过关后有 35% 机会插入支线，两种都遇到过就重新轮抽。支线结账后接回原来的派单。</p><p>关卡与 '+ACHIEVEMENTS.length+' 枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
+  if(a==="table-event-choice"&&b.closest("dialog")===dialog)return resolveTableEvent(id);
+  if(b.closest("dialog")===dialog){
+    if(stage==="kitchen"&&b.closest(".seating-reminder")){
+      if(a==="goto-seating"){
+        dialog.close();
+        kitchenView="seating";
+        selectedSeatToken=null;
+        SoundFX.tap();
+        return render(true);
+      }
+      if(a==="force-serve-seating"){
+        dialog.close();
+        return submitKitchenOrder();
+      }
+    }
+    if(a==="cart-kick")return kickCartItem(id);
+    if(a==="cart-finish-now")return finishCartGame();
+    if(a==="cart-proceed"&&continueAfterCart())return advanceToKitchen();
+    if(a==="confirm-zero-order"&&stage==="menu"&&dialog.open&&isZeroOrder()&&!removing.size){
+      dialog.close();
+      return settle(true);
+    }
+  }
+  if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。交单后可在经理批注下方对照结账小票。</p><p>主线共八关，依次接待家常川菜、西关早茶、发薪前夜、同学撸串、长辈寿宴、重辣湘宴、商务请托和驻京办终宴。留意谁喝酒、汤何时上；粤闽的茶位按人数入账。主线第 3 关过后会插一张快餐水单，第 6 关过后若还有没遇到的支线，再保底插一张。第 4、5 关过关后有三成机会遇到剩余支线。第 8 关达标后可以自由接单，自由局过关后有 35% 机会插入支线，两种都遇到过就重新轮抽。支线结账后接回原来的派单。</p><p>第 7、8 关在后厨打开「包厢座次」，把托盘铭牌拖到座位，或先点铭牌再点座位。也可以互换座次，或拖回托盘撤回。第 4、7 关出菜前还有三回合抢买单。第 4 关与部分自由局会遇到共享点餐，赶在倒计时结束前删掉队友加的贵菜。</p><p>关卡与 '+ACHIEVEMENTS.length+' 枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
   if(a==="skip-tutorial"){
     saveMark(tutorialSkipKey);
     const next=b.closest(".foot")?.querySelector(".primary:not(:disabled)")||page.querySelector("h2");
@@ -2623,6 +3510,7 @@ document.addEventListener("click",e=>{
   }
   if(a==="close")return b.closest("dialog").close();
   if(a==="share")return openShare();
+  if(a==="copy-diag")return copyDiagnostic(b);
   if(a==="close-share")return shareModal.close();
   if(a==="share-continue"&&shareModal.open){
     const proceed=stage==="report"&&(report?.passed||activeSideQuest||dailyExam);
@@ -2665,10 +3553,21 @@ document.addEventListener("click",e=>{
   }
   if(a==="kitchen"&&stage==="menu"&&!orderSubmissionIssue(scene,order)&&!removing.size){
     SoundFX.tap();
-    if(maybeTableEvent())return;
-    stage="kitchen";return render(true);
+    if(isZeroOrder())return modal("空单预警",
+      '<p>你一道菜都没点，确定要让一桌人干坐着喝西北风吗？</p>'+
+      action("confirm-zero-order","确定交白卷","smallbtn",'type="button"'),"回去点菜");
+    if(maybeStartCartGame())return;
+    return advanceToKitchen();
   }
-  if(a==="serve"&&stage==="kitchen"&&order.length)return settle();
+  if(a==="kitchen-view"&&stage==="kitchen"&&tableSeatingPlan()&&(id==="serving"||id==="seating")){
+    kitchenView=id;
+    selectedSeatToken=null;SoundFX.tap();render();
+    page.querySelector(".body").scrollTop=0;
+    return;
+  }
+  if(a==="seat-chip"||a==="seat-slot"||a==="seat-bank-return")return clickSeatToken(b);
+  if(a==="pay-move"&&stage==="kitchen")return playPaymentMove(b);
+  if(a==="serve"&&stage==="kitchen"&&order.length)return submitKitchenOrder();
   if(removing.has(id))return;
   if(a==="dish-detail"&&stage==="menu"){
     SoundFX.tap();
@@ -2693,6 +3592,7 @@ document.addEventListener("click",e=>{
     render();
     if(newlyChecked){
       const row=page.querySelector('[data-dish="'+id+'"]');
+      row.classList.add("just-marked");
       if(animateDetails)row.classList.add("just-checked");
       row.querySelector(".dish-check").focus({preventScroll:true});
     }
@@ -2734,7 +3634,20 @@ shareModal.addEventListener("click",e=>{
 shareModal.addEventListener("close",()=>{pressedShareBackdrop=false;if(!shareModal.open)activeShare=null;nextReportDialog()});
 document.addEventListener("close",syncMenuClock,true);
 document.addEventListener("visibilitychange",syncMenuClock);
-dialog.addEventListener("close",nextReportDialog);
+dialog.addEventListener("cancel",e=>{
+  if(pendingTableEvent||paymentGame||cartGame)e.preventDefault();
+});
+dialog.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&(pendingTableEvent||paymentGame||cartGame))e.preventDefault();
+});
+dialog.addEventListener("close",()=>{
+  if(!dialog.open&&(pendingTableEvent||paymentGame||cartGame)){
+    dialog.showModal();
+    syncMenuClock();
+    return;
+  }
+  nextReportDialog();
+});
 achModal.addEventListener("close",nextReportDialog);
 window.addEventListener("storage",event=>{
   if(event.key===savePrefix+"muted"){SoundFX.init();return}
@@ -2774,7 +3687,7 @@ if(window.location.protocol==="http:"||window.location.protocol==="https:"){
 <noscript>
   <section style="max-width:420px;margin:24px auto;padding:16px;background:#f5ede0;color:#2b2520;font-family:serif;border:2px solid #9b352a">
     <h1>中国式饭局 · 点菜模拟器</h1>
-    <p>欢迎来到万家酒楼《点菜模拟器》在线网页小游戏。请开启浏览器的 JavaScript 以体验完整的复写纸联单勾菜、八大菜系动态水单、后厨上菜排序、经理红笔毒舌批注与 22 枚成就系统。</p>
+    <p>欢迎来到万家酒楼《点菜模拟器》在线网页小游戏。请开启浏览器的 JavaScript 以体验完整的复写纸联单勾菜、八大菜系动态水单、后厨上菜排序、经理红笔毒舌批注与 33 枚成就系统。</p>
     <p>项目开源地址：<a href="https://github.com/shaoxiangm/diancai-simulator">github.com/shaoxiangm/diancai-simulator</a></p>
   </section>
 </noscript>
