@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#9b352a">
-<meta name="application-version" content="3.1.0">
+<meta name="application-version" content="3.1.1">
 <title>点菜模拟器 · 中国式饭局人情世故在线小游戏</title>
 <meta name="description" content="《点菜模拟器》是一款免费的复古复写纸风格中国式饭局网页小游戏。涵盖八大菜系与门店档次隔离、22枚奇葩成就、后厨排单与经理毒舌批注，考验你的预算把控与酒桌人情世故。">
 <meta name="keywords" content="点菜模拟器,中国式饭局模拟器,点菜小游戏,网页小游戏,人情世故模拟器,HTML5小游戏,饭局点菜">
@@ -79,9 +79,6 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
   font:900 22px/1 var(--serif);text-shadow:.4px 0 currentColor;
 }
 .cover-bottom{display:grid;gap:9px;align-content:end}
-.cover-side-entry{justify-self:center;min-height:36px;border:1px dashed var(--red);color:var(--red);font:700 14px/1.25 var(--hand)}
-.side-entry-list{display:grid;gap:6px}
-.side-entry-list .smallbtn{min-height:36px;text-align:left}
 .primary.cover-open{min-height:48px;border-radius:2px;box-shadow:inset 0 0 0 3px var(--red),inset 0 0 0 4px #ebc7aa80,0 2px #d6b999,0 4px #713b2d,0 5px 9px #5c452530}
 @media(max-height:520px){.cover-board{gap:6px;padding-block:10px}.cover-titleblock{padding-block:6px}.cover-title::after{margin-top:6px}.cover-chop{margin-top:9px;font-size:16px}.cover-bottom{gap:4px}}
 @media(max-height:420px) and (orientation:landscape){
@@ -348,7 +345,6 @@ body{height:auto;min-height:100dvh;overflow:auto}
         <p class="tiny" id="resumeNote" hidden>旧版成就已留档。新版八桌饭局从第一关开席。</p>
         <button class="primary cover-open" type="button" data-act="draw">翻开菜单 · 接第 1 关派单</button>
         <button class="smallbtn" type="button" data-act="daily-exam">今日全网统考</button>
-        <button class="smallbtn cover-side-entry" type="button" data-act="side-entry" aria-haspopup="dialog" aria-controls="dialog">快餐彩蛋 · 翻纸签</button>
       </div>
     </div>
   </section>
@@ -649,10 +645,13 @@ const SIDE_QUESTS=[
 ].map(s=>({...s,isSideQuest:true,mode:s.id,region:"fast_food",guestTraits:{},purpose:s.brief}));
 
 function selectSideQuest(completedLevel,seenIds,random=Math.random){
-  if(!Number.isInteger(completedLevel)||completedLevel<2||completedLevel>7)return null;
+  if(!Number.isInteger(completedLevel)||completedLevel<2||completedLevel===8)return null;
+  const freePlay=completedLevel>8;
   const seen=new Set(seenIds);
-  const remaining=SIDE_QUESTS.filter(s=>!seen.has(s.id));
-  if(!remaining.length||random()>=0.4)return null;
+  if(completedLevel===2&&seen.size)return null;
+  const remaining=SIDE_QUESTS.filter(quest=>!seen.has(quest.id));
+  const chance=freePlay?0.35:completedLevel===2||completedLevel===5?1:0.4;
+  if(!remaining.length||(chance<1&&random()>=chance))return null;
   return remaining[Math.floor(random()*remaining.length)];
 }
 
@@ -1575,7 +1574,7 @@ const campaignKey="campaign140.";
 const lastLevel=8;
 const progress={level:1,achievements:new Set()};
 const memoryMarks=new Set();
-let mainStageIdx=1,activeSideQuest=null,sideFromCover=false,firstOrderReplay=false;
+let activeSideQuest=null;
 const sideSessionKey=savePrefix+"sideQuests200";
 const sideSession=readSideSession();
 
@@ -1587,7 +1586,7 @@ function readSideSession(){
       for(const quest of SIDE_QUESTS)if(saved.seen.includes(quest.id))state.seen.add(quest.id);
     }
     const next=saved?.pending;
-    if(next&&state.seen.has(next.id)&&Number.isInteger(next.mainStageIdx)&&next.mainStageIdx>=3&&next.mainStageIdx<=8)
+    if(next&&state.seen.has(next.id)&&Number.isInteger(next.mainStageIdx)&&next.mainStageIdx>=3&&next.mainStageIdx<=lastLevel+1)
       state.pending={id:next.id,mainStageIdx:next.mainStageIdx};
   }catch{}
   return state;
@@ -1600,21 +1599,26 @@ function resumedSide(){
   if(sideSession.pending?.mainStageIdx!==progress.level)return null;
   return SIDE_QUESTS.find(q=>q.id===sideSession.pending.id)||null;
 }
+function reserveSideQuest(quest){
+  sideSession.seen.add(quest.id);
+  saveSideSession({id:quest.id,mainStageIdx:progress.level});
+}
 function chooseNextScene(){
-  mainStageIdx=Math.min(progress.level,lastLevel);
-  let nextSide=null;
-  if(stage==="cover"){
-    nextSide=resumedSide();
-    if(!nextSide&&sideSession.pending)saveSideSession(null);
-  }else if(!activeSideQuest&&report?.passed&&!report.freePlay&&progress.level===report.level+1){
-    nextSide=selectSideQuest(report.level,sideSession.seen);
-    if(nextSide){
-      sideSession.seen.add(nextSide.id);
-      saveSideSession({id:nextSide.id,mainStageIdx});
+  let nextSide=resumedSide();
+  if(!nextSide&&sideSession.pending)saveSideSession(null);
+  if(!nextSide&&stage==="report"&&!activeSideQuest&&report?.passed){
+    const eligible=report.freePlay?progress.level>lastLevel:progress.level===report.level+1;
+    if(eligible){
+      if(report.freePlay&&sideSession.seen.size===SIDE_QUESTS.length){
+        sideSession.seen.clear();
+        saveSideSession(null);
+      }
+      nextSide=selectSideQuest(report.level,sideSession.seen);
+      if(nextSide)reserveSideQuest(nextSide);
     }
   }
   activeSideQuest=nextSide;
-  roundLevel=activeSideQuest?mainStageIdx:progress.level;
+  roundLevel=progress.level;
   if(activeSideQuest)return activeSideQuest;
   beginAttempt();
   return drawScenario(roundLevel,scene);
@@ -1777,9 +1781,9 @@ async function turnInOrder(){
     saveMark(id);
   }
   if(report.newAchievements.length)readProgress();
-  if(!dailyExam&&!firstOrderReplay){
+  if(!dailyExam){
     if(activeSideQuest){
-      if(!sideFromCover)saveSideSession(null);
+      saveSideSession(null);
     }else if(freePlay){
       if(clean)writeFreeRun("",report.passed?streakBefore+1:0);
     }else if(report.passed){
@@ -1787,6 +1791,11 @@ async function turnInOrder(){
       if(clean)saveMark(campaignKey+"clean."+roundLevel);
       saveMark(campaignKey+"pass."+roundLevel);
       progress.level=Math.max(progress.level,roundLevel+1);
+      // 过关时先留好保底支线，结算页刷新后仍能取到这张单。
+      if(progress.level===roundLevel+1&&(roundLevel===2||roundLevel===5)){
+        const quest=selectSideQuest(roundLevel,sideSession.seen);
+        if(quest)reserveSideQuest(quest);
+      }
     }else{
       saveMark(campaignKey+"retry."+roundLevel);
     }
@@ -1972,7 +1981,6 @@ function renderCover(){
   bookCover.hidden=false;
   bookCover.inert=false;
   bookCover.querySelector('[data-act="daily-exam"]').textContent="今日全网统考（"+todayExam().label+"）";
-  bookCover.querySelector('[data-act="side-entry"]').textContent=progress.level>1?"翻纸签 · 彩蛋与回练":"快餐彩蛋 · 翻纸签";
   bookCover.querySelector("#resumeNote").hidden=progress.level!==1||!(hasMark("campaign8.pass.1")||hasMark("pass.1"));
   bookCover.querySelector(".cover-open").textContent=resumedSide()?"翻开菜单 · 继续支线彩蛋":progress.level>lastLevel?"翻开菜单 · 自由接单":"翻开菜单 · 接第 "+progress.level+" 关派单";
   const bookmark=bookCover.querySelector("#cover-bookmark");
@@ -2151,7 +2159,7 @@ function menu(){
   const benefits=freeItems.length?'<section aria-label="进店福利"><div class="subtitle"><h3>进店福利</h3><span class="tiny">每桌任选一样 · 已勾 '+claimed+' 样</span></div>'+freeItems.map(dishRow).join("")+'</section>':'';
   const cost='<div class="order-cost'+(over?' over':'')+'">'+(over?'超预算':'预计')+' <b>¥'+sum+'</b> / '+limit+'<small>'+note+'</small></div>';
   const pickGuide=!reviewingOrder&&order.length<2?tutorialNote("点菜名右侧的方框勾菜，再点一次就取消。"):"";
-  const queueGuide=order.length>=2?tutorialNote("排单时按住菜名右侧 ≡ 拖动，按凉菜 → 热菜 → 汤品上桌。"):"";
+  const queueGuide=order.length>=2?tutorialNote("菜点齐了？点下方按钮进后厨排上菜顺序。"):"";
   return [head+briefPanel(false)+benefits+tabs+pickGuide+'<section class="order-list" aria-label="'+(reviewingOrder?'本桌已点菜品':cat)+'">'+list.map(dishRow).join("")+
     (list.length?'':'<p class="empty">联单还是空的。点「继续点菜」，挑一道开单。</p>')+'</section>',
     (hint?'<p class="tiny">'+hint+'</p>':'')+'<div class="order-strip">'+orderLink+cost+meter+'</div>'+queueGuide+action("kitchen","确认菜单并排上菜顺序","primary",!issue&&!removing.size?"":"disabled")];
@@ -2382,7 +2390,7 @@ function showShareContent(model){
     shareBeat:"击败全国 "+model.percentile+"% 经手人",shareQuote:model.quote,
     shareMessage:model.text.endsWith(model.url)?model.text.slice(0,-model.url.length).trimEnd():model.text,
     shareCopy:"一键复制战报与链接",shareStatus:"",
-    shareContinue:(dailyExam||sideFromCover||firstOrderReplay)?"收好战报 · 返回封面":activeSideQuest?continueMainLabel():!model.passed?"关闭弹窗 · 返回复盘":
+    shareContinue:dailyExam?"收好战报 · 返回封面":activeSideQuest?continueMainLabel():!model.passed?"关闭弹窗 · 返回复盘":
       progress.level>lastLevel?"收下喜报 · 自由接单":"收下喜报 · 继续闯第 "+progress.level+" 关"
   };
   for(const [id,value] of Object.entries(fields))document.getElementById(id).textContent=value;
@@ -2427,7 +2435,7 @@ function grade(){
     (otherAwards.length?'<p class="more-awards">同单另记：'+otherAwards.join('、')+'</p>':'')+'</header>';
   const result=report.campaignWon?'八关通关 · 首席司长荣誉':report.passed?'闯关成功':'差 '+(report.passScore-report.score)+' 分过关';
   const nextLevel=Math.max(progress.level,report.level+(report.passed?1:0));
-  const next=(dailyExam||sideFromCover||firstOrderReplay)?"返回封面":activeSideQuest?continueMainLabel():nextLevel>lastLevel?'自由接单 · 再来一桌':nextLevel>report.level?'撕开第 '+nextLevel+' 关派单':'重考第 '+report.level+' 关';
+  const next=dailyExam?"返回封面":activeSideQuest?continueMainLabel():nextLevel>lastLevel?'自由接单 · 再来一桌':nextLevel>report.level?'撕开第 '+nextLevel+' 关派单':'重考第 '+report.level+' 关';
   const foot='<div class="exam-line"><b>'+result+'</b><span>'+deskRoundLabel(report.level)+' · 过关线 '+report.passScore+' 分</span></div>';
   const banner='<div class="percentile">击败全国 '+report.percentile+'% 经手人</div>';
   const bars='<div class="bars">'+report.dimensions.map(x=>'<div class="bar"><span>'+x.label+'</span><div class="track"><i style="width:'+x.value+'%"></i></div><b>'+x.value+'</b></div>').join('')+'</div>';
@@ -2480,8 +2488,6 @@ function returnToCover(){
   dailyExam=null;
   receiptPrintPending=false;
   activeSideQuest=null;
-  sideFromCover=false;
-  firstOrderReplay=false;
   stage="cover";
   pad.classList.remove("back");
   render(true);
@@ -2544,7 +2550,7 @@ function maybeTableEvent(){
   const rng=dailyExam?createSeededRng(dailyExam.seed^0x65766e74):Math.random;
   return rng()<0.55&&triggerTableEvent(rng);
 }
-async function draw(exam=null,sideQuest=null,replayFirst=false){
+async function draw(exam=null){
   if(turningPage)return;
   turningPage=true;
   sheetFace.inert=true;
@@ -2560,8 +2566,6 @@ async function draw(exam=null,sideQuest=null,replayFirst=false){
     }
     readProgress();
     dailyExam=exam;
-    sideFromCover=Boolean(sideQuest);
-    firstOrderReplay=replayFirst;
     if(dailyExam){
       const rng=createSeededRng(dailyExam.seed);
       activeSideQuest=null;
@@ -2570,16 +2574,7 @@ async function draw(exam=null,sideQuest=null,replayFirst=false){
       table=scene.tableNames[Math.floor(rng()*scene.tableNames.length)];
       number=String(Math.floor(100000+rng()*900000));
     }else{
-      if(sideQuest){
-        mainStageIdx=Math.min(progress.level,lastLevel);
-        roundLevel=mainStageIdx;
-        activeSideQuest=sideQuest;
-        scene=sideQuest;
-      }else if(firstOrderReplay){
-        activeSideQuest=null;
-        roundLevel=1;
-        scene=drawScenario(roundLevel,scene);
-      }else scene=chooseNextScene();
+      scene=chooseNextScene();
       table=pick(scene.tableNames);
       number=serial();
     }
@@ -2613,7 +2608,7 @@ document.addEventListener("click",e=>{
   SoundFX.unlock();
   if(turningPage||queueDrag)return;
   const a=b.dataset.act,id=b.dataset.id,idx=order.findIndex(x=>x.dish.id===id);
-  if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。交单后可在经理批注下方对照结账小票。</p><p>主线共八关，依次接待家常川菜、长辈寿宴、西关早茶、发薪前夜、重辣湘宴、商务请托、同学撸串和驻京办终宴。留意谁喝酒、汤何时上；粤闽的茶位按人数入账。主线第 2 至 7 关过关后，下一张派单有四成机会夹进快餐支线，每种每次会话最多遇到一次。支线结账后继续原关。封面纸签也能直接选快餐派单。过了首关还能回练，补盖首单成就。第八关达标后可自由接单。</p><p>关卡与 '+ACHIEVEMENTS.length+' 枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
+  if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。交单后可在经理批注下方对照结账小票。</p><p>主线共八关，依次接待家常川菜、长辈寿宴、西关早茶、发薪前夜、重辣湘宴、商务请托、同学撸串和驻京办终宴。留意谁喝酒、汤何时上；粤闽的茶位按人数入账。主线第 2 关过后会插一张快餐水单，第 5 关过后若还有没遇到的支线，再保底插一张。第 3、4、6、7 关过关后有四成机会遇到剩余支线。第 8 关达标后可以自由接单，自由局过关后有 35% 机会插入支线，两种都遇到过就重新轮抽。支线结账后接回原来的派单。</p><p>关卡与 '+ACHIEVEMENTS.length+' 枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
   if(a==="skip-tutorial"){
     saveMark(tutorialSkipKey);
     const next=b.closest(".foot")?.querySelector(".primary:not(:disabled)")||page.querySelector("h2");
@@ -2630,30 +2625,15 @@ document.addEventListener("click",e=>{
   if(a==="share")return openShare();
   if(a==="close-share")return shareModal.close();
   if(a==="share-continue"&&shareModal.open){
-    const proceed=stage==="report"&&(report?.passed||activeSideQuest||dailyExam||firstOrderReplay);
+    const proceed=stage==="report"&&(report?.passed||activeSideQuest||dailyExam);
     shareModal.close();
-    if(proceed)return (dailyExam||sideFromCover||firstOrderReplay)?returnToCover():draw();
+    if(proceed)return dailyExam?returnToCover():draw();
     return;
   }
   if(a==="copy-share")return copyShare();
   if(a==="save-share"&&activeShare)return saveShareImage(activeShare);
   if(a==="daily-exam"&&stage==="cover")return draw(todayExam());
-  if(a==="side-entry"&&stage==="cover"){
-    SoundFX.tap();
-    const choices=SIDE_QUESTS.map(quest=>action("side-play",quest.title,"smallbtn",'data-id="'+quest.id+'"')).join("");
-    const replay=progress.level>1?action("first-replay","首单回练 · 楼下川菜馆"):"";
-    return modal(replay?"彩蛋与首单回练":"快餐彩蛋",'<div class="side-entry-list">'+choices+replay+'</div>');
-  }
-  if(a==="first-replay"&&stage==="cover"&&dialog.open&&progress.level>1){
-    dialog.close();
-    return draw(null,null,true);
-  }
-  if(a==="side-play"&&stage==="cover"&&dialog.open){
-    const quest=SIDE_QUESTS.find(item=>item.id===id);
-    if(quest){dialog.close();return draw(null,quest)}
-    return;
-  }
-  if(a==="draw"&&(stage==="cover"||stage==="report"))return (dailyExam||sideFromCover||firstOrderReplay)?returnToCover():draw();
+  if(a==="draw"&&(stage==="cover"||stage==="report"))return dailyExam?returnToCover():draw();
   if(a==="brief"&&(stage==="brief"||stage==="menu")){
     SoundFX.tap();
     const open=b.getAttribute("aria-expanded")!=="true";
