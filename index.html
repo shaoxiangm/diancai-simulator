@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#9b352a">
-<meta name="application-version" content="3.0.1">
+<meta name="application-version" content="3.1.0">
 <title>点菜模拟器 · 中国式饭局人情世故在线小游戏</title>
-<meta name="description" content="《点菜模拟器》是一款免费的复古复写纸风格中国式饭局网页小游戏。涵盖八大菜系与门店档次隔离、18枚奇葩成就、后厨排单与经理毒舌批注，考验你的预算把控与酒桌人情世故。">
+<meta name="description" content="《点菜模拟器》是一款免费的复古复写纸风格中国式饭局网页小游戏。涵盖八大菜系与门店档次隔离、22枚奇葩成就、后厨排单与经理毒舌批注，考验你的预算把控与酒桌人情世故。">
 <meta name="keywords" content="点菜模拟器,中国式饭局模拟器,点菜小游戏,网页小游戏,人情世故模拟器,HTML5小游戏,饭局点菜">
 <meta name="author" content="shaoxiangm">
 <link rel="canonical" href="https://shaoxiangm.github.io/diancai-simulator/">
@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="点菜模拟器 · 中国式饭局在线小游戏">
-<meta name="twitter:description" content="八大菜系动态水单、18枚成就与经理红笔毒舌批注，来测测你的饭局情商。">
+<meta name="twitter:description" content="八大菜系动态水单、22枚成就与经理红笔毒舌批注，来测测你的饭局情商。">
 <style>
 :root{--paper:#f5ede0;--pink:#f3ddd6;--red:#9b352a;--line:#b88676;--green:#2b2520;--ink:#2b2520;--blue:#253c66;--pen:#b52b27;--muted:#6b5f52;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
 *{box-sizing:border-box}
@@ -79,6 +79,9 @@ h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--serif)}h2{font-size:28px;line-hei
   font:900 22px/1 var(--serif);text-shadow:.4px 0 currentColor;
 }
 .cover-bottom{display:grid;gap:9px;align-content:end}
+.cover-side-entry{justify-self:center;min-height:36px;border:1px dashed var(--red);color:var(--red);font:700 14px/1.25 var(--hand)}
+.side-entry-list{display:grid;gap:6px}
+.side-entry-list .smallbtn{min-height:36px;text-align:left}
 .primary.cover-open{min-height:48px;border-radius:2px;box-shadow:inset 0 0 0 3px var(--red),inset 0 0 0 4px #ebc7aa80,0 2px #d6b999,0 4px #713b2d,0 5px 9px #5c452530}
 @media(max-height:520px){.cover-board{gap:6px;padding-block:10px}.cover-titleblock{padding-block:6px}.cover-title::after{margin-top:6px}.cover-chop{margin-top:9px;font-size:16px}.cover-bottom{gap:4px}}
 @media(max-height:420px) and (orientation:landscape){
@@ -278,6 +281,10 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 @keyframes rip-holes{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0)}}
 @keyframes tear-away{0%{transform:none}36%{transform:translateY(1%) rotate(1.6deg)}66%{transform:translate(1%,5%) rotate(4deg)}100%{transform:translate(9%,62%) rotate(7deg);opacity:.16}}
 @keyframes paper-land{0%{transform:translate(-3%,-8%) rotate(-3deg);opacity:.55}74%{transform:translateY(1%) rotate(.5deg);opacity:1}100%{transform:none}}
+.tutorial-note{position:relative;margin:7px 0;padding:6px 81px 6px 9px;border:1px solid #c5ad71;border-left:3px solid #b69a58;border-radius:2px;background:#f8edbe;color:#554220;box-shadow:0 2px 0 #695d5018;font:700 clamp(13px,3.6vw,14px)/1.5 var(--hand);pointer-events:none}
+.tutorial-note p{margin:0}
+.tutorial-skip{position:absolute;top:2px;right:3px;min-height:26px;padding:2px 6px;border:0;background:transparent;color:#625025;font:600 12px/1.4 var(--serif);text-decoration:underline;text-underline-offset:2px;white-space:nowrap;pointer-events:auto}
+.foot>.tutorial-note{margin:0 0 7px}
 #shareImagePreview{margin-top:15px;border-top:1px dashed var(--line)}
 #shareImagePreview p{margin:9px 0;font-size:13px;color:var(--muted)}
 #shareImagePreview img{display:block;width:100%;height:auto;-webkit-touch-callout:default;user-select:auto}
@@ -293,7 +300,7 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
     "中国式饭局点菜模拟器"
   ],
   "url": "https://shaoxiangm.github.io/diancai-simulator/",
-  "description": "一款基于复古复写纸点菜单体验的中国式饭局模拟网页小游戏，包含主线八大菜系接待关卡、快餐彩蛋、随机突发事件与18枚成就图鉴。",
+  "description": "一款基于复古复写纸点菜单体验的中国式饭局模拟网页小游戏，包含主线八大菜系接待关卡、快餐彩蛋、随机突发事件与22枚成就图鉴。",
   "genre": [
     "Simulation",
     "Casual",
@@ -341,6 +348,7 @@ body{height:auto;min-height:100dvh;overflow:auto}
         <p class="tiny" id="resumeNote" hidden>旧版成就已留档。新版八桌饭局从第一关开席。</p>
         <button class="primary cover-open" type="button" data-act="draw">翻开菜单 · 接第 1 关派单</button>
         <button class="smallbtn" type="button" data-act="daily-exam">今日全网统考</button>
+        <button class="smallbtn cover-side-entry" type="button" data-act="side-entry" aria-haspopup="dialog" aria-controls="dialog">快餐彩蛋 · 翻纸签</button>
       </div>
     </div>
   </section>
@@ -353,7 +361,7 @@ body{height:auto;min-height:100dvh;overflow:auto}
       <button class="smallbtn" data-act="help" aria-haspopup="dialog" aria-controls="dialog">玩法说明</button>
     </div>
     <span class="brand-level" id="tag-level">第 1 关 · 须达 60 分</span>
-    <button id="progress-tag" class="archive-link" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-count">成就 0/18</span></button>
+    <button id="progress-tag" class="archive-link" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-count">成就 0/22</span></button>
   </header>
   <div id="page"></div>
   </div>
@@ -867,7 +875,15 @@ const ACHIEVEMENTS=[
   {id:'ach_friday',type:'secret',name:'疯五狂热信徒',description:'在疯狂星期五，用炸鸡、蛋挞或快乐水把五十元花得一分不剩。',
     clue:'周五收的那笔转账，照着同事的口味花个精光。',comment:'五十块钱一分没剩，精准换算成高碳水与金黄炸鸡，你完美贯彻了星期五的教义！'},
   {id:'ach_silver',type:'secret',name:'银拱门荣誉股东',description:'在银拱门用二十八元配出两份白区主食及两份红区小食。',
-    clue:'月底两个人的饭钱，白区和红区都得数够份数。',comment:'两白两红严丝合缝，二十八块钱吃出两顿大餐的尊严，银拱门财务总监连夜给你发荣誉勋章。'}
+    clue:'月底两个人的饭钱，白区和红区都得数够份数。',comment:'两白两红严丝合缝，二十八块钱吃出两顿大餐的尊严，银拱门财务总监连夜给你发荣誉勋章。'},
+  {id:'ach_participant',type:'secret',priority:104,name:'重在参与',description:'第一关只点一份老坛酸菜鱼并通关。',
+    clue:'新手的第一张单，先看看一条鱼能撑起几双筷子。',comment:'三个人就点一条酸菜鱼，鱼肉分完了还拿汤泡空气。看在你头一回开单，经理这回勉强放行。'},
+  {id:'ach_boring',type:'secret',priority:104,name:'老实点菜，很枯燥吧',description:'主线通关时零饮料、零忌口踩雷，凉菜、热菜、汤品依次上齐，并剩下超过四分之一预算。',
+    clue:'菜序照规矩排，杯子空着，账上还留一大截。',comment:'凉菜、热菜、汤，一样不差。没酒水助兴，预算还剩一大截。整桌规矩得没人插句话。老实点菜，很枯燥吧？'},
+  {id:'ach_grass_crowd',type:'secret',priority:104,name:'真·吃草群众',description:'炸鸡支线只点两份沙拉，花光五十元。',
+    clue:'同事说别带草料。试试两盒刚好够不够。',comment:'别人都在啃炸鸡，你拿五十块换了两盒草。肠胃清了，灵魂也升华了。我破例给你盖个章。'},
+  {id:'ach_mcd_rebel',type:'secret',priority:104,name:'麦门叛逆者',description:'在随心配支线把两套的四份餐全点成同一个区。',
+    clue:'不想红白相配？两套该拿的份数可别少。',comment:'一红配一白是银拱门的规矩，四份全挑同一个区是你的脾气。既然你吃得这么理直气壮，我破例放行。'}
 ];
 const RANK_TIERS=[
   {max:39,rank:'试用期端茶小弟',stampNote:'考核未过'},
@@ -879,7 +895,7 @@ const RANK_TIERS=[
   {max:98,rank:'礼宾统筹正处长',stampNote:'滴水不漏'},
   {max:100,rank:'驻京办首席司长',stampNote:'炉火纯青'}
 ];
-function passScore(level){return Math.min(92,60+(level-1)*5)}
+function passScore(level){return level===8?80:Math.min(92,60+(level-1)*5)}
 const percentileBands=[[0,39,1,17],[40,59,18,41],[60,69,42,61],[70,79,62,77],
   [80,89,78,90],[90,95,91,95],[96,99,96,98]];
 function estimatePercentile(score){
@@ -922,7 +938,9 @@ function judgeSideQuest(scenario,order,level){
     const eligible=items.length>0&&items.every(row=>row.dish.tags.includes('friday_ok'));
     checks=[['转账对账',budgetFit(difference)],['余款核对',budgetFit(Math.min(0,difference))],
       ['垫款核对',budgetFit(Math.max(0,difference))],['餐品核对',eligible?100:0],['忌菜核对',salad?0:100]];
-    if(salad){
+    if(items.length===1&&items[0].qty===2&&salad&&bill===50){
+      score=98;awardId='ach_grass_crowd';reason='两盒草料破例放行';
+    }else if(salad){
       score=25;reason='草料上了桌';
       text='堂堂疯狂星期五，你拿别人转你的五十块钱点了一盒草？！原味炸鸡的脸都被你丢尽了！';
     }else if(difference!==0){
@@ -944,6 +962,8 @@ function judgeSideQuest(scenario,order,level){
       ['两区配对',portionFit(white-red,0)],['双人份量',portionFit(servings,4)]];
     if(matched){
       score=98;awardId='ach_silver';reason='两套餐点齐了';
+    }else if(servings===4&&(white===4||red===4)){
+      score=98;awardId='ach_mcd_rebel';reason='单色套餐破例放行';
     }else{
       score=35;reason='套餐配错了';
       text='连 1+1 随心配的【一白配一红】死规矩都敢打破，银拱门点餐机都要被你按冒烟了！';
@@ -1035,6 +1055,19 @@ function judge(scenario, order, options={}) {
   const regionPenalty=13*wrong.length;
   const level=options.level??scenario.level??1;
   const target=passScore(level);
+  const tutorial=level===1&&scenario.id===SCENARIOS[0].id;
+  const violatesDriving=scenario.noAlcohol&&alcohol.length>0;
+  const tutorialPass=tutorial&&n>0&&bill<=hi&&!sea.length&&!chili.length&&!violatesDriving;
+  const tutorialFish=tutorialPass&&items.length===1&&items[0].dish.id==='dish_70'&&items[0].qty===1;
+  function earnsBoringAward(result){
+    if(!SCENARIOS.some(main=>main.id===scenario.id&&main.level===level)||!Number.isFinite(hi)||bill>=hi*0.75)return false;
+    if(purchases.some(({dish})=>dish.category==='drinks'||dish.ingredientType==='drink'))return false;
+    if(sea.length||chili.length||peeling.length||bones.length||heatMissing||sweetMissing)return false;
+    if(result.notes.some(row=>['缺道软嫩菜','长辈咬不动','少了清爽选择','少了实在肉菜'].includes(row.reason)))return false;
+    const courses=ds.map(d=>d.ingredientType==='staple'?3:isSoup(d)?2:isCold(d)?0:1);
+    return [0,1,2].every(course=>courses.includes(course))&&
+      courses.every((course,index)=>index===0||course>=courses[index-1]);
+  }
   function finish(result){
     const passed=result.score>=target;
     const existing=new Set(options.earnedAchievements||[]);
@@ -1058,7 +1091,9 @@ function judge(scenario, order, options={}) {
       ach_shameless:freeSweep||(scenario.mode==='tea'&&teaWaived),
       ach_peanut:coldTable,
       ach_coconut:coconuts>=3,
-      ach_undercover:sweetMissing
+      ach_undercover:sweetMissing,
+      ach_participant:passed&&tutorialFish,
+      ach_boring:passed&&earnsBoringAward(result)
     };
     const awards=ACHIEVEMENTS.filter(a=>earned[a.id]).sort((a,b)=>(b.priority??100)-(a.priority??100));
     const pinned=awards.filter(a=>a.type==='secret'||!existing.has(a.id))
@@ -1137,7 +1172,14 @@ function judge(scenario, order, options={}) {
     }
     const dimensions=labels.map((label,i)=>({label,value:clamp(scores[i])}));
     const average=clamp(dimensions.reduce((sum,d)=>sum+d.value,0)/dimensions.length);
-    const score=Math.min(cap,special?.score??average);
+    if(tutorial&&bill>hi){
+      limit(target-1,'第一关的水单超出了预算');
+      note(100,anchor,'新手账单超支','起步这一桌也得守住预算。请撤掉几道菜再交单。');
+    }
+    if(tutorial&&chili.length)limit(target-1,'第一关的辣味忌口未落实');
+    const nominal=Math.min(cap,special?.score??average);
+    // 新手免掉分量和次序的硬门槛，仍展示按原公式计算的五项分数。
+    const score=tutorialFish?target:tutorialPass?Math.max(target,nominal):nominal;
     const {rank,stampNote}=special??RANK_TIERS.find(tier=>score<=tier.max);
     notes.sort((a,b)=>b.priority-a.priority);
     return finish({score,rank,stampNote,dimensions,fatal,notes});
@@ -1187,7 +1229,7 @@ function judge(scenario, order, options={}) {
     note(100,'本桌水单','桌上没有菜','账上只有杯盏，这么多双筷子往哪儿伸？起码把一道正经菜交给后厨。');
     return scoreReport();
   }
-  if(beggar||(single&&!hasIronPotStew)){
+  if(!tutorialPass&&(beggar||(single&&!hasIronPotStew))){
     const {dish,qty}=order[0];
     const coverage=Math.min(1,dish.portion*qty/h)*dish.edibility/100;
     const score=beggar?15:15+Math.round(3*coverage);
@@ -1217,7 +1259,7 @@ function judge(scenario, order, options={}) {
   if(short)note(79,anchor,'菜数不足',hasIronPotStew?'整锅连贴饼算四道，这桌折足了也只有'+effectiveDishCount+'道。再添点清爽配菜，'+h+'位客人能多换两口味。':h+'位客人只开'+n+'道。再加份也算同一道，转盘上不会多出花样。');
   else if(extra)note(59,anchor,'菜数过多',n+'道菜，比这桌合宜的上限多'+extra+'道。你给打包盒也留座了？');
   else note(44,anchor,'菜数合宜',h+'位客人开'+n+'道，这张单子有分寸。',true);
-  if(size<h*0.5||(effectiveDishCount<h*0.55&&(!hasIronPotStew||size<h)))limit(39,'菜量严重不足，整桌接待失格');
+  if(!tutorialPass&&(size<h*0.5||(effectiveDishCount<h*0.55&&(!hasIronPotStew||size<h))))limit(39,'菜量严重不足，整桌接待失格');
   if(size>h*2.6){scores[2]-=Math.min(40,(size/h-2.6)*17);note(73,anchor,'份量压桌','菜名数过了，份数也得数。别把明天的午餐也点了。');}
   if(hasIronPotStew){
     note(79,'铁锅炖大鹅','一锅出齐','整鹅、粉条和锅边贴饼都算在这一锅里，硬菜和主食都已有着落。',true);
@@ -1533,7 +1575,7 @@ const campaignKey="campaign140.";
 const lastLevel=8;
 const progress={level:1,achievements:new Set()};
 const memoryMarks=new Set();
-let mainStageIdx=1,activeSideQuest=null;
+let mainStageIdx=1,activeSideQuest=null,sideFromCover=false,firstOrderReplay=false;
 const sideSessionKey=savePrefix+"sideQuests200";
 const sideSession=readSideSession();
 
@@ -1627,18 +1669,21 @@ function readProgress(){
     // 新八关单独记进度，历版成就继续使用同一本档案。
     if(hasMark("pass.1")&&!hasMark("ach_first"))saveMark("ach_first");
     while(progress.level<=lastLevel&&hasMark(campaignKey+"pass."+progress.level))progress.level++;
-    let raw=null,achievements;
+    let raw=null,savedFields=null,achievements=[];
     try{
       raw=localStorage.getItem(achievementKey);
       const parsed=JSON.parse(raw);
-      achievements=Array.isArray(parsed)?parsed.filter(id=>typeof id==="string"&&id.startsWith("ach_")):[];
-    }catch{achievements=[]}
+      if(parsed&&typeof parsed==="object"&&!Array.isArray(parsed))savedFields=parsed;
+      const savedIds=savedFields?savedFields.achievements:parsed;
+      if(Array.isArray(savedIds))achievements=savedIds.filter(id=>typeof id==="string"&&id.startsWith("ach_"));
+    }catch{}
     const ids=new Set(achievements);
     for(const a of ACHIEVEMENTS){
       if(ids.has(a.id)||hasMark(a.id))progress.achievements.add(a.id);
     }
     // 旧版印章保留在底单；新图鉴只展示当前成就库收录的印章。
-    const merged=JSON.stringify([...new Set([...ids,...progress.achievements])]);
+    const mergedIds=[...new Set([...ids,...progress.achievements])];
+    const merged=JSON.stringify(savedFields?{...savedFields,achievements:mergedIds}:mergedIds);
     if(raw!==merged)localStorage.setItem(achievementKey,merged);
   }catch{storageOK=false}
 }
@@ -1732,9 +1777,9 @@ async function turnInOrder(){
     saveMark(id);
   }
   if(report.newAchievements.length)readProgress();
-  if(!dailyExam){
+  if(!dailyExam&&!firstOrderReplay){
     if(activeSideQuest){
-      saveSideSession(null);
+      if(!sideFromCover)saveSideSession(null);
     }else if(freePlay){
       if(clean)writeFreeRun("",report.passed?streakBefore+1:0);
     }else if(report.passed){
@@ -1902,8 +1947,22 @@ function briefPanel(first){
     action("brief","派单简报"+context,"brief-toggle",'aria-expanded="'+open+'" aria-controls="dispatch-details"')+
     '<div id="dispatch-details"'+(open?'':' hidden')+'>'+(first?'':meta())+scenarioInfo()+'</div></section>';
 }
+const tutorialSkipKey="tutorial.first-order.skip";
+function showFirstOrderTutorial(){
+  if(roundLevel!==1||scene?.mode!=="home"||dailyExam||activeSideQuest||progress.level>1||hasMark(tutorialSkipKey))return false;
+  if(["ach_first","ach_friday","ach_silver","ach_grass_crowd","ach_mcd_rebel"].some(id=>progress.achievements.has(id)))return false;
+  for(let n=1;n<=lastLevel;n++){
+    if(hasMark(campaignKey+"pass."+n)||hasMark("campaign8.pass."+n)||hasMark("pass."+n))return false;
+  }
+  return true;
+}
+function tutorialNote(text){
+  if(!showFirstOrderTutorial())return "";
+  return '<aside class="tutorial-note" aria-label="首单指点"><p>'+text+'</p>'+
+    action("skip-tutorial","跳过指点","tutorial-skip",'type="button"')+'</aside>';
+}
 function briefView(){
-  return [heading("第一联　／　接待派单",scene.title)+meta()+briefPanel(true),action("edit","接单，开始勾菜","primary")+imprint()];
+  return [heading("第一联　／　接待派单",scene.title)+meta()+tutorialNote("先看这桌几位、预算上限和客人忌口，再按单点菜。")+briefPanel(true),action("edit","接单，开始勾菜","primary")+imprint()];
 }
 function summary(){
   const sum=total(),over=sum>scene.budgetMax;
@@ -1913,6 +1972,7 @@ function renderCover(){
   bookCover.hidden=false;
   bookCover.inert=false;
   bookCover.querySelector('[data-act="daily-exam"]').textContent="今日全网统考（"+todayExam().label+"）";
+  bookCover.querySelector('[data-act="side-entry"]').textContent=progress.level>1?"翻纸签 · 彩蛋与回练":"快餐彩蛋 · 翻纸签";
   bookCover.querySelector("#resumeNote").hidden=progress.level!==1||!(hasMark("campaign8.pass.1")||hasMark("pass.1"));
   bookCover.querySelector(".cover-open").textContent=resumedSide()?"翻开菜单 · 继续支线彩蛋":progress.level>lastLevel?"翻开菜单 · 自由接单":"翻开菜单 · 接第 "+progress.level+" 关派单";
   const bookmark=bookCover.querySelector("#cover-bookmark");
@@ -2090,9 +2150,11 @@ function menu(){
   const claimed=frugal?order.filter(item=>item.dish.price===0).length:0;
   const benefits=freeItems.length?'<section aria-label="进店福利"><div class="subtitle"><h3>进店福利</h3><span class="tiny">每桌任选一样 · 已勾 '+claimed+' 样</span></div>'+freeItems.map(dishRow).join("")+'</section>':'';
   const cost='<div class="order-cost'+(over?' over':'')+'">'+(over?'超预算':'预计')+' <b>¥'+sum+'</b> / '+limit+'<small>'+note+'</small></div>';
-  return [head+briefPanel(false)+benefits+tabs+'<section class="order-list" aria-label="'+(reviewingOrder?'本桌已点菜品':cat)+'">'+list.map(dishRow).join("")+
+  const pickGuide=!reviewingOrder&&order.length<2?tutorialNote("点菜名右侧的方框勾菜，再点一次就取消。"):"";
+  const queueGuide=order.length>=2?tutorialNote("排单时按住菜名右侧 ≡ 拖动，按凉菜 → 热菜 → 汤品上桌。"):"";
+  return [head+briefPanel(false)+benefits+tabs+pickGuide+'<section class="order-list" aria-label="'+(reviewingOrder?'本桌已点菜品':cat)+'">'+list.map(dishRow).join("")+
     (list.length?'':'<p class="empty">联单还是空的。点「继续点菜」，挑一道开单。</p>')+'</section>',
-    (hint?'<p class="tiny">'+hint+'</p>':'')+'<div class="order-strip">'+orderLink+cost+meter+'</div>'+action("kitchen","确认菜单并排上菜顺序","primary",!issue&&!removing.size?"":"disabled")];
+    (hint?'<p class="tiny">'+hint+'</p>':'')+'<div class="order-strip">'+orderLink+cost+meter+'</div>'+queueGuide+action("kitchen","确认菜单并排上菜顺序","primary",!issue&&!removing.size?"":"disabled")];
 }
 function courseLabel(dish,i){
   if(dish.tags.includes("tea_fee"))return "全桌 · 按位计费";
@@ -2110,7 +2172,7 @@ function kitchen(){
   return [heading("第二联　／　排菜","后厨排单","按住右侧 ≡ 拖动，或点 ↑ ↓ 微调。排在前面的先上桌。")+'<div class="sliptop"><b>'+table+' · '+order.length+' 项</b>'+action("edit","返回勾菜")+'</div><div class="order-list queue-list">'+order.map(({dish,qty},i)=>{
     const attr='data-id="'+dish.id+'" aria-label="';
     return '<div class="queue" data-id="'+dish.id+'"><i class="seq">'+(i+1)+'</i><div class="detail"><span class="name">'+dish.name+'</span><div class="desc">'+qty+' 份　¥'+qty*dish.price+'</div><span class="course">'+courseLabel(dish,i)+'</span></div>'+action("up","↑","ctrl",attr+'上移'+dish.name+'" '+(i===0?'disabled':''))+action("down","↓","ctrl",attr+'下移'+dish.name+'" '+(i===order.length-1?'disabled':''))+'<button type="button" class="queue-grip" aria-label="调整'+dish.name+'顺序，拖动或使用上下方向键" '+(order.length===1?'disabled':'')+'>≡</button></div>';
-  }).join("")+'</div>',summary()+action("serve","交后厨出菜","primary")];
+  }).join("")+'</div>',summary()+(order.length>=2?tutorialNote("拖住菜名右侧 ≡ 排序，凉菜 → 热菜 → 汤品。"):"")+action("serve","交后厨出菜","primary")];
 }
 // 只移动被越过的相邻行，抓手及其父行一直连在原节点上，持续捕获同一指针。
 let queueDrag=null;
@@ -2320,7 +2382,7 @@ function showShareContent(model){
     shareBeat:"击败全国 "+model.percentile+"% 经手人",shareQuote:model.quote,
     shareMessage:model.text.endsWith(model.url)?model.text.slice(0,-model.url.length).trimEnd():model.text,
     shareCopy:"一键复制战报与链接",shareStatus:"",
-    shareContinue:dailyExam?"收好战报 · 返回封面":activeSideQuest?continueMainLabel():!model.passed?"关闭弹窗 · 返回复盘":
+    shareContinue:(dailyExam||sideFromCover||firstOrderReplay)?"收好战报 · 返回封面":activeSideQuest?continueMainLabel():!model.passed?"关闭弹窗 · 返回复盘":
       progress.level>lastLevel?"收下喜报 · 自由接单":"收下喜报 · 继续闯第 "+progress.level+" 关"
   };
   for(const [id,value] of Object.entries(fields))document.getElementById(id).textContent=value;
@@ -2365,7 +2427,7 @@ function grade(){
     (otherAwards.length?'<p class="more-awards">同单另记：'+otherAwards.join('、')+'</p>':'')+'</header>';
   const result=report.campaignWon?'八关通关 · 首席司长荣誉':report.passed?'闯关成功':'差 '+(report.passScore-report.score)+' 分过关';
   const nextLevel=Math.max(progress.level,report.level+(report.passed?1:0));
-  const next=dailyExam?"返回封面":activeSideQuest?continueMainLabel():nextLevel>lastLevel?'自由接单 · 再来一桌':nextLevel>report.level?'撕开第 '+nextLevel+' 关派单':'重考第 '+report.level+' 关';
+  const next=(dailyExam||sideFromCover||firstOrderReplay)?"返回封面":activeSideQuest?continueMainLabel():nextLevel>lastLevel?'自由接单 · 再来一桌':nextLevel>report.level?'撕开第 '+nextLevel+' 关派单':'重考第 '+report.level+' 关';
   const foot='<div class="exam-line"><b>'+result+'</b><span>'+deskRoundLabel(report.level)+' · 过关线 '+report.passScore+' 分</span></div>';
   const banner='<div class="percentile">击败全国 '+report.percentile+'% 经手人</div>';
   const bars='<div class="bars">'+report.dimensions.map(x=>'<div class="bar"><span>'+x.label+'</span><div class="track"><i style="width:'+x.value+'%"></i></div><b>'+x.value+'</b></div>').join('')+'</div>';
@@ -2417,6 +2479,9 @@ function returnToCover(){
   shareTimer=0;shareDue=false;awardNoticePending=false;
   dailyExam=null;
   receiptPrintPending=false;
+  activeSideQuest=null;
+  sideFromCover=false;
+  firstOrderReplay=false;
   stage="cover";
   pad.classList.remove("back");
   render(true);
@@ -2479,7 +2544,7 @@ function maybeTableEvent(){
   const rng=dailyExam?createSeededRng(dailyExam.seed^0x65766e74):Math.random;
   return rng()<0.55&&triggerTableEvent(rng);
 }
-async function draw(exam=null){
+async function draw(exam=null,sideQuest=null,replayFirst=false){
   if(turningPage)return;
   turningPage=true;
   sheetFace.inert=true;
@@ -2495,6 +2560,8 @@ async function draw(exam=null){
     }
     readProgress();
     dailyExam=exam;
+    sideFromCover=Boolean(sideQuest);
+    firstOrderReplay=replayFirst;
     if(dailyExam){
       const rng=createSeededRng(dailyExam.seed);
       activeSideQuest=null;
@@ -2503,7 +2570,16 @@ async function draw(exam=null){
       table=scene.tableNames[Math.floor(rng()*scene.tableNames.length)];
       number=String(Math.floor(100000+rng()*900000));
     }else{
-      scene=chooseNextScene();
+      if(sideQuest){
+        mainStageIdx=Math.min(progress.level,lastLevel);
+        roundLevel=mainStageIdx;
+        activeSideQuest=sideQuest;
+        scene=sideQuest;
+      }else if(firstOrderReplay){
+        activeSideQuest=null;
+        roundLevel=1;
+        scene=drawScenario(roundLevel,scene);
+      }else scene=chooseNextScene();
       table=pick(scene.tableNames);
       number=serial();
     }
@@ -2537,7 +2613,14 @@ document.addEventListener("click",e=>{
   SoundFX.unlock();
   if(turningPage||queueDrag)return;
   const a=b.dataset.act,id=b.dataset.id,idx=order.findIndex(x=>x.dish.id===id);
-  if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。交单后可在经理批注下方对照结账小票。</p><p>主线共八关，依次接待家常川菜、长辈寿宴、西关早茶、发薪前夜、重辣湘宴、商务请托、同学撸串和驻京办终宴。留意谁喝酒、汤何时上；粤闽的茶位按人数入账。主线第 2 至 7 关过关后，下一张派单有四成机会夹进快餐支线，每种每次会话最多遇到一次。支线结账后继续原关。第八关达标后可自由接单。</p><p>关卡与 '+ACHIEVEMENTS.length+' 枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
+  if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。交单后可在经理批注下方对照结账小票。</p><p>主线共八关，依次接待家常川菜、长辈寿宴、西关早茶、发薪前夜、重辣湘宴、商务请托、同学撸串和驻京办终宴。留意谁喝酒、汤何时上；粤闽的茶位按人数入账。主线第 2 至 7 关过关后，下一张派单有四成机会夹进快餐支线，每种每次会话最多遇到一次。支线结账后继续原关。封面纸签也能直接选快餐派单。过了首关还能回练，补盖首单成就。第八关达标后可自由接单。</p><p>关卡与 '+ACHIEVEMENTS.length+' 枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
+  if(a==="skip-tutorial"){
+    saveMark(tutorialSkipKey);
+    const next=b.closest(".foot")?.querySelector(".primary:not(:disabled)")||page.querySelector("h2");
+    b.closest(".tutorial-note")?.remove();
+    next?.focus({preventScroll:true});
+    return;
+  }
   if(a==="archive"){
     readProgress();updateTag();
     archivePages.innerHTML=archive();
@@ -2547,15 +2630,30 @@ document.addEventListener("click",e=>{
   if(a==="share")return openShare();
   if(a==="close-share")return shareModal.close();
   if(a==="share-continue"&&shareModal.open){
-    const proceed=stage==="report"&&(report?.passed||activeSideQuest||dailyExam);
+    const proceed=stage==="report"&&(report?.passed||activeSideQuest||dailyExam||firstOrderReplay);
     shareModal.close();
-    if(proceed)return dailyExam?returnToCover():draw();
+    if(proceed)return (dailyExam||sideFromCover||firstOrderReplay)?returnToCover():draw();
     return;
   }
   if(a==="copy-share")return copyShare();
   if(a==="save-share"&&activeShare)return saveShareImage(activeShare);
   if(a==="daily-exam"&&stage==="cover")return draw(todayExam());
-  if(a==="draw"&&(stage==="cover"||stage==="report"))return dailyExam?returnToCover():draw();
+  if(a==="side-entry"&&stage==="cover"){
+    SoundFX.tap();
+    const choices=SIDE_QUESTS.map(quest=>action("side-play",quest.title,"smallbtn",'data-id="'+quest.id+'"')).join("");
+    const replay=progress.level>1?action("first-replay","首单回练 · 楼下川菜馆"):"";
+    return modal(replay?"彩蛋与首单回练":"快餐彩蛋",'<div class="side-entry-list">'+choices+replay+'</div>');
+  }
+  if(a==="first-replay"&&stage==="cover"&&dialog.open&&progress.level>1){
+    dialog.close();
+    return draw(null,null,true);
+  }
+  if(a==="side-play"&&stage==="cover"&&dialog.open){
+    const quest=SIDE_QUESTS.find(item=>item.id===id);
+    if(quest){dialog.close();return draw(null,quest)}
+    return;
+  }
+  if(a==="draw"&&(stage==="cover"||stage==="report"))return (dailyExam||sideFromCover||firstOrderReplay)?returnToCover():draw();
   if(a==="brief"&&(stage==="brief"||stage==="menu")){
     SoundFX.tap();
     const open=b.getAttribute("aria-expanded")!=="true";
@@ -2696,7 +2794,7 @@ if(window.location.protocol==="http:"||window.location.protocol==="https:"){
 <noscript>
   <section style="max-width:420px;margin:24px auto;padding:16px;background:#f5ede0;color:#2b2520;font-family:serif;border:2px solid #9b352a">
     <h1>中国式饭局 · 点菜模拟器</h1>
-    <p>欢迎来到万家酒楼《点菜模拟器》在线网页小游戏。请开启浏览器的 JavaScript 以体验完整的复写纸联单勾菜、八大菜系动态水单、后厨上菜排序、经理红笔毒舌批注与 18 枚成就系统。</p>
+    <p>欢迎来到万家酒楼《点菜模拟器》在线网页小游戏。请开启浏览器的 JavaScript 以体验完整的复写纸联单勾菜、八大菜系动态水单、后厨上菜排序、经理红笔毒舌批注与 22 枚成就系统。</p>
     <p>项目开源地址：<a href="https://github.com/shaoxiangm/diancai-simulator">github.com/shaoxiangm/diancai-simulator</a></p>
   </section>
 </noscript>
