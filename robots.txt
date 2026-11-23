@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shaoxiangm.github.io/diancai-simulator/sitemap.xml
