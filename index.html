@@ -4,21 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#9b352a">
-<meta name="application-version" content="4.0.1">
+<meta name="application-version" content="4.0.3">
 <title>点菜模拟器 (Diancai Simulator) - 复古复写纸风格中国式饭局人情世故小游戏</title>
-<meta name="description" content="《点菜模拟器》是一款国营饭店复古复写纸风格的免费网页小游戏。体验中国式饭局人情世故：看人数卡预算、防隐蔽忌口、排上菜顺序、包厢圆桌拖拽排座次、解锁33枚奇葩成就，打开即玩。">
+<meta name="description" content="《点菜模拟器》是一款国营饭店复古复写纸风格的免费网页小游戏。体验中国式饭局人情世故：看人数卡预算、防隐蔽忌口、排上菜顺序、包厢圆桌拖拽排座次、解锁35枚奇葩成就，打开即玩。">
 <meta name="keywords" content="点菜模拟器, Diancai Simulator, 饭局模拟器, 排座次游戏, 网页小游戏, 独立游戏, 人情世故模拟器">
 <meta name="author" content="shaoxiangm">
 <link rel="canonical" href="https://shaoxiangm.github.io/diancai-simulator/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="点菜模拟器">
 <meta property="og:title" content="点菜模拟器 - 中国式饭局人情世故在线小游戏">
-<meta property="og:description" content="国营饭店复古复写纸双联单画风，体验点菜卡预算、圆桌排座次、防忌口与解锁33枚奇葩成就。">
+<meta property="og:description" content="国营饭店复古复写纸双联单画风，体验点菜卡预算、圆桌排座次、防忌口与解锁35枚奇葩成就。">
 <meta property="og:url" content="https://shaoxiangm.github.io/diancai-simulator/">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="点菜模拟器 · 中国式饭局在线小游戏">
-<meta name="twitter:description" content="八大菜系动态水单、33枚成就与经理红笔毒舌批注，来测测你的饭局情商。">
+<meta name="twitter:description" content="八大菜系动态水单、35枚成就与经理红笔毒舌批注，来测测你的饭局情商。">
 <style>
 :root{--paper:#f5ede0;--pink:#f3ddd6;--red:#9b352a;--line:#b88676;--green:#2b2520;--ink:#2b2520;--blue:#253c66;--pen:#b52b27;--muted:#6b5f52;--serif:"STSong","Songti SC","SimSun",serif;--hand:"KaiTi","STKaiti","FangSong",serif;--mono:"Courier New",monospace}
 *{box-sizing:border-box}
@@ -429,7 +429,7 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
     "点菜模拟器在线小游戏"
   ],
   "url": "https://shaoxiangm.github.io/diancai-simulator/",
-  "description": "复古复写纸风格中国式饭局人情世故模拟网页小游戏，包含八大菜系点单、圆桌排座次与33款成就系统。"
+  "description": "复古复写纸风格中国式饭局人情世故模拟网页小游戏，包含八大菜系点单、圆桌排座次与35款成就系统。"
 }
 </script>
 <script type="application/ld+json">
@@ -443,7 +443,7 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
     "中国式饭局点菜模拟器"
   ],
   "url": "https://shaoxiangm.github.io/diancai-simulator/",
-  "description": "一款基于复古复写纸点菜单体验的中国式饭局模拟网页小游戏，包含主线八大菜系接待关卡、快餐彩蛋、随机突发事件与33枚成就图鉴。",
+  "description": "一款基于复古复写纸点菜单体验的中国式饭局模拟网页小游戏，包含主线八大菜系接待关卡、快餐彩蛋、随机突发事件与35枚成就图鉴。",
   "genre": [
     "Simulation",
     "Casual",
@@ -495,7 +495,7 @@ body{height:auto;min-height:100dvh;overflow:auto}
         <p class="tiny" id="resumeNote" hidden>旧版成就已留档。新版八桌饭局从第一关开席。</p>
         <button class="primary cover-open" type="button" data-act="draw">翻开菜单 · 接第 1 关派单</button>
         <button class="smallbtn" type="button" data-act="daily-exam">今日全网统考</button>
-        <small class="cover-edition">4.0.1</small>
+        <small class="cover-edition">4.0.3</small>
       </div>
     </div>
   </section>
@@ -508,7 +508,7 @@ body{height:auto;min-height:100dvh;overflow:auto}
       <button class="smallbtn" data-act="help" aria-haspopup="dialog" aria-controls="dialog">玩法说明</button>
     </div>
     <span class="brand-level" id="tag-level">第 1 关 · 须达 60 分</span>
-    <button id="progress-tag" class="archive-link" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-count">成就 0/33</span></button>
+    <button id="progress-tag" class="archive-link" data-act="archive" aria-haspopup="dialog" aria-controls="achModal" title="经理成就档案"><span id="tag-count">成就 0/35</span></button>
   </header>
   <div id="page"></div>
   </div>
@@ -727,8 +727,21 @@ const TEA_DIMSUM=[
   id,name,price,spec,portion,prestige,edibility,heaviness,ingredientType,cookMethod,tags,menuDesc,
   category:"广式茶点",regions:["guangfu"],minTier:"mid_high",spicy:0
 }));
+const CANTEEN_MENU=[
+  ["灵魂白米饭（二两）",1,"主食汤饮","二两装","staple","steamed","canteen_staple","不锈钢大蒸箱现盛，管饱基石，饭量大可点两份。"],
+  ["青椒土豆丝",2,"食堂素菜","一勺装","veg","stir_fry","canteen_veg","食堂性价比之王，刀工粗细全看切配师傅当天心情。"],
+  ["清炒油麦菜",2,"食堂素菜","一勺装","veg","stir_fry","canteen_veg","绿叶菜担当，油水略足，胜在便宜解腻。"],
+  ["西红柿炒鸡蛋",4,"食堂荤菜","一勺装","veg","stir_fry","canteen_half","国民下饭神菜，八分番茄两分蛋，汤汁拌饭一绝。"],
+  ["糖醋里脊（面粉版）",6,"食堂荤菜","一勺装","pork","pan_fry","canteen_meat","七分炸面糊三分里脊肉，但裹满糖醋汁照样香迷糊。"],
+  ["红烧大鸡腿",7,"食堂荤菜","整只装","poultry","braised","canteen_meat","食堂窗口的硬通货，阿姨铁勺一抖，全看你跟她熟不熟。"],
+  ["橘子炒月饼",5,"食堂荤菜","周三限定新品","pastry","stir_fry","canteen_dark","周三食堂大师傅研发新品，金黄橘瓣配五仁月饼，酸甜咸香直击天灵盖。"],
+  ["自取紫菜汤",0,"主食汤饮","大桶免费自取","soup","soup","canteen_free","窗口旁不锈钢大桶自取，去晚了只能捞到两片紫菜和葱花水。",1]
+].map(([name,price,category,spec,ingredientType,cookMethod,tag,menuDesc,maxQty],index)=>({
+  id:"canteen_"+String(index+1).padStart(2,"0"),name,price,category,spec,ingredientType,cookMethod,
+  tags:[tag],menuDesc,maxQty
+}));
 const MENU_CATEGORIES=["广式茶点","海鲜水产","招牌硬菜","热炒小菜","砂锅炖煲","时令素菜","汤羹主食","凉菜卤味","酒水饮品","餐位杂项",
-  ...new Set(SP_MENUS.flatMap(menu=>menu.dishes.map(d=>d.category)))
+  ...new Set(SP_MENUS.flatMap(menu=>menu.dishes.map(d=>d.category))),"食堂荤菜","食堂素菜","主食汤饮"
 ];
 
 // ==================== [MODULE 2: SCENARIOS_DB] 剧本与本店水单 ====================
@@ -805,15 +818,25 @@ const SIDE_QUESTS=[
     tableNames:["靠窗双人桌"],regionLabel:"快餐堂食",tierLabel:"1+1 随心配",
     guestsSummary:"你和室友，两人各吃一套。",
     brief:"月底钱包见底，你和室友走进银拱门快餐厅点“1+1 随心配”（1份白区主食 ¥9 + 1份红区小食 ¥5）。两人必须严格凑齐【2白 + 2红】组合！"
+  },{
+    id:"sp_canteen",title:"第三食堂 · 周三打饭窗口",restaurantName:"三食堂二楼 · 营养快餐窗",headcount:1,budgetMin:0,budgetMax:15,
+    tableNames:["不锈钢餐盘位"],regionLabel:"高校食堂",tierLabel:"一卡通限额 ¥15",
+    guestsSummary:"刚下完周三上午满课的你，一个人端着不锈钢餐盘排队打饭。",
+    brief:"刚下完周三上午的满课，你饿着肚子冲进三食堂。掏出校园一卡通一刷——余额只剩 ¥15！打饭阿姨正拿着大铁勺盯着你：「后面还排着长队呢，快点，主食、荤菜、素菜自己搭，别刷超了！」"
   }
 ].map(s=>({...s,isSideQuest:true,mode:s.id,region:"fast_food",guestTraits:{},purpose:s.brief}));
 
-function selectSideQuest(completedLevel,seenIds,random=Math.random){
+const CANTEEN_QUEST=SIDE_QUESTS.find(quest=>quest.id==="sp_canteen");
+const isWednesday=(now=new Date())=>now.getDay()===3;
+function rotationSideQuests(now){
+  return isWednesday(now)?SIDE_QUESTS.filter(quest=>quest!==CANTEEN_QUEST):SIDE_QUESTS;
+}
+function selectSideQuest(completedLevel,seenIds,random=Math.random,now=new Date()){
   if(!Number.isInteger(completedLevel)||completedLevel<3||completedLevel===7||completedLevel===8)return null;
   const freePlay=completedLevel>8;
   const seen=new Set(seenIds);
-  if(completedLevel===3&&seen.size)return null;
-  const remaining=SIDE_QUESTS.filter(quest=>!seen.has(quest.id));
+  if(completedLevel===3&&[...seen].some(id=>id!==CANTEEN_QUEST.id))return null;
+  const remaining=rotationSideQuests(now).filter(quest=>!seen.has(quest.id));
   const chance=freePlay?0.35:completedLevel===3||completedLevel===6?1:0.3;
   if(!remaining.length||(chance<1&&random()>=chance))return null;
   return remaining[Math.floor(random()*remaining.length)];
@@ -962,6 +985,7 @@ const FRUGAL_FREEBIES=[
 
 const TEA_HOUSE_DISH_IDS=new Set(["dish_19","dish_26","dish_37","dish_39","dish_44","dish_89","dish_94","dish_95"]);
 function buildStoreMenu(scenario,allDishes=DISHES){
+  if(scenario.id===CANTEEN_QUEST.id)return CANTEEN_MENU.slice();
   if(scenario.isSideQuest){
     const menu=SP_MENUS.find(m=>m.id===scenario.id);
     return menu?menu.dishes.slice():[];
@@ -1093,7 +1117,11 @@ const ACHIEVEMENTS=[
   {id:'ach_cart_guard',type:'regular',priority:102,name:'护盘侠',description:'在「共享点餐保卫战」中删掉全部偷塞进来的刺客菜并过关。',
     clue:'队友扫码疯狂加贵菜时，手速要够快。',comment:'手速快得出了残影，愣是没让一只大龙虾混进结账单。队友直呼扫兴，你的钱包长舒一口气。'},
   {id:'ach_cart_sucker',type:'secret',priority:105,name:'冤大头提款机',description:'在「共享点餐保卫战」中漏掉至少 3 道刺客菜被塞进账单。',
-    clue:'共享购物车开启时，放任队友自由发挥。',comment:'眼睁睁看着兄弟们往购物车里塞龙虾和茅台，你在一旁微笑点头。自动提款机成精了也就你这样。'}
+    clue:'共享购物车开启时，放任队友自由发挥。',comment:'眼睁睁看着兄弟们往购物车里塞龙虾和茅台，你在一旁微笑点头。自动提款机成精了也就你这样。'},
+  {id:'ach_canteen_pro',type:'regular',priority:102,name:'食堂精算师',description:'在第三食堂用 ¥15 校园卡余额配齐主食、荤菜与素菜并过关。',
+    clue:'一卡通只剩十五块，主食、荤菜、素菜一样别落下。',comment:'十五块钱吃出一荤一素一汤一饭，一卡通余额卡得比高数微积分还准，食堂阿姨都没机会对你手抖。'},
+  {id:'ach_dark_cuisine',type:'secret',priority:105,name:'黑暗料理勇者',description:'在第三食堂点出周三研发新品《橘子炒月饼》且未刷爆一卡通。',
+    clue:'周三食堂大师傅刚端出一盆神秘水果月饼新品，敢不敢刷卡尝鲜？',comment:'大师傅刚端出这盆橘子炒月饼，全食堂没一个人敢伸筷子，你倒好，刷卡刷得比谁都干脆。这胃口，铁打的。'}
 ];
 const RANK_TIERS=[
   {max:39,rank:'试用期端茶小弟',stampNote:'考核未过'},
@@ -1178,6 +1206,26 @@ function judgeSideQuest(scenario,order,level){
       score=35;reason='套餐配错了';
       text='连 1+1 随心配的【一白配一红】死规矩都敢打破，银拱门点餐机都要被你按冒烟了！';
     }
+  }else if(scenario.id===CANTEEN_QUEST.id){
+    const tags=new Set(items.flatMap(row=>row.dish.tags));
+    const hasStaple=tags.has('canteen_staple'),pureMeat=tags.has('canteen_meat');
+    const pureVeg=tags.has('canteen_veg'),halfDish=tags.has('canteen_half'),hasDark=tags.has('canteen_dark');
+    const balanced=(pureMeat&&pureVeg)||(halfDish&&(pureMeat||pureVeg));
+    const budgetScore=difference>0?Math.max(15,98-8*difference):100;
+    checks=[['一卡通余额',budgetScore],['主食搭配',hasStaple?100:0],
+      ['荤菜搭配',pureMeat||halfDish?100:0],['素菜搭配',pureVeg||halfDish?100:0],
+      ['餐盘搭配',balanced||hasDark?100:0]];
+    if(difference>0){
+      score=budgetScore;reason='校园卡余额不足';
+      text='校园一卡通余额不足！阿姨面无表情把你的餐盘扣了下来，身后排队的同学发出了催促的叹息。';
+    }else if(hasDark){
+      score=98;awardId='ach_dark_cuisine';reason='新品破例放行';
+    }else if(hasStaple&&balanced){
+      score=difference===0?100:98;awardId='ach_canteen_pro';reason='一卡通核账通过';
+    }else{
+      score=45;reason='主食荤素没配齐';
+      text='打饭讲究有饭有荤有素，光打白米饭或全点素菜，下午满课可扛不住。';
+    }
   }else{
     throw new RangeError('未知的支线派单：'+scenario.id);
   }
@@ -1203,7 +1251,7 @@ function judge(scenario, order, options={}) {
   const cartSucker=cartGameResult?.leaked>=3;
   const bill=purchases.reduce((sum,row)=>sum+orderLineTotal(scenario,row),fee?orderLineTotal(scenario,fee):0);
   // 茶位参与对账，仍可在没有菜品与饮品时交白卷。
-  if(!purchases.length){
+  if(!purchases.length&&scenario.id!==CANTEEN_QUEST.id){
     const blank=ACHIEVEMENTS.find(a=>a.id==='ach_zero_dish');
     const notes=[{priority:blank.priority,dish:mainMode?blank.name:'本桌水单',reason:'交白卷',text:blank.comment,good:false}];
     const achievements=mainMode?[blank.id]:[];
@@ -1890,7 +1938,8 @@ function readSideSession(){
       for(const quest of SIDE_QUESTS)if(saved.seen.includes(quest.id))state.seen.add(quest.id);
     }
     const next=saved?.pending;
-    if(next&&state.seen.has(next.id)&&Number.isInteger(next.mainStageIdx)&&next.mainStageIdx>=4&&next.mainStageIdx<=lastLevel+1)
+    const earliestStage=next?.id===CANTEEN_QUEST.id?2:4;
+    if(next&&state.seen.has(next.id)&&Number.isInteger(next.mainStageIdx)&&next.mainStageIdx>=earliestStage&&next.mainStageIdx<=lastLevel+1)
       state.pending={id:next.id,mainStageIdx:next.mainStageIdx};
   }catch{}
   return state;
@@ -1907,17 +1956,28 @@ function reserveSideQuest(quest){
   sideSession.seen.add(quest.id);
   saveSideSession({id:quest.id,mainStageIdx:progress.level});
 }
+function canEnterWednesdayCanteen(){
+  return progress.level>1&&isWednesday()&&!sideSession.seen.has(CANTEEN_QUEST.id);
+}
 function chooseNextScene(){
   let nextSide=resumedSide();
   if(!nextSide&&sideSession.pending)saveSideSession(null);
+  if(stage==="cover"&&canEnterWednesdayCanteen()){
+    // 已留单但尚未结账的旧支线退回原抽签池，让特辑结账后直接接回主线。
+    if(nextSide)sideSession.seen.delete(nextSide.id);
+    nextSide=CANTEEN_QUEST;
+    reserveSideQuest(nextSide);
+  }
   if(!nextSide&&stage==="report"&&!activeSideQuest&&report?.passed){
     const eligible=report.freePlay?progress.level>lastLevel:progress.level===report.level+1;
     if(eligible){
-      if(report.freePlay&&sideSession.seen.size===SIDE_QUESTS.length){
-        sideSession.seen.clear();
+      const now=new Date();
+      if(report.freePlay&&rotationSideQuests(now).every(quest=>sideSession.seen.has(quest.id))){
+        // 旧支线继续轮抽，第三食堂每个会话只出现一次。
+        for(const quest of SIDE_QUESTS)if(quest!==CANTEEN_QUEST)sideSession.seen.delete(quest.id);
         saveSideSession(null);
       }
-      nextSide=selectSideQuest(report.level,sideSession.seen);
+      nextSide=selectSideQuest(report.level,sideSession.seen,Math.random,now);
       if(nextSide)reserveSideQuest(nextSide);
     }
   }
@@ -2162,9 +2222,12 @@ async function turnInOrder(){
       saveMark(campaignKey+"pass."+roundLevel);
       progress.level=Math.max(progress.level,roundLevel+1);
       // 过关时先留好保底支线，结算页刷新后仍能取到这张单。
-      if(progress.level===roundLevel+1&&(roundLevel===3||roundLevel===6)){
-        const quest=selectSideQuest(roundLevel,sideSession.seen);
-        if(quest)reserveSideQuest(quest);
+      if(progress.level===roundLevel+1){
+        if(roundLevel===1&&canEnterWednesdayCanteen())reserveSideQuest(CANTEEN_QUEST);
+        else if(roundLevel===3||roundLevel===6){
+          const quest=selectSideQuest(roundLevel,sideSession.seen);
+          if(quest)reserveSideQuest(quest);
+        }
       }
     }else{
       saveMark(campaignKey+"retry."+roundLevel);
@@ -2312,7 +2375,11 @@ async function copyShare(){
 function action(act,label,cls="smallbtn",attrs=""){
   return '<button class="'+cls+'" data-act="'+act+'" '+attrs+'>'+label+'</button>';
 }
-function ticket(title){return '<div class="ticket"><span>'+title+'</span><b>'+(dailyExam?'今日统考 · ':'')+'№ '+number+'</b></div>'}
+function ticket(title){
+  let prefix=dailyExam?'今日统考 · ':'';
+  if(scene?.id===CANTEEN_QUEST.id&&(stage==="brief"||stage==="menu")&&isWednesday())prefix='周三特供 · ';
+  return '<div class="ticket"><span>'+title+'</span><b>'+prefix+'№ '+number+'</b></div>';
+}
 function meta(){
   return '<div class="meta">'+[["台号",table||"待派"],["人数",scene?scene.headcount+" 位":"待定"],["经手人","玩家"],["单号",number]].map(([k,v])=>'<div>'+k+'<b>'+v+'</b></div>').join("")+'</div>';
 }
@@ -2359,7 +2426,10 @@ function renderCover(){
   bookCover.inert=false;
   bookCover.querySelector('[data-act="daily-exam"]').textContent="今日全网统考（"+todayExam().label+"）";
   bookCover.querySelector("#resumeNote").hidden=progress.level!==1||!(hasMark("campaign8.pass.1")||hasMark("pass.1"));
-  bookCover.querySelector(".cover-open").textContent=resumedSide()?"翻开菜单 · 继续支线彩蛋":progress.level>lastLevel?"翻开菜单 · 自由接单":"翻开菜单 · 接第 "+progress.level+" 关派单";
+  let startLabel=progress.level>lastLevel?"自由接单":"接第 "+progress.level+" 关派单";
+  if(canEnterWednesdayCanteen())startLabel="周三食堂特辑";
+  else if(resumedSide())startLabel="继续支线彩蛋";
+  bookCover.querySelector(".cover-open").textContent="翻开菜单 · "+startLabel;
   const bookmark=bookCover.querySelector("#cover-bookmark");
   bookmark.hidden=!challenge;
   if(challenge){
@@ -3560,7 +3630,7 @@ async function draw(exam=null){
     soldOutIds.clear();
     menuEdits=0;menuElapsed=0;menuStarted=null;
     order=initialOrderFor(scene,storeMenu);
-    cat={tea:"广式茶点",frugal:"汤羹主食"}[scene.mode]??cats.find(c=>storeMenu.some(d=>menuCategoryLabel(d)===c));
+    cat={tea:"广式茶点",frugal:"汤羹主食",sp_canteen:"食堂荤菜"}[scene.mode]??cats.find(c=>storeMenu.some(d=>menuCategoryLabel(d)===c));
     reviewingOrder=false;categoryScroll=0;
     lastBudgetSum=total();
     lastBudgetPct=budgetPct(lastBudgetSum,scene.budgetMax);
@@ -3610,7 +3680,7 @@ document.addEventListener("click",e=>{
       return settle(true);
     }
   }
-  if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。交单后可在经理批注下方对照结账小票。</p><p>主线共八关，依次接待家常川菜、西关早茶、发薪前夜、同学撸串、长辈寿宴、重辣湘宴、商务请托和驻京办终宴。留意谁喝酒、汤何时上；粤闽的茶位按人数入账。主线第 3 关过后会插一张快餐水单，第 6 关过后若还有没遇到的支线，再保底插一张。第 4、5 关过关后有三成机会遇到剩余支线。第 8 关达标后可以自由接单，自由局过关后有 35% 机会插入支线，两种都遇到过就重新轮抽。支线结账后接回原来的派单。</p><p>第 7、8 关在后厨打开「包厢座次」，把托盘铭牌拖到座位，或先点铭牌再点座位。也可以互换座次，或拖回托盘撤回。第 4、7 关出菜前还有三回合抢买单。第 4 关与部分自由局会遇到共享点餐，赶在倒计时结束前删掉队友加的贵菜。</p><p>关卡与 '+ACHIEVEMENTS.length+' 枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
+  if(a==="help")return modal("接单须知 · "+gameVersion,'<p>先看人数、预算和忌口。点菜名或速写可看做法，用＋、−改份数。勾完可查「已点菜单」，再按住后厨的「≡」排上菜次序。交单后可在经理批注下方对照结账小票。</p><p>主线共八关，依次接待家常川菜、西关早茶、发薪前夜、同学撸串、长辈寿宴、重辣湘宴、商务请托和驻京办终宴。留意谁喝酒、汤何时上；粤闽的茶位按人数入账。周三第一次通过第 1 关会接到第三食堂彩蛋，已过第 1 关的玩家可从封面直接开食堂特辑。平日食堂也参与支线轮抽。第 3、6 关后有保底支线，第 4、5 关过关后有三成机会遇到剩余支线。第 8 关达标后可以自由接单，自由局过关后有 35% 机会插入支线。支线结账后接回原来的派单。</p><p>第 7、8 关在后厨打开「包厢座次」，把托盘铭牌拖到座位，或先点铭牌再点座位。也可以互换座次，或拖回托盘撤回。第 4、7 关出菜前还有三回合抢买单。第 4 关与部分自由局会遇到共享点餐，赶在倒计时结束前删掉队友加的贵菜。</p><p>关卡与 '+ACHIEVEMENTS.length+' 枚成就保存在当前浏览器。连续三桌首次交单即过关可获三连胜，中途重开会打断连胜。</p>');
   if(a==="skip-tutorial"){
     saveMark(tutorialSkipKey);
     const next=b.closest(".foot")?.querySelector(".primary:not(:disabled)")||page.querySelector("h2");
@@ -3803,7 +3873,7 @@ if(window.location.protocol==="http:"||window.location.protocol==="https:"){
 <noscript>
   <section style="max-width:420px;margin:24px auto;padding:16px;background:#f5ede0;color:#2b2520;font-family:serif;border:2px solid #9b352a">
     <h1>中国式饭局 · 点菜模拟器</h1>
-    <p>《点菜模拟器》（Diancai Simulator）是一款免费的中国式饭局网页小游戏。先看人数和预算，在复古复写纸联单上勾选八大菜系的菜品，避开宾客忌口，排好上菜顺序，并在包厢圆桌拖拽安排座次。结算可查看经理批注、热敏小票，收集 33 枚成就。请开启浏览器的 JavaScript 开始游戏。</p>
+    <p>《点菜模拟器》（Diancai Simulator）是一款免费的中国式饭局网页小游戏。先看人数和预算，在复古复写纸联单上勾选八大菜系的菜品，避开宾客忌口，排好上菜顺序，并在包厢圆桌拖拽安排座次。结算可查看经理批注、热敏小票，收集 35 枚成就。请开启浏览器的 JavaScript 开始游戏。</p>
     <p>项目开源地址：<a href="https://github.com/shaoxiangm/diancai-simulator">github.com/shaoxiangm/diancai-simulator</a></p>
   </section>
 </noscript>
