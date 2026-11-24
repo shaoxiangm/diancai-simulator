@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#9b352a">
-<meta name="application-version" content="4.0.0-beta">
+<meta name="application-version" content="4.0.1">
 <title>点菜模拟器 · 中国式饭局人情世故在线小游戏</title>
 <meta name="description" content="《点菜模拟器》是一款免费的复古复写纸风格中国式饭局网页小游戏。涵盖八大菜系与门店档次隔离、33枚奇葩成就、后厨排单与经理毒舌批注，考验你的预算把控与酒桌人情世故。">
 <meta name="keywords" content="点菜模拟器,中国式饭局模拟器,点菜小游戏,网页小游戏,人情世故模拟器,HTML5小游戏,饭局点菜">
@@ -331,9 +331,14 @@ dialog{color:var(--ink);width:min(345px,92vw);max-height:80dvh;padding:21px;back
 @media(max-width:350px){.body{padding-inline:14px}.brand{margin-inline:14px}.foot{padding-inline:14px}.meta b{margin-left:4px}.tab{font-size:12px}}
 @media(prefers-reduced-motion:reduce){*,*::after{animation-duration:.001ms!important;transition:none!important}}
 .sheet-face{--face:var(--paper);position:relative;display:flex;flex:1;min-height:0;flex-direction:column;background-color:var(--face);background-image:inherit;transform-origin:8px 0}
-.kitchen-pass-overlay{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:16px;background:color-mix(in srgb,var(--paper) 80%,transparent)}
+.kitchen-pass-overlay{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;background:color-mix(in srgb,var(--paper) 82%,transparent)}
 .kitchen-pass-card{width:min(100%,290px);padding:16px;background:var(--paper);border:4px double var(--red);box-shadow:0 4px 13px color-mix(in srgb,var(--ink) 16%,transparent)}
 .kitchen-pass-card h3{color:var(--red);font-size:19px}
+.kitchen-ad-banner{position:relative;flex:none;width:min(100%,300px);height:80px;padding:18px 12px 8px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:repeating-linear-gradient(-45deg,#9b352a08 0 6px,transparent 6px 12px),var(--paper);border:1.5px dashed var(--red);border-radius:3px;box-shadow:0 3px 10px color-mix(in srgb,var(--ink) 12%,transparent)}
+.kitchen-ad-banner .ad-badge{position:absolute;left:6px;top:5px;padding:1px 5px;border-radius:2px;background:#2b2520b8;color:#fff7e8;font:700 10px/1.2 var(--mono);letter-spacing:.04em}
+.kitchen-ad-banner .ad-tag{position:absolute;right:7px;top:5px;color:var(--muted);font:600 10px/1.2 var(--serif)}
+.kitchen-ad-banner strong{color:var(--red);font:900 16px/1.25 var(--serif);letter-spacing:.08em}
+.kitchen-ad-banner span.ad-sub{margin-top:3px;color:var(--blue);font:700 12px/1.25 var(--hand)}
 .kitchen-pass-steps{list-style:none;margin:10px 0 0;padding:0}
 .kitchen-pass-steps li{padding:6px 0;border-top:1px dotted var(--line);color:var(--muted);font:700 15px/1.45 var(--hand);opacity:.56}
 .kitchen-pass-steps li.on{color:var(--blue);opacity:1}
@@ -477,7 +482,7 @@ body{height:auto;min-height:100dvh;overflow:auto}
         <p class="tiny" id="resumeNote" hidden>旧版成就已留档。新版八桌饭局从第一关开席。</p>
         <button class="primary cover-open" type="button" data-act="draw">翻开菜单 · 接第 1 关派单</button>
         <button class="smallbtn" type="button" data-act="daily-exam">今日全网统考</button>
-        <small class="cover-edition">4.0.0 beta</small>
+        <small class="cover-edition">4.0.1</small>
       </div>
     </div>
   </section>
@@ -2077,6 +2082,9 @@ async function settle(zeroOrder=false){
   nextReportDialog();
 }
 async function runKitchenPass(scene,order){
+  const motion=matchMedia("(prefers-reduced-motion: reduce)");
+  if(isZeroOrder(order)||motion.matches)return;
+
   if(typeof window.onBeforeKitchenServe==="function"){
     try{
       await window.onBeforeKitchenServe({scene,order,roundLevel});
@@ -2085,13 +2093,13 @@ async function runKitchenPass(scene,order){
       // 第三方插屏失败时，仍继续完成出单。
     }
   }
-  const motion=matchMedia("(prefers-reduced-motion: reduce)");
-  if(motion.matches)return;
-
   const overlay=document.createElement("div");
   overlay.className="kitchen-pass-overlay";
   overlay.innerHTML='<div class="kitchen-pass-card"><h3>后厨出单传菜</h3><ol class="kitchen-pass-steps">'+
-    '<li>① 粉联传后厨 · 灶台点火</li><li>② 猛火现烹中 · 装盘走菜</li><li>③ 整席上齐 · 经理验单</li></ol></div>';
+    '<li>① 粉联传后厨 · 灶台点火</li><li>② 猛火现烹中 · 装盘走菜</li><li>③ 整席上齐 · 经理验单</li></ol></div>'+
+    '<aside class="kitchen-ad-banner" id="ad-slot-kitchen-banner" aria-label="广告位招租">'+
+    '<span class="ad-badge">AD · 广告</span><span class="ad-tag">黄金展位</span>'+
+    '<strong>黄金广告位招租</strong><span class="ad-sub">诚邀餐饮 / 酒水 / 外卖金主入驻 · GitHub @shaoxiangm</span></aside>';
   sheetFace.append(overlay);
   const steps=overlay.querySelectorAll("li"),beatTimes=[0,420,850,1300];
   const started=performance.now();
@@ -2107,7 +2115,7 @@ async function runKitchenPass(scene,order){
   }
 }
 async function turnInOrder(){
-  await runKitchenPass(scene,order);
+  if(!isZeroOrder())await runKitchenPass(scene,order);
   readProgress();
   const freePlay=!dailyExam&&!activeSideQuest&&roundLevel>lastLevel;
   const run=freePlay?readFreeRun():null;
@@ -2497,8 +2505,8 @@ function dishRow(d){
     '<div class="dish-sale"><span class="price">¥'+d.price+'</span>'+check+'</div>'+
     '<div class="dish-desc" id="'+detailsId+'" aria-hidden="'+!open+'"><span>'+d.menuDesc+'</span></div>'+quantity+note+'</article>';
 }
-function isZeroOrder(){
-  return !order.some(({dish,qty})=>qty>0&&!dish.tags.includes("tea_fee"));
+function isZeroOrder(entries=order){
+  return !entries.some(({dish,qty})=>qty>0&&!dish.tags.includes("tea_fee"));
 }
 function menu(){
   const frugal=scene.mode==="frugal";
